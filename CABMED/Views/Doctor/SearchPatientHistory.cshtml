@@ -1,0 +1,43 @@
+@model IEnumerable<CABMED.Models.Users>
+@{
+    ViewBag.Title = "Recherche patients";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container" style="margin-top:30px; max-width:900px;">
+    <h2>Recherche de patients</h2>
+    <p class="text-muted">Recherchez parmi vos patients par nom, prénom, email ou ID patient.</p>
+
+    @using (Html.BeginForm("SearchPatientHistory", "Doctor", FormMethod.Get))
+    {
+        <div class="input-group" style="max-width:500px;">
+            <input type="text" name="q" value="@Request["q"]" class="form-control" placeholder="Nom, email ou ID patient" />
+            <span class="input-group-btn">
+                <button class="btn btn-primary" type="submit">
+                    <span class="glyphicon glyphicon-search"></span> Rechercher
+                </button>
+            </span>
+        </div>
+    }
+
+    <hr />
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="list-group">
+            @foreach (var p in Model)
+            {
+                <a href="@Url.Action("PatientHistory", "Doctor", new { patientId = p.UserId })" class="list-group-item">
+                    <h4 class="list-group-item-heading">@p.Prenom @p.Nom <small>(ID: @p.UserId)</small></h4>
+                    <p class="list-group-item-text">@p.Email</p>
+                </a>
+            }
+        </div>
+    }
+    else if (!string.IsNullOrWhiteSpace(Request["q"]))
+    {
+        <div class="alert alert-info" style="margin-top:15px;">
+            <span class="glyphicon glyphicon-info-sign"></span> Aucun patient trouvé pour cette recherche.
+        </div>
+    }
+</div>

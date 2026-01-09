@@ -1,0 +1,68 @@
+@model CABMED.ViewModels.LoginViewModel
+
+@{
+    ViewBag.Title = "Connexion";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container" style="max-width: 520px; margin-top: 40px;">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Connexion</h3>
+        </div>
+        <div class="panel-body">
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success" role="alert">
+                    @TempData["SuccessMessage"]
+                </div>
+            }
+
+            @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+
+            @using (Html.BeginForm("Login", "Auth", FormMethod.Post, new { @class = "form" }))
+            {
+                @Html.AntiForgeryToken()
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Email)
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-envelope"></span>
+                        </span>
+                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control", autocomplete = "email", placeholder = "exemple@email.com" })
+                    </div>
+                    @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Password)
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-lock"></span>
+                        </span>
+                        @Html.PasswordFor(m => m.Password, new { @class = "form-control", autocomplete = "current-password", placeholder = "Mot de passe" })
+                    </div>
+                    @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block btn-lg">
+                    <span class="glyphicon glyphicon-log-in"></span> Se connecter
+                </button>
+            }
+
+            <hr />
+
+            <div class="text-center">
+                <p>Pas encore de compte patient ?</p>
+                <a href="@Url.Action("Register", "Auth")" class="btn btn-success">
+                    <span class="glyphicon glyphicon-user"></span> Créer un compte
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

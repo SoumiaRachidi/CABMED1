@@ -1,0 +1,515 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="CabinetModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Consultations">
+          <Key>
+            <PropertyRef Name="ConsultationId" />
+          </Key>
+          <Property Name="ConsultationId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="RendezVousId" Type="int" Nullable="false" />
+          <Property Name="MedecinId" Type="int" Nullable="false" />
+          <Property Name="Diagnostic" Type="varchar(max)" />
+          <Property Name="Notes" Type="varchar(max)" />
+          <Property Name="DateConsultation" Type="datetime" />
+        </EntityType>
+        <EntityType Name="Disponibilites">
+          <Key>
+            <PropertyRef Name="DisponibiliteId" />
+          </Key>
+          <Property Name="DisponibiliteId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="MedecinId" Type="int" Nullable="false" />
+          <Property Name="JourSemaine" Type="int" Nullable="false" />
+          <Property Name="HeureDebut" Type="time" Precision="7" Nullable="false" />
+          <Property Name="HeureFin" Type="time" Precision="7" Nullable="false" />
+          <Property Name="Type" Type="varchar" MaxLength="20" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Prescriptions">
+          <Key>
+            <PropertyRef Name="PrescriptionId" />
+          </Key>
+          <Property Name="PrescriptionId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ConsultationId" Type="int" Nullable="false" />
+          <Property Name="Medicament" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="Posologie" Type="varchar" MaxLength="255" Nullable="false" />
+        </EntityType>
+        <EntityType Name="RendezVous">
+          <Key>
+            <PropertyRef Name="RendezVousId" />
+          </Key>
+          <Property Name="RendezVousId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="PatientId" Type="int" Nullable="false" />
+          <Property Name="MedecinId" Type="int" Nullable="false" />
+          <Property Name="DateHeureDebut" Type="datetime" Nullable="false" />
+          <Property Name="DateHeureFin" Type="datetime" Nullable="false" />
+          <Property Name="Statut" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="Motif" Type="varchar(max)" />
+        </EntityType>
+        <EntityType Name="ResultatsExamens">
+          <Key>
+            <PropertyRef Name="ResultatId" />
+          </Key>
+          <Property Name="ResultatId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ConsultationId" Type="int" Nullable="false" />
+          <Property Name="TypeExamen" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="DateExamen" Type="date" Nullable="false" />
+          <Property Name="Fichier_URL" Type="varchar" MaxLength="512" />
+          <Property Name="CommentairesMedecin" Type="varchar(max)" />
+        </EntityType>
+        <EntityType Name="Users">
+          <Key>
+            <PropertyRef Name="UserId" />
+          </Key>
+          <Property Name="UserId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Nom" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="Prenom" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="Email" Type="varchar" MaxLength="150" Nullable="false" />
+          <Property Name="Telephone" Type="varchar" MaxLength="20" />
+          <Property Name="PasswordHash" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="Role" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="DateNaissance" Type="date" />
+          <Property Name="AntecedentsMedicaux" Type="varchar(max)" />
+          <Property Name="Specialite" Type="varchar" MaxLength="100" />
+          <Property Name="IsActive" Type="bit" />
+          <Property Name="CreatedAt" Type="datetime" />
+        </EntityType>
+        <Association Name="FK_Consultations_Medecin">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="Consultations" Type="Self.Consultations" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="Consultations">
+              <PropertyRef Name="MedecinId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Consultations_RendezVous">
+          <End Role="RendezVous" Type="Self.RendezVous" Multiplicity="1" />
+          <End Role="Consultations" Type="Self.Consultations" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="RendezVous">
+              <PropertyRef Name="RendezVousId" />
+            </Principal>
+            <Dependent Role="Consultations">
+              <PropertyRef Name="RendezVousId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Disponibilites_Medecin">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="Disponibilites" Type="Self.Disponibilites" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="Disponibilites">
+              <PropertyRef Name="MedecinId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Prescriptions_Consultations">
+          <End Role="Consultations" Type="Self.Consultations" Multiplicity="1" />
+          <End Role="Prescriptions" Type="Self.Prescriptions" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Consultations">
+              <PropertyRef Name="ConsultationId" />
+            </Principal>
+            <Dependent Role="Prescriptions">
+              <PropertyRef Name="ConsultationId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_RendezVous_Medecin">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="RendezVous" Type="Self.RendezVous" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="RendezVous">
+              <PropertyRef Name="MedecinId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_RendezVous_Patient">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="RendezVous" Type="Self.RendezVous" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="RendezVous">
+              <PropertyRef Name="PatientId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Resultats_Consultations">
+          <End Role="Consultations" Type="Self.Consultations" Multiplicity="1" />
+          <End Role="ResultatsExamens" Type="Self.ResultatsExamens" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Consultations">
+              <PropertyRef Name="ConsultationId" />
+            </Principal>
+            <Dependent Role="ResultatsExamens">
+              <PropertyRef Name="ConsultationId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="CabinetModelStoreContainer">
+          <EntitySet Name="Consultations" EntityType="Self.Consultations" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Disponibilites" EntityType="Self.Disponibilites" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Prescriptions" EntityType="Self.Prescriptions" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="RendezVous" EntityType="Self.RendezVous" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ResultatsExamens" EntityType="Self.ResultatsExamens" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Users" EntityType="Self.Users" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_Consultations_Medecin" Association="Self.FK_Consultations_Medecin">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Consultations" EntitySet="Consultations" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Consultations_RendezVous" Association="Self.FK_Consultations_RendezVous">
+            <End Role="RendezVous" EntitySet="RendezVous" />
+            <End Role="Consultations" EntitySet="Consultations" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Disponibilites_Medecin" Association="Self.FK_Disponibilites_Medecin">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Disponibilites" EntitySet="Disponibilites" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Prescriptions_Consultations" Association="Self.FK_Prescriptions_Consultations">
+            <End Role="Consultations" EntitySet="Consultations" />
+            <End Role="Prescriptions" EntitySet="Prescriptions" />
+          </AssociationSet>
+          <AssociationSet Name="FK_RendezVous_Medecin" Association="Self.FK_RendezVous_Medecin">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="RendezVous" EntitySet="RendezVous" />
+          </AssociationSet>
+          <AssociationSet Name="FK_RendezVous_Patient" Association="Self.FK_RendezVous_Patient">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="RendezVous" EntitySet="RendezVous" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Resultats_Consultations" Association="Self.FK_Resultats_Consultations">
+            <End Role="Consultations" EntitySet="Consultations" />
+            <End Role="ResultatsExamens" EntitySet="ResultatsExamens" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="CabinetModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Consultations">
+          <Key>
+            <PropertyRef Name="ConsultationId" />
+          </Key>
+          <Property Name="ConsultationId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="RendezVousId" Type="Int32" Nullable="false" />
+          <Property Name="MedecinId" Type="Int32" Nullable="false" />
+          <Property Name="Diagnostic" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="Notes" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="DateConsultation" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="Users" Relationship="Self.FK_Consultations_Medecin" FromRole="Consultations" ToRole="Users" />
+          <NavigationProperty Name="RendezVous" Relationship="Self.FK_Consultations_RendezVous" FromRole="Consultations" ToRole="RendezVous" />
+          <NavigationProperty Name="Prescriptions" Relationship="Self.FK_Prescriptions_Consultations" FromRole="Consultations" ToRole="Prescriptions" />
+          <NavigationProperty Name="ResultatsExamens" Relationship="Self.FK_Resultats_Consultations" FromRole="Consultations" ToRole="ResultatsExamens" />
+        </EntityType>
+        <EntityType Name="Disponibilites">
+          <Key>
+            <PropertyRef Name="DisponibiliteId" />
+          </Key>
+          <Property Name="DisponibiliteId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="MedecinId" Type="Int32" Nullable="false" />
+          <Property Name="JourSemaine" Type="Int32" Nullable="false" />
+          <Property Name="HeureDebut" Type="Time" Nullable="false" Precision="7" />
+          <Property Name="HeureFin" Type="Time" Nullable="false" Precision="7" />
+          <Property Name="Type" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
+          <NavigationProperty Name="Users" Relationship="Self.FK_Disponibilites_Medecin" FromRole="Disponibilites" ToRole="Users" />
+        </EntityType>
+        <EntityType Name="Prescriptions">
+          <Key>
+            <PropertyRef Name="PrescriptionId" />
+          </Key>
+          <Property Name="PrescriptionId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ConsultationId" Type="Int32" Nullable="false" />
+          <Property Name="Medicament" Type="String" MaxLength="255" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Posologie" Type="String" MaxLength="255" FixedLength="false" Unicode="false" Nullable="false" />
+          <NavigationProperty Name="Consultations" Relationship="Self.FK_Prescriptions_Consultations" FromRole="Prescriptions" ToRole="Consultations" />
+        </EntityType>
+        <EntityType Name="RendezVous">
+          <Key>
+            <PropertyRef Name="RendezVousId" />
+          </Key>
+          <Property Name="RendezVousId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="PatientId" Type="Int32" Nullable="false" />
+          <Property Name="MedecinId" Type="Int32" Nullable="false" />
+          <Property Name="DateHeureDebut" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="DateHeureFin" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="Statut" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Motif" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Consultations" Relationship="Self.FK_Consultations_RendezVous" FromRole="RendezVous" ToRole="Consultations" />
+          <NavigationProperty Name="Users" Relationship="Self.FK_RendezVous_Medecin" FromRole="RendezVous" ToRole="Users" />
+          <NavigationProperty Name="Users1" Relationship="Self.FK_RendezVous_Patient" FromRole="RendezVous" ToRole="Users" />
+        </EntityType>
+        <EntityType Name="ResultatsExamens">
+          <Key>
+            <PropertyRef Name="ResultatId" />
+          </Key>
+          <Property Name="ResultatId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ConsultationId" Type="Int32" Nullable="false" />
+          <Property Name="TypeExamen" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="DateExamen" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="Fichier_URL" Type="String" MaxLength="512" FixedLength="false" Unicode="false" />
+          <Property Name="CommentairesMedecin" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Consultations" Relationship="Self.FK_Resultats_Consultations" FromRole="ResultatsExamens" ToRole="Consultations" />
+        </EntityType>
+        <EntityType Name="Users">
+          <Key>
+            <PropertyRef Name="UserId" />
+          </Key>
+          <Property Name="UserId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Nom" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Prenom" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Email" Type="String" MaxLength="150" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Telephone" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="PasswordHash" Type="String" MaxLength="255" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Role" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="DateNaissance" Type="DateTime" Precision="0" />
+          <Property Name="AntecedentsMedicaux" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="Specialite" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="IsActive" Type="Boolean" />
+          <Property Name="CreatedAt" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="Consultations" Relationship="Self.FK_Consultations_Medecin" FromRole="Users" ToRole="Consultations" />
+          <NavigationProperty Name="Disponibilites" Relationship="Self.FK_Disponibilites_Medecin" FromRole="Users" ToRole="Disponibilites" />
+          <NavigationProperty Name="RendezVous" Relationship="Self.FK_RendezVous_Medecin" FromRole="Users" ToRole="RendezVous" />
+          <NavigationProperty Name="RendezVous1" Relationship="Self.FK_RendezVous_Patient" FromRole="Users" ToRole="RendezVous" />
+        </EntityType>
+        <Association Name="FK_Consultations_Medecin">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="Consultations" Type="Self.Consultations" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="Consultations">
+              <PropertyRef Name="MedecinId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Consultations_RendezVous">
+          <End Role="RendezVous" Type="Self.RendezVous" Multiplicity="1" />
+          <End Role="Consultations" Type="Self.Consultations" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="RendezVous">
+              <PropertyRef Name="RendezVousId" />
+            </Principal>
+            <Dependent Role="Consultations">
+              <PropertyRef Name="RendezVousId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Prescriptions_Consultations">
+          <End Role="Consultations" Type="Self.Consultations" Multiplicity="1" />
+          <End Role="Prescriptions" Type="Self.Prescriptions" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Consultations">
+              <PropertyRef Name="ConsultationId" />
+            </Principal>
+            <Dependent Role="Prescriptions">
+              <PropertyRef Name="ConsultationId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Resultats_Consultations">
+          <End Role="Consultations" Type="Self.Consultations" Multiplicity="1" />
+          <End Role="ResultatsExamens" Type="Self.ResultatsExamens" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Consultations">
+              <PropertyRef Name="ConsultationId" />
+            </Principal>
+            <Dependent Role="ResultatsExamens">
+              <PropertyRef Name="ConsultationId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Disponibilites_Medecin">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="Disponibilites" Type="Self.Disponibilites" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="Disponibilites">
+              <PropertyRef Name="MedecinId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_RendezVous_Medecin">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="RendezVous" Type="Self.RendezVous" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="RendezVous">
+              <PropertyRef Name="MedecinId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_RendezVous_Patient">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="RendezVous" Type="Self.RendezVous" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="RendezVous">
+              <PropertyRef Name="PatientId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="CabinetEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Consultations" EntityType="Self.Consultations" />
+          <EntitySet Name="Disponibilites" EntityType="Self.Disponibilites" />
+          <EntitySet Name="Prescriptions" EntityType="Self.Prescriptions" />
+          <EntitySet Name="RendezVous" EntityType="Self.RendezVous" />
+          <EntitySet Name="ResultatsExamens" EntityType="Self.ResultatsExamens" />
+          <EntitySet Name="Users" EntityType="Self.Users" />
+          <AssociationSet Name="FK_Consultations_Medecin" Association="Self.FK_Consultations_Medecin">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Consultations" EntitySet="Consultations" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Consultations_RendezVous" Association="Self.FK_Consultations_RendezVous">
+            <End Role="RendezVous" EntitySet="RendezVous" />
+            <End Role="Consultations" EntitySet="Consultations" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Prescriptions_Consultations" Association="Self.FK_Prescriptions_Consultations">
+            <End Role="Consultations" EntitySet="Consultations" />
+            <End Role="Prescriptions" EntitySet="Prescriptions" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Resultats_Consultations" Association="Self.FK_Resultats_Consultations">
+            <End Role="Consultations" EntitySet="Consultations" />
+            <End Role="ResultatsExamens" EntitySet="ResultatsExamens" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Disponibilites_Medecin" Association="Self.FK_Disponibilites_Medecin">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Disponibilites" EntitySet="Disponibilites" />
+          </AssociationSet>
+          <AssociationSet Name="FK_RendezVous_Medecin" Association="Self.FK_RendezVous_Medecin">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="RendezVous" EntitySet="RendezVous" />
+          </AssociationSet>
+          <AssociationSet Name="FK_RendezVous_Patient" Association="Self.FK_RendezVous_Patient">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="RendezVous" EntitySet="RendezVous" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="CabinetModelStoreContainer" CdmEntityContainer="CabinetEntities">
+          <EntitySetMapping Name="Consultations">
+            <EntityTypeMapping TypeName="CabinetModel.Consultations">
+              <MappingFragment StoreEntitySet="Consultations">
+                <ScalarProperty Name="ConsultationId" ColumnName="ConsultationId" />
+                <ScalarProperty Name="RendezVousId" ColumnName="RendezVousId" />
+                <ScalarProperty Name="MedecinId" ColumnName="MedecinId" />
+                <ScalarProperty Name="Diagnostic" ColumnName="Diagnostic" />
+                <ScalarProperty Name="Notes" ColumnName="Notes" />
+                <ScalarProperty Name="DateConsultation" ColumnName="DateConsultation" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Disponibilites">
+            <EntityTypeMapping TypeName="CabinetModel.Disponibilites">
+              <MappingFragment StoreEntitySet="Disponibilites">
+                <ScalarProperty Name="DisponibiliteId" ColumnName="DisponibiliteId" />
+                <ScalarProperty Name="MedecinId" ColumnName="MedecinId" />
+                <ScalarProperty Name="JourSemaine" ColumnName="JourSemaine" />
+                <ScalarProperty Name="HeureDebut" ColumnName="HeureDebut" />
+                <ScalarProperty Name="HeureFin" ColumnName="HeureFin" />
+                <ScalarProperty Name="Type" ColumnName="Type" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Prescriptions">
+            <EntityTypeMapping TypeName="CabinetModel.Prescriptions">
+              <MappingFragment StoreEntitySet="Prescriptions">
+                <ScalarProperty Name="PrescriptionId" ColumnName="PrescriptionId" />
+                <ScalarProperty Name="ConsultationId" ColumnName="ConsultationId" />
+                <ScalarProperty Name="Medicament" ColumnName="Medicament" />
+                <ScalarProperty Name="Posologie" ColumnName="Posologie" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="RendezVous">
+            <EntityTypeMapping TypeName="CabinetModel.RendezVous">
+              <MappingFragment StoreEntitySet="RendezVous">
+                <ScalarProperty Name="RendezVousId" ColumnName="RendezVousId" />
+                <ScalarProperty Name="PatientId" ColumnName="PatientId" />
+                <ScalarProperty Name="MedecinId" ColumnName="MedecinId" />
+                <ScalarProperty Name="DateHeureDebut" ColumnName="DateHeureDebut" />
+                <ScalarProperty Name="DateHeureFin" ColumnName="DateHeureFin" />
+                <ScalarProperty Name="Statut" ColumnName="Statut" />
+                <ScalarProperty Name="Motif" ColumnName="Motif" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ResultatsExamens">
+            <EntityTypeMapping TypeName="CabinetModel.ResultatsExamens">
+              <MappingFragment StoreEntitySet="ResultatsExamens">
+                <ScalarProperty Name="ResultatId" ColumnName="ResultatId" />
+                <ScalarProperty Name="ConsultationId" ColumnName="ConsultationId" />
+                <ScalarProperty Name="TypeExamen" ColumnName="TypeExamen" />
+                <ScalarProperty Name="DateExamen" ColumnName="DateExamen" />
+                <ScalarProperty Name="Fichier_URL" ColumnName="Fichier_URL" />
+                <ScalarProperty Name="CommentairesMedecin" ColumnName="CommentairesMedecin" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Users">
+            <EntityTypeMapping TypeName="CabinetModel.Users">
+              <MappingFragment StoreEntitySet="Users">
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="Nom" ColumnName="Nom" />
+                <ScalarProperty Name="Prenom" ColumnName="Prenom" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="Telephone" ColumnName="Telephone" />
+                <ScalarProperty Name="PasswordHash" ColumnName="PasswordHash" />
+                <ScalarProperty Name="Role" ColumnName="Role" />
+                <ScalarProperty Name="DateNaissance" ColumnName="DateNaissance" />
+                <ScalarProperty Name="AntecedentsMedicaux" ColumnName="AntecedentsMedicaux" />
+                <ScalarProperty Name="Specialite" ColumnName="Specialite" />
+                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Aucun" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

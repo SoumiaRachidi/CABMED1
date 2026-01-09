@@ -1,0 +1,202 @@
+@{
+    ViewBag.Title = "Tableau de bord Admin";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    /* Professional medical minimalist theme */
+    :root {
+        --primary:#2b7de9;        /* light blue */
+        --accent:#2ecc71;         /* medical green */
+        --warning:#e67e22;        /* orange */
+        --muted:#6c757d;
+        --bg:#ffffff;
+        --card:#f8f9fa;
+        --border:#e9ecef;
+    }
+    .admin-dashboard { background: var(--bg); }
+    .metric-card { border:1px solid var(--border); border-radius:12px; background: var(--card); padding:22px; box-shadow:0 2px 8px rgba(0,0,0,.03); }
+    .metric-card .value { font-size:40px; font-weight:700; margin:6px 0; }
+    .metric-card .label { color: var(--muted); }
+    .metric-icon { width:44px; height:44px; display:flex; align-items:center; justify-content:center; border-radius:10px; color:#fff; }
+    .metric-icon.primary { background: var(--primary); }
+    .metric-icon.accent { background: var(--accent); }
+    .metric-icon.warning { background: var(--warning); }
+
+    .quick-actions .btn { border-radius:10px; padding:14px 18px; font-weight:600; }
+    .panel-clean { border:1px solid var(--border); border-radius:12px; background: var(--card); }
+    .panel-clean .panel-heading { padding:16px 18px; border-bottom:1px solid var(--border); }
+    .panel-clean .panel-body { padding:18px; }
+
+    .form-control { border-radius:10px; }
+    .filter-chip { display:inline-block; padding:8px 12px; border:1px solid var(--border); border-radius:20px; margin-right:8px; cursor:pointer; background:#fff; }
+    .filter-chip.active { border-color: var(--primary); color: var(--primary); }
+
+    @@media (max-width: 768px) {
+        .metric-card { margin-bottom:16px; }
+    }
+</style>
+
+<div class="container admin-dashboard" style="margin-top: 24px;">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="d-flex" style="align-items:center; justify-content:space-between;">
+                <div>
+                    <h2 style="margin:0;">Tableau de bord administrateur</h2>
+                    <p class="text-muted" style="margin:4px 0 16px;">Bienvenue, @Session["UserName"]</p>
+                </div>
+                <div class="quick-actions">
+                    <a href="@Url.Action("CreateStaff", "Admin")" class="btn btn-primary">
+                        <span class="glyphicon glyphicon-plus"></span> Ajouter un employé
+                    </a>
+                    <a href="@Url.Action("StaffList", "Admin")" class="btn btn-info">
+                        <span class="glyphicon glyphicon-list-alt"></span> Gérer le personnel
+                    </a>
+                    <a href="@Url.Action("PatientsList", "Admin")" class="btn btn-success">
+                        <span class="glyphicon glyphicon-user"></span> Liste des patients
+                    </a>
+                    <a href="@Url.Action("Logout", "Auth")" class="btn btn-default">
+                        <span class="glyphicon glyphicon-log-out"></span> Déconnexion
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Metrics -->
+    <div class="row" style="margin-top: 8px;">
+        <div class="col-md-4">
+            <div class="metric-card">
+                <div class="d-flex" style="gap:12px; align-items:center;">
+                    <div class="metric-icon primary">
+                        <span class="glyphicon glyphicon-plus-sign"></span>
+                    </div>
+                    <div>
+                        <div class="value" style="color: var(--primary);">@ViewBag.TotalDoctors</div>
+                        <div class="label">Médecins actifs</div>
+                    </div>
+                </div>
+                <div class="text-right" style="margin-top:10px;">
+                    <a href="@Url.Action("StaffList", "Admin")" class="btn btn-link">Voir détails</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="metric-card">
+                <div class="d-flex" style="gap:12px; align-items:center;">
+                    <div class="metric-icon accent">
+                        <span class="glyphicon glyphicon-briefcase"></span>
+                    </div>
+                    <div>
+                        <div class="value" style="color: var(--accent);">@ViewBag.TotalSecretaries</div>
+                        <div class="label">Secrétaires actives</div>
+                    </div>
+                </div>
+                <div class="text-right" style="margin-top:10px;">
+                    <a href="@Url.Action("StaffList", "Admin")" class="btn btn-link">Voir détails</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="metric-card">
+                <div class="d-flex" style="gap:12px; align-items:center;">
+                    <div class="metric-icon warning">
+                        <span class="glyphicon glyphicon-heart"></span>
+                    </div>
+                    <div>
+                        <div class="value" style="color: var(--warning);">@ViewBag.TotalPatients</div>
+                        <div class="label">Patients enregistrés</div>
+                    </div>
+                </div>
+                <div class="text-right" style="margin-top:10px;">
+                    <a href="@Url.Action("PatientsList", "Admin")" class="btn btn-link">Voir détails</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters & quick search (client-side only) -->
+    <div class="row" style="margin-top:24px;">
+        <div class="col-md-12">
+            <div class="panel-clean">
+                <div class="panel-heading">
+                    <strong>Filtrer rapidement</strong>
+                </div>
+                <div class="panel-body">
+                    <div class="row" style="gap:12px;">
+                        <div class="col-sm-6">
+                            <input id="quick-search" type="text" class="form-control" placeholder="Rechercher un employé ou patient (ouvre la page correspondante)">
+                        </div>
+                        <div class="col-sm-6 text-right">
+                            <span class="filter-chip" data-target="@Url.Action("StaffList","Admin")">Personnel</span>
+                            <span class="filter-chip" data-target="@Url.Action("PatientsList","Admin")">Patients</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Account management shortcuts (no backend changes) -->
+    <div class="row" style="margin-top:24px;">
+        <div class="col-md-6">
+            <div class="panel-clean">
+                <div class="panel-heading"><strong>Mon compte</strong></div>
+                <div class="panel-body">
+                    <p class="text-muted">Gérer vos informations personnelles.</p>
+                    <div class="btn-group" role="group">
+                        <a class="btn btn-info" href="@Url.Action("StaffList","Admin")">
+                            <span class="glyphicon glyphicon-pencil"></span> Modifier mon profil
+                        </a>
+                        <a class="btn btn-warning" href="@Url.Action("Login","Auth")">
+                            <span class="glyphicon glyphicon-lock"></span> Changer le mot de passe
+                        </a>
+                    </div>
+                    <small class="text-muted" style="display:block; margin-top:8px;">Ces actions ouvrent les pages existantes sans modifier la logique serveur.</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="panel-clean">
+                <div class="panel-heading"><strong>Actions rapides</strong></div>
+                <div class="panel-body">
+                    <div class="btn-group" role="group">
+                        <a class="btn btn-primary" href="@Url.Action("CreateStaff","Admin")">
+                            <span class="glyphicon glyphicon-plus"></span> Ajouter un employé
+                        </a>
+                        <a class="btn btn-success" href="@Url.Action("PatientsList","Admin")">
+                            <span class="glyphicon glyphicon-user"></span> Voir les patients
+                        </a>
+                        <a class="btn btn-default" href="@Url.Action("Logout","Auth")">
+                            <span class="glyphicon glyphicon-log-out"></span> Déconnexion
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    (function(){
+        var chips = document.querySelectorAll('.filter-chip');
+        chips.forEach(function(ch){
+            ch.addEventListener('click', function(){
+                chips.forEach(function(c){ c.classList.remove('active'); });
+                ch.classList.add('active');
+                var url = ch.getAttribute('data-target');
+                if(url){ window.location.href = url; }
+            });
+        });
+        var qs = document.getElementById('quick-search');
+        if(qs){
+            qs.addEventListener('keydown', function(e){
+                if(e.key === 'Enter'){
+                    window.location.href = '@Url.Action("StaffList","Admin")';
+                }
+            });
+        }
+    })();
+</script>
+}

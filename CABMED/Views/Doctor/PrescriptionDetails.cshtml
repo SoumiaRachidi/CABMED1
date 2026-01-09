@@ -1,0 +1,160 @@
+@model CABMED.ViewModels.PrescriptionDetailsViewModel
+@{
+    ViewBag.Title = "Ordonnance";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    :root {
+        --rx-primary:#2b7de9;
+        --rx-accent:#1abc9c;
+        --rx-text:#2c3e50;
+        --rx-muted:#7f8c8d;
+        --rx-border:#e5e7eb;
+        --rx-bg:#f5f7fb;
+    }
+
+    body.rx-mode { background: var(--rx-bg); }
+
+    .rx-shell { max-width:1000px; margin:30px auto; }
+    .rx-card { background:#ffffff; border-radius:18px; box-shadow:0 8px 24px rgba(15,23,42,.08); padding:32px 36px; }
+    .rx-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:24px; }
+    .rx-brand { display:flex; align-items:center; }
+    .rx-logo { width:52px; height:52px; border-radius:16px; background:rgba(43,125,233,0.08); display:flex; align-items:center; justify-content:center; margin-right:14px; }
+    .rx-logo span { font-size:26px; color:var(--rx-primary); }
+    .rx-clinic-name { font-size:24px; font-weight:700; color:var(--rx-text); }
+    .rx-subtitle { color:var(--rx-muted); }
+
+    .rx-meta { text-align:right; font-size:13px; color:var(--rx-muted); }
+    .rx-meta .rx-rx { font-size:34px; font-weight:800; color:var(--rx-primary); margin-bottom:4px; }
+
+    .rx-divider { border-top:1px solid var(--rx-border); margin:18px 0 22px; }
+
+    .rx-section-title { font-size:15px; font-weight:700; color:var(--rx-text); margin-bottom:8px; }
+    .rx-section { margin-bottom:18px; }
+
+    .rx-grid { display:flex; justify-content:space-between; gap:40px; }
+    .rx-grid-col { flex:1; font-size:13px; color:var(--rx-text); }
+
+    .rx-label { font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--rx-muted); margin-bottom:2px; }
+    .rx-value-strong { font-weight:600; }
+
+    .rx-prescription-box { background:#fefce8; border-radius:14px; border:1px solid #facc15; padding:16px 18px; font-size:14px; }
+
+    .rx-footer { margin-top:22px; padding-top:14px; border-top:1px dashed var(--rx-border); font-size:11px; color:var(--rx-muted); }
+
+    .rx-actions { margin-top:18px; text-align:right; }
+    .rx-actions .btn { border-radius:999px; padding:9px 18px; }
+    .btn-rx-print { background:var(--rx-primary); border-color:var(--rx-primary); color:#fff; }
+    .btn-rx-send { background:#22c55e; border-color:#22c55e; color:#fff; }
+    .btn-rx-edit { background:#e5e7eb; border-color:#e5e7eb; color:#111827; }
+</style>
+
+<div class="rx-shell">
+    <div class="rx-card" id="prescription-container">
+        <div class="rx-header">
+            <div class="rx-brand">
+                <div class="rx-logo">
+                    <span class="glyphicon glyphicon-heartbeat"></span>
+                </div>
+                <div>
+                    <div class="rx-clinic-name">MediClinic Pro</div>
+                    <div class="rx-subtitle">Centre Médical Professionnel</div>
+                    <div class="rx-subtitle">123 Avenue de la Santé, Ville · Tél : 01 23 45 67 89</div>
+                </div>
+            </div>
+            <div class="rx-meta">
+                <div class="rx-rx">Rx</div>
+                <div>Ordonnance n°: @Model.PrescriptionId</div>
+                <div>Date : @Model.DatePrescription.ToString("dd MMMM yyyy")</div>
+            </div>
+        </div>
+
+        <div class="rx-divider"></div>
+
+        <div class="rx-section">
+            <div class="rx-section-title">Informations du patient</div>
+            <div class="rx-grid">
+                <div class="rx-grid-col">
+                    <div class="rx-label">Nom</div>
+                    <div class="rx-value-strong">@Model.PatientName</div>
+                </div>
+                <div class="rx-grid-col">
+                    <div class="rx-label">ID patient</div>
+                    <div>@Model.PatientId</div>
+                </div>
+                <div class="rx-grid-col">
+                    <div class="rx-label">Âge</div>
+                    <div>—</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="rx-section">
+            <div class="rx-section-title">Prescription</div>
+            <div class="rx-prescription-box">
+                <p><strong>Médicament(s)</strong></p>
+                <p>@Html.Raw(Html.Encode(Model.Medicament).Replace("\n", "<br />"))</p>
+                <p style="margin-top:10px;"><strong>Posologie / Instructions</strong></p>
+                <p>@Html.Raw(Html.Encode(Model.Posologie).Replace("\n", "<br />"))</p>
+            </div>
+        </div>
+
+        <div class="rx-section" style="margin-top:26px;">
+            <div class="rx-grid">
+                <div class="rx-grid-col">
+                    <div class="rx-label">Médecin prescripteur</div>
+                    <div class="rx-value-strong">@Model.DoctorName</div>
+                    @if (!string.IsNullOrEmpty(Model.DoctorSpecialite))
+                    {
+                        <div>@Model.DoctorSpecialite</div>
+                    }
+                    <div class="rx-subtitle" style="margin-top:8px;">Signature numérique</div>
+                </div>
+                <div class="rx-grid-col" style="text-align:right;">
+                    <div style="margin-top:32px; border-top:1px solid var(--rx-border); padding-top:6px;">
+                        @Model.DoctorName
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="rx-footer">
+            Cette ordonnance est valable 30 jours à compter de la date d'émission. Pour toute question, veuillez contacter le cabinet.
+        </div>
+    </div>
+
+    <div class="rx-actions">
+        <a href="@Url.Action("Index", "Doctor")" class="btn btn-default btn-rx-edit">Edit Prescription</a>
+        <button type="button" class="btn btn-rx-print" onclick="printPrescription();">
+            <span class="glyphicon glyphicon-print"></span> Print Prescription
+        </button>
+        <button type="button" class="btn btn-rx-send" onclick="sendToPatient();">
+            <span class="glyphicon glyphicon-send"></span> Send to Patient
+        </button>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    (function(){
+        document.body.classList.add('rx-mode');
+    })();
+
+    function printPrescription() {
+        var w = window.open('', '_blank');
+        var content = document.getElementById('prescription-container').outerHTML;
+        w.document.open();
+        w.document.write('<html><head><title>Ordonnance</title>');
+        w.document.write('<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" />');
+        w.document.write('</head><body style="background:#f5f7fb; padding:20px;">' + content + '</body></html>');
+        w.document.close();
+        w.focus();
+        setTimeout(function(){ w.print(); }, 500);
+    }
+
+    function sendToPatient() {
+        alert('Simulation : envoi de l\'ordonnance au patient par email ou portail patient.');
+    }
+</script>
+}

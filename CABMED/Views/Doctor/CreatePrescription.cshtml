@@ -1,0 +1,44 @@
+@model CABMED.ViewModels.PrescriptionViewModel
+@{
+    ViewBag.Title = "Nouvelle ordonnance";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container" style="margin-top:30px; max-width:900px;">
+    <h2>Nouvelle ordonnance</h2>
+    <hr />
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(m => m.ConsultationId)
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <strong>Informations sur le patient</strong>
+            </div>
+            <div class="panel-body">
+                <p><strong>Patient :</strong> @Model.PatientName</p>
+                <p><strong>Médecin :</strong> @Model.DoctorName</p>
+                <p><strong>Date :</strong> @Model.DatePrescription.ToString("dd/MM/yyyy")</p>
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.Medicament)
+            @Html.TextAreaFor(m => m.Medicament, new { @class = "form-control", rows = 4, placeholder = "Ex: Paracétamol 500mg" })
+            @Html.ValidationMessageFor(m => m.Medicament, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.Posologie)
+            @Html.TextAreaFor(m => m.Posologie, new { @class = "form-control", rows = 5, placeholder = "Ex: 1 comprimé, 3 fois par jour pendant 5 jours" })
+            @Html.ValidationMessageFor(m => m.Posologie, "", new { @class = "text-danger" })
+        </div>
+
+        <button type="submit" class="btn btn-success">
+            <span class="glyphicon glyphicon-ok"></span> Enregistrer et afficher l'ordonnance
+        </button>
+        <a href="@Url.Action("Index", "Doctor")" class="btn btn-default">Annuler</a>
+    }
+</div>

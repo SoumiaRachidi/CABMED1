@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="d9d2b036ae0d474d831abb397a528268" Name="Diagram1" ZoomLevel="96">
+        <EntityTypeShape EntityType="CabinetModel.Consultations" Width="1.5" PointX="5.25" PointY="9.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="CabinetModel.Disponibilites" Width="1.5" PointX="3" PointY="10.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="CabinetModel.Prescriptions" Width="1.5" PointX="7.5" PointY="8.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="CabinetModel.RendezVous" Width="1.5" PointX="3" PointY="13.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="CabinetModel.ResultatsExamens" Width="1.5" PointX="7.5" PointY="11" IsExpanded="true" />
+        <EntityTypeShape EntityType="CabinetModel.Users" Width="1.5" PointX="0.75" PointY="5.375" IsExpanded="true" />
+        <AssociationConnector Association="CabinetModel.FK_Consultations_Medecin" ManuallyRouted="false" />
+        <AssociationConnector Association="CabinetModel.FK_Consultations_RendezVous" ManuallyRouted="false" />
+        <AssociationConnector Association="CabinetModel.FK_Prescriptions_Consultations" ManuallyRouted="false" />
+        <AssociationConnector Association="CabinetModel.FK_Resultats_Consultations" ManuallyRouted="false" />
+        <AssociationConnector Association="CabinetModel.FK_Disponibilites_Medecin" ManuallyRouted="false" />
+        <AssociationConnector Association="CabinetModel.FK_RendezVous_Medecin" ManuallyRouted="false" />
+        <AssociationConnector Association="CabinetModel.FK_RendezVous_Patient" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>
