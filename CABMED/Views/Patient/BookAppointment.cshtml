@@ -1,0 +1,169 @@
+@model CABMED.ViewModels.AppointmentRequestViewModel
+@{
+    ViewBag.Title = "Demande de rendez-vous";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@functions {
+    private string GetPatientInfoValue(object info, params string[] propertyNames)
+    {
+        if (info == null || propertyNames == null) return null;
+
+        var dict = info as IDictionary<string, object>;
+        foreach (var name in propertyNames)
+        {
+            if (string.IsNullOrWhiteSpace(name)) continue;
+
+            if (dict != null && dict.TryGetValue(name, out var v))
+                return v?.ToString();
+
+            var prop = info.GetType().GetProperty(name);
+            var value = prop?.GetValue(info);
+            if (value != null) return value.ToString();
+        }
+        return null;
+    }
+}
+
+<style>
+    :root {
+        --primary: #1f5aa6;
+        --border: #dee2e6;
+        --bg: #ffffff;
+        --muted: #6c757d;
+    }
+
+    .appointment-form {
+        max-width: 820px;
+        margin: 0 auto;
+        padding: 24px;
+    }
+
+    .form-card {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 28px;
+        margin-bottom: 24px;
+    }
+
+    .form-title {
+        font-size: 24px;
+        font-weight: 600;
+        text-align: center;
+    }
+
+    .form-subtitle {
+        text-align: center;
+        color: var(--muted);
+        margin-bottom: 28px;
+    }
+
+    .form-group label {
+        font-weight: 600;
+    }
+
+    .form-control {
+        border-radius: 6px;
+        padding: 12px;
+    }
+
+    .patient-info {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 24px;
+        background: #f9fafb;
+    }
+
+    .btn-primary {
+        background: var(--primary);
+        border-radius: 6px;
+        padding: 14px;
+        font-weight: 600;
+    }
+
+    .btn-secondary {
+        margin-top: 12px;
+        border-radius: 6px;
+        padding: 14px;
+    }
+</style>
+
+<div class="appointment-form">
+    <div class="form-card">
+        <h2 class="form-title">Nouvelle demande de rendez-vous</h2>
+        <p class="form-subtitle">
+            Merci de fournir les informations nécessaires afin de planifier votre consultation
+        </p>
+
+        @{
+            var nom = GetPatientInfoValue(ViewBag.PatientInfo, "Nom", "LastName") ?? ViewBag.UserName;
+            var prenom = GetPatientInfoValue(ViewBag.PatientInfo, "Prenom", "FirstName");
+            var tel = GetPatientInfoValue(ViewBag.PatientInfo, "Telephone", "Phone") ?? "Non renseigné";
+        }
+
+        <div class="patient-info">
+            <strong>Patient :</strong> @nom @prenom <br />
+            <strong>Téléphone :</strong> @tel
+        </div>
+
+        @Html.ValidationSummary(true, "", new { @class = "validation-summary-errors" })
+
+        @using (Html.BeginForm("BookAppointment", "Patient", FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.SymptomsDescription)
+                @Html.TextAreaFor(m => m.SymptomsDescription, new
+                {
+                    @class = "form-control",
+                    rows = 5,
+                    placeholder = "Description détaillée des symptômes"
+                })
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 form-group">
+                    @Html.LabelFor(m => m.PreferredSpecialty)
+                    @Html.DropDownListFor(m => m.PreferredSpecialty, ViewBag.Specialties as SelectList, "-- Sélectionner --", new { @class = "form-control" })
+                </div>
+
+                <div class="col-md-6 form-group">
+                    @Html.LabelFor(m => m.UrgencyLevel)
+                    @Html.DropDownListFor(m => m.UrgencyLevel, ViewBag.Urgencies as SelectList, "-- Sélectionner --", new { @class = "form-control" })
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 form-group">
+                    @Html.LabelFor(m => m.PreferredDate)
+                    @Html.TextBoxFor(m => m.PreferredDate, "{0:yyyy-MM-dd}", new { type = "date", @class = "form-control" })
+                </div>
+
+                <div class="col-md-6 form-group">
+                    @Html.LabelFor(m => m.PreferredTime)
+                    @Html.TextBoxFor(m => m.PreferredTime, new { type = "time", @class = "form-control" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.AdditionalComments)
+                @Html.TextAreaFor(m => m.AdditionalComments, new
+                {
+                    @class = "form-control",
+                    rows = 3
+                })
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">
+                Soumettre la demande
+            </button>
+
+            <a href="@Url.Action("Index","Patient")" class="btn btn-secondary btn-block">
+                Retour au tableau de bord
+            </a>
+        }
+    </div>
+</div>

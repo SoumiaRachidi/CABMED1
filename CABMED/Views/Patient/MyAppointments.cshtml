@@ -1,0 +1,371 @@
+@model List<CABMED.ViewModels.AppointmentViewModel>
+@{
+    ViewBag.Title = "Mes rendez-vous";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    /* Professional appointments listing styling */
+    :root {
+        --primary:#2b7de9;        
+        --accent:#2ecc71;         
+        --warning:#e67e22;        
+        --danger:#e74c3c;         
+        --muted:#6c757d;
+        --bg:#ffffff;
+        --card:#f8f9fa;
+        --border:#e9ecef;
+    }
+
+    .appointments-container { background: var(--bg); }
+    
+    .appointment-card {
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: white;
+        margin-bottom: 16px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .appointment-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0,0,0,.1);
+    }
+    
+    .appointment-header {
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border);
+        background: var(--card);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .appointment-body {
+        padding: 20px;
+    }
+    
+    .status-badge {
+        padding: 4px 12px;
+        border-radius: 16px;
+        font-size: 11px;
+        font-weight: 600;
+        color: white;
+        text-transform: uppercase;
+    }
+    
+    .badge-warning { background: var(--warning); }
+    .badge-success { background: var(--accent); }
+    .badge-danger { background: var(--danger); }
+    .badge-info { background: var(--primary); }
+    .badge-secondary { background: var(--muted); }
+    
+    .appointment-pending {
+        border-left: 4px solid var(--warning);
+    }
+    
+    .appointment-approved {
+        border-left: 4px solid var(--accent);
+    }
+    
+    .appointment-declined {
+        border-left: 4px solid var(--danger);
+    }
+    
+    .appointment-completed {
+        border-left: 4px solid var(--primary);
+    }
+    
+    .filters-section {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 24px;
+    }
+    
+    .filter-tab {
+        display: inline-block;
+        padding: 8px 16px;
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        margin-right: 8px;
+        margin-bottom: 8px;
+        cursor: pointer;
+        background: white;
+        font-size: 13px;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        color: var(--muted);
+    }
+    
+    .filter-tab.active,
+    .filter-tab:hover {
+        border-color: var(--primary);
+        background: var(--primary);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        background: white;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+    }
+    
+    @@media (max-width: 768px) {
+        .appointment-header {
+            flex-direction: column;
+            text-align: center;
+            gap: 8px;
+        }
+    }
+</style>
+
+<div class="container appointments-container" style="margin-top: 24px;">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="d-flex" style="align-items:center; justify-content:space-between; margin-bottom: 24px;">
+                <div>
+                    <h2 style="margin:0;">Mes rendez-vous</h2>
+                    <p class="text-muted" style="margin:4px 0;">Suivez l'état de vos demandes et rendez-vous confirmés</p>
+                </div>
+                <div>
+                    <a href="@Url.Action("BookAppointment", "Patient")" class="btn btn-primary">
+                        <span class="glyphicon glyphicon-plus"></span>
+                        Nouvelle demande
+                    </a>
+                    <a href="@Url.Action("Index", "Patient")" class="btn btn-secondary">
+                        <span class="glyphicon glyphicon-arrow-left"></span>
+                        Retour
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-section">
+        <strong style="display: block; margin-bottom: 12px;">Filtrer par statut:</strong>
+        <a href="#" class="filter-tab active" data-filter="all">Tous</a>
+        <a href="#" class="filter-tab" data-filter="pending">En attente</a>
+        <a href="#" class="filter-tab" data-filter="approved">Approuvés</a>
+        <a href="#" class="filter-tab" data-filter="declined">Refusés</a>
+        <a href="#" class="filter-tab" data-filter="completed">Terminés</a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success" style="border-radius: 8px; margin-bottom: 24px;">
+            <span class="glyphicon glyphicon-ok-circle"></span>
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <!-- Appointments List -->
+    <div id="appointmentsList">
+        @if (Model != null && Model.Count > 0)
+        {
+            foreach (var appointment in Model.OrderByDescending(a => a.DateDemande ?? DateTime.MinValue))
+            {
+                var cardClass = "";
+                switch (appointment.RequestStatus?.ToLower())
+                {
+                    case "en attente":
+                        cardClass = "appointment-pending";
+                        break;
+                    case "approuvé":
+                    case "confirmé":
+                        cardClass = "appointment-approved";
+                        break;
+                    case "refusé":
+                        cardClass = "appointment-declined";
+                        break;
+                    case "terminé":
+                        cardClass = "appointment-completed";
+                        break;
+                }
+
+                <div class="appointment-card @cardClass" data-status="@appointment.RequestStatus?.ToLower().Replace(" ", "").Replace("é", "e")">
+                    <div class="appointment-header">
+                        <div>
+                            <h4 style="margin: 0;">
+                                @if (!string.IsNullOrEmpty(appointment.AssignedDoctor))
+                                {
+                                    <span>@appointment.AssignedDoctor</span>
+                                }
+                                else
+                                {
+                                    <span>@appointment.PreferredSpecialty</span>
+                                }
+                            </h4>
+                            <small class="text-muted">
+                                Demande du @(appointment.DateDemande?.ToString("dd/MM/yyyy à HH:mm") ?? "Date inconnue")
+                            </small>
+                        </div>
+                        <div>
+                            <span class="status-badge @appointment.StatusBadgeClass">
+                                @appointment.RequestStatus
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="appointment-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                @if (!string.IsNullOrEmpty(appointment.SymptomsDescription))
+                                {
+                                    <div style="margin-bottom: 16px;">
+                                        <strong>Motif de consultation:</strong>
+                                        <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; margin-top: 4px; border-left: 3px solid var(--primary);">
+                                            @appointment.SymptomsDescription
+                                        </div>
+                                    </div>
+                                }
+                                
+                                @if (!string.IsNullOrEmpty(appointment.SecretaryComments))
+                                {
+                                    <div style="margin-bottom: 16px;">
+                                        <strong>Commentaires du secrétariat:</strong>
+                                        <p style="margin: 4px 0; color: var(--muted);">@appointment.SecretaryComments</p>
+                                    </div>
+                                }
+                            </div>
+                            <div class="col-md-4">
+                                @if (appointment.DateHeureDebut != DateTime.MinValue)
+                                {
+                                    <div style="background: var(--accent); color: white; padding: 16px; border-radius: 8px; text-align: center;">
+                                        <strong>Rendez-vous confirmé</strong><br>
+                                        <span class="glyphicon glyphicon-calendar"></span>
+                                        @appointment.DateHeureDebut.ToString("dd/MM/yyyy")<br>
+                                        <span class="glyphicon glyphicon-time"></span>
+                                        @appointment.HeureDebut - @appointment.HeureFin
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div style="text-align: center; padding: 16px; background: #f8f9fa; border-radius: 8px;">
+                                        @if (appointment.UrgencyLevel != null)
+                                        {
+                                            <div style="margin-bottom: 8px;">
+                                                <strong>Urgence:</strong><br>
+                                                <span class="priority-badge @appointment.PriorityClass">@appointment.UrgencyLevel</span>
+                                            </div>
+                                        }
+                                        
+                                        @if (appointment.RequestStatus?.ToLower() == "en attente")
+                                        {
+                                            <div style="color: var(--warning);">
+                                                <span class="glyphicon glyphicon-hourglass"></span><br>
+                                                <small>En cours de traitement</small>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        
+                        @if (appointment.ProcessedDate.HasValue)
+                        {
+                            <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
+                                <small class="text-muted">
+                                    <span class="glyphicon glyphicon-user"></span>
+                                    Traité le @appointment.ProcessedDate.Value.ToString("dd/MM/yyyy à HH:mm")
+                                    @if (!string.IsNullOrEmpty(appointment.ProcessedBy))
+                                    {
+                                        <span> par @appointment.ProcessedBy</span>
+                                    }
+                                </small>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="empty-state">
+                <span class="glyphicon glyphicon-calendar" style="font-size: 64px; color: #ccc;"></span>
+                <h3 style="margin: 24px 0 8px; color: var(--muted);">Aucun rendez-vous</h3>
+                <p class="text-muted">Vous n'avez pas encore de demande de rendez-vous.</p>
+                <a href="@Url.Action("BookAppointment", "Patient")" class="btn btn-primary" style="margin-top: 16px;">
+                    <span class="glyphicon glyphicon-plus"></span>
+                    Faire ma première demande
+                </a>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    // Filter functionality
+    $('.filter-tab').click(function(e) {
+        e.preventDefault();
+        
+        $('.filter-tab').removeClass('active');
+        $(this).addClass('active');
+        
+        var filter = $(this).data('filter');
+        filterAppointments(filter);
+    });
+    
+    function filterAppointments(filter) {
+        $('.appointment-card').each(function() {
+            var status = $(this).data('status');
+            var show = false;
+            
+            switch(filter) {
+                case 'all':
+                    show = true;
+                    break;
+                case 'pending':
+                    show = status === 'enattente';
+                    break;
+                case 'approved':
+                    show = status === 'approuve' || status === 'confirme';
+                    break;
+                case 'declined':
+                    show = status === 'refuse';
+                    break;
+                case 'completed':
+                    show = status === 'termine';
+                    break;
+            }
+            
+            if (show) {
+                $(this).fadeIn();
+            } else {
+                $(this).fadeOut();
+            }
+        });
+    }
+    
+    $(document).ready(function() {
+        // Auto-refresh every 5 minutes to check for status updates
+        setInterval(function() {
+            // You can implement AJAX refresh here
+            // location.reload();
+        }, 300000);
+    });
+</script>
+
+<style>
+    .priority-badge {
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 10px;
+        font-weight: 600;
+        color: white;
+        text-transform: uppercase;
+    }
+    
+    .priority-high { background: var(--danger); }
+    .priority-medium { background: var(--warning); }
+    .priority-low { background: var(--accent); }
+    .priority-normal { background: var(--muted); }
+</style>
+}

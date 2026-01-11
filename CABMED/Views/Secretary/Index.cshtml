@@ -1,14 +1,349 @@
 @{
     ViewBag.Title = "Espace Secrétaire";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    var pendingCount = ViewBag.PendingRequests is int pc ? pc : Convert.ToInt32(ViewBag.PendingRequests ?? 0);
+    var nextPending = ViewBag.NextPendingRequest as CABMED.ViewModels.AppointmentRequestViewModel;
 }
 
-<div class="container" style="margin-top:30px;">
-    <div class="jumbotron">
-        <h2>Bienvenue dans votre espace, @ViewBag.UserName</h2>
-        <p class="lead">Ceci est le tableau de bord secrétaire.</p>
-        <p>
-            <a class="btn btn-primary btn-lg" href="@Url.Action("Logout", "Auth")" role="button">Se déconnecter</a>
-        </p>
+<style>
+    /* Professional medical minimalist theme - consistent with other dashboards */
+    :root {
+        --primary:#2b7de9;        /* light blue */
+        --accent:#2ecc71;         /* medical green */
+        --warning:#e67e22;        /* orange */
+        --danger:#e74c3c;         /* red */
+        --muted:#6c757d;
+        --bg:#ffffff;
+        --card:#f8f9fa;
+        --border:#e9ecef;
+    }
+    .secretary-dashboard { background: var(--bg); }
+    .metric-card { border:1px solid var(--border); border-radius:12px; background: var(--card); padding:22px; box-shadow:0 2px 8px rgba(0,0,0,.03); }
+    .metric-card .value { font-size:40px; font-weight:700; margin:6px 0; }
+    .metric-card .label { color: var(--muted); }
+    .metric-icon { width:44px; height:44px; display:flex; align-items:center; justify-content:center; border-radius:10px; color:#fff; }
+    .metric-icon.primary { background: var(--primary); }
+    .metric-icon.accent { background: var(--accent); }
+    .metric-icon.warning { background: var(--warning); }
+    .metric-icon.danger { background: var(--danger); }
+
+    .quick-actions .btn { border-radius:10px; padding:14px 18px; font-weight:600; margin-right:8px; margin-bottom:8px; }
+    .panel-clean { border:1px solid var(--border); border-radius:12px; background: var(--card); }
+    .panel-clean .panel-heading { padding:16px 18px; border-bottom:1px solid var(--border); background:#fff; border-radius:12px 12px 0 0; }
+    .panel-clean .panel-body { padding:18px; }
+
+    .form-control { border-radius:10px; }
+    .request-card { 
+        border-left:4px solid var(--warning); 
+        background:#fff; 
+        padding:16px; 
+        margin:8px 0; 
+        border-radius:8px; 
+        box-shadow:0 1px 3px rgba(0,0,0,.1);
+        transition: all 0.3s ease;
+    }
+    .request-card:hover { transform: translateY(-2px); box-shadow:0 4px 12px rgba(0,0,0,.15); }
+    .request-card.urgent { border-left-color: var(--danger); }
+    .request-card.low { border-left-color: var(--accent); }
+    
+    .priority-badge {
+        padding: 4px 12px;
+        border-radius: 16px;
+        font-size: 12px;
+        font-weight: 600;
+        color: white;
+    }
+    .priority-high { background: var(--danger); }
+    .priority-medium { background: var(--warning); }
+    .priority-low { background: var(--accent); }
+
+    @@media (max-width: 768px) {
+        .metric-card { margin-bottom:16px; }
+        .quick-actions .btn { display:block; width:100%; margin-right:0; }
+    }
+</style>
+
+<div class="container secretary-dashboard" style="margin-top: 24px;">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="d-flex" style="align-items:center; justify-content:space-between;">
+                <div>
+                    <h2 style="margin:0;">Espace Secrétaire</h2>
+                    <p class="text-muted" style="margin:4px 0 16px;">Bienvenue, @ViewBag.UserName</p>
+                </div>
+                <div class="quick-actions">
+                    <a href="@Url.Action("AppointmentRequests", "Secretary")" class="btn btn-warning">
+                        <span class="glyphicon glyphicon-list-alt"></span> Demandes de RDV
+                        @if (pendingCount > 0)
+                        {
+                            <span class="badge" style="background: #fff; color: var(--warning); margin-left: 4px;">@pendingCount</span>
+                        }
+                    </a>
+                    <a href="@Url.Action("ManageAppointments", "Secretary")" class="btn btn-info">
+                        <span class="glyphicon glyphicon-calendar"></span> Gérer les RDV
+                    </a>
+                    <a href="@Url.Action("PatientsList", "Admin")" class="btn btn-success">
+                        <span class="glyphicon glyphicon-user"></span> Liste des patients
+                    </a>
+                    <a href="@Url.Action("Logout", "Auth")" class="btn btn-default">
+                        <span class="glyphicon glyphicon-log-out"></span> Déconnexion
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Metrics -->
+    <div class="row" style="margin-top: 8px;">
+        <div class="col-md-4">
+            <div class="metric-card">
+                <div class="d-flex" style="gap:12px; align-items:center;">
+                    <div class="metric-icon warning">
+                        <span class="glyphicon glyphicon-hourglass"></span>
+                    </div>
+                    <div>
+                        <div class="value" style="color: var(--warning);">@(ViewBag.PendingRequests ?? 0)</div>
+                        <div class="label">Demandes en attente</div>
+                    </div>
+                </div>
+                <div class="text-right" style="margin-top:10px;">
+                    <a href="@Url.Action("AppointmentRequests", "Secretary")" class="btn btn-link">Traiter maintenant</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="metric-card">
+                <div class="d-flex" style="gap:12px; align-items:center;">
+                    <div class="metric-icon accent">
+                        <span class="glyphicon glyphicon-ok-sign"></span>
+                    </div>
+                    <div>
+                        <div class="value" style="color: var(--accent);">@(ViewBag.ApprovedToday ?? 0)</div>
+                        <div class="label">Approuvées aujourd'hui</div>
+                    </div>
+                </div>
+                <div class="text-right" style="margin-top:10px;">
+                    <a href="@Url.Action("TodayAppointments", "Secretary")" class="btn btn-link">Voir détails</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="metric-card">
+                <div class="d-flex" style="gap:12px; align-items:center;">
+                    <div class="metric-icon primary">
+                        <span class="glyphicon glyphicon-stats"></span>
+                    </div>
+                    <div>
+                        <div class="value" style="color: var(--primary);">@(ViewBag.TotalRequestsToday ?? 0)</div>
+                        <div class="label">Total demandes aujourd'hui</div>
+                    </div>
+                </div>
+                <div class="text-right" style="margin-top:10px;">
+                    <a href="@Url.Action("Reports", "Secretary")" class="btn btn-link">Voir rapport</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions Section -->
+    <div class="row" style="margin-top:24px;">
+        <div class="col-md-6">
+            <div class="panel-clean">
+                <div class="panel-heading">
+                    <strong><span class="glyphicon glyphicon-flash"></span> Actions rapides</strong>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <a href="@Url.Action("AppointmentRequests", "Secretary")" class="btn btn-warning btn-block">
+                                <span class="glyphicon glyphicon-list-alt"></span><br>
+                                Traiter les demandes
+                                @if (pendingCount > 0)
+                                {
+                                    <br><small>(@pendingCount en attente)</small>
+                                }
+                            </a>
+                        </div>
+                        <div class="col-sm-6">
+                            <a href="@Url.Action("CreateAppointment", "Secretary")" class="btn btn-primary btn-block">
+                                <span class="glyphicon glyphicon-plus"></span><br>
+                                Nouveau RDV direct
+                            </a>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top:12px;">
+                        <div class="col-sm-6">
+                            <a href="@Url.Action("TodayAppointments", "Secretary")" class="btn btn-info btn-block">
+                                <span class="glyphicon glyphicon-calendar"></span><br>
+                                RDV d'aujourd'hui
+                            </a>
+                        </div>
+                        <div class="col-sm-6">
+                            <a href="@Url.Action("PatientsList", "Admin")" class="btn btn-success btn-block">
+                                <span class="glyphicon glyphicon-search"></span><br>
+                                Rechercher patient
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="panel-clean">
+                <div class="panel-heading">
+                    <strong><span class="glyphicon glyphicon-exclamation-sign"></span> Demandes urgentes</strong>
+                </div>
+                <div class="panel-body">
+                    @if (pendingCount > 0 && nextPending != null)
+                    {
+                        var urgencyClass = nextPending.UrgencyLevel == "Élevé" ? "priority-high" : nextPending.UrgencyLevel == "Moyen" ? "priority-medium" : "priority-low";
+                        var minutesPending = Math.Max(1, (int)(DateTime.Now - nextPending.DateDemande).TotalMinutes);
+                        <div class="request-card @(nextPending.UrgencyLevel == "Élevé" ? "urgent" : nextPending.UrgencyLevel == "Moyen" ? "" : "low")">
+                            <div class="d-flex" style="justify-content:space-between; align-items:flex-start;">
+                                <div>
+                                    <h5 style="margin:0 0 8px 0;">
+                                        <span class="priority-badge @urgencyClass">@nextPending.UrgencyLevel</span>
+                                        @nextPending.PatientNom @nextPending.PatientPrenom
+                                    </h5>
+                                    <p style="margin:0; color: var(--muted); font-size:14px;">
+                                        @nextPending.SymptomsDescription
+                                    </p>
+                                    <small class="text-muted">Il y a @minutesPending min</small>
+                                </div>
+                                <div>
+                                    <a href="@Url.Action("AppointmentRequests", "Secretary")" class="btn btn-sm btn-warning">Traiter</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center" style="margin-top:16px;">
+                            <a href="@Url.Action("AppointmentRequests", "Secretary")" class="btn btn-link">
+                                Voir toutes les demandes (@pendingCount)
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center text-muted" style="padding:20px;">
+                            <span class="glyphicon glyphicon-ok-circle" style="font-size:32px; color: var(--accent);"></span>
+                            <p style="margin-top:12px;">Aucune demande urgente</p>
+                            <small>Toutes les demandes ont été traitées</small>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Today's Schedule Overview -->
+    <div class="row" style="margin-top:24px;">
+        <div class="col-md-12">
+            <div class="panel-clean">
+                <div class="panel-heading">
+                    <strong><span class="glyphicon glyphicon-time"></span> Planning du jour</strong>
+                    <span class="pull-right">
+                        <small class="text-muted">@DateTime.Now.ToString("dddd dd MMMM yyyy")</small>
+                    </span>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div style="text-align:center; padding:20px;">
+                                <div class="metric-icon primary" style="margin:0 auto 12px;">
+                                    <span class="glyphicon glyphicon-time"></span>
+                                </div>
+                                <h5>9h00 - 12h00</h5>
+                                <p class="text-muted">Consultations matinales</p>
+                                <small>Dr. Martin, Dr. Dupuis</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div style="text-align:center; padding:20px;">
+                                <div class="metric-icon accent" style="margin:0 auto 12px;">
+                                    <span class="glyphicon glyphicon-time"></span>
+                                </div>
+                                <h5>14h00 - 17h00</h5>
+                                <p class="text-muted">Consultations après-midi</p>
+                                <small>Dr. Laurent, Dr. Bernard</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div style="text-align:center; padding:20px;">
+                                <div class="metric-icon warning" style="margin:0 auto 12px;">
+                                    <span class="glyphicon glyphicon-phone"></span>
+                                </div>
+                                <h5>Urgences</h5>
+                                <p class="text-muted">Dr. Martin (garde)</p>
+                                <small>Disponible toute la journée</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics and Tips -->
+    <div class="row" style="margin-top:24px;">
+        <div class="col-md-12">
+            <div class="panel-clean">
+                <div class="panel-heading">
+                    <strong><span class="glyphicon glyphicon-info-sign"></span> Conseils et bonnes pratiques</strong>
+                    <span class="pull-right"><small class="text-muted">@pendingCount demandes en file</small></span>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div style="text-align:center; padding:20px;">
+                                <div class="metric-icon accent" style="margin:0 auto 12px;">
+                                    <span class="glyphicon glyphicon-clock"></span>
+                                </div>
+                                <h5>Traitement rapide</h5>
+                                <p class="text-muted">Traitez les demandes urgentes en moins de 2h pour optimiser la satisfaction patient.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div style="text-align:center; padding:20px;">
+                                <div class="metric-icon primary" style="margin:0 auto 12px;">
+                                    <span class="glyphicon glyphicon-phone"></span>
+                                </div>
+                                <h5>Communication</h5>
+                                <p class="text-muted">Contactez toujours le patient pour confirmer les détails du rendez-vous.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div style="text-align:center; padding:20px;">
+                                <div class="metric-icon warning" style="margin:0 auto 12px;">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </div>
+                                <h5>Planification</h5>
+                                <p class="text-muted">Vérifiez la disponibilité des médecins avant d'assigner un rendez-vous.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+@section Scripts {
+<script>
+    $(document).ready(function() {
+        // Auto-refresh pending requests count every 30 seconds
+        setInterval(function() {
+            // You can implement AJAX call to refresh metrics
+            // $.get('@Url.Action("GetPendingCount", "Secretary")', function(data) {
+            //     $('.pending-count').text(data.count);
+            // });
+        }, 30000);
+
+        // Highlight urgent requests
+        $('.request-card.urgent').addClass('animate__animated animate__pulse');
+        
+        // Notification for new requests (you can implement with SignalR)
+        // connection.on("NewAppointmentRequest", function (patientName) {
+        //     toastr.info("Nouvelle demande de RDV de " + patientName);
+        // });
+    });
+</script>
+}

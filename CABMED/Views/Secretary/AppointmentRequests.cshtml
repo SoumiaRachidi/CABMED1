@@ -1,0 +1,650 @@
+@model List<CABMED.ViewModels.AppointmentRequestViewModel>
+@{
+    ViewBag.Title = "Demandes de rendez-vous";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    Func<string, string, string> getInitials = (lastName, firstName) =>
+    {
+        var first = !string.IsNullOrWhiteSpace(lastName) ? char.ToUpper(lastName[0]).ToString() : "P";
+        var second = !string.IsNullOrWhiteSpace(firstName) ? char.ToUpper(firstName[0]).ToString() : string.Empty;
+        return first + second;
+    };
+}
+
+<style>
+    /* Professional appointment management styling */
+    :root {
+        --primary:#2b7de9;        
+        --accent:#2ecc71;         
+        --warning:#e67e22;        
+        --danger:#e74c3c;         
+        --muted:#6c757d;
+        --bg:#ffffff;
+        --card:#f8f9fa;
+        --border:#e9ecef;
+    }
+
+    .requests-container { background: var(--bg); }
+    
+    .request-item {
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: white;
+        margin-bottom: 20px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .request-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0,0,0,.15);
+    }
+    
+    .request-header {
+        padding: 20px;
+        border-bottom: 1px solid var(--border);
+        background: var(--card);
+    }
+    
+    .request-body {
+        padding: 20px;
+    }
+    
+    .request-actions {
+        padding: 16px 20px;
+        background: #f8f9fa;
+        border-top: 1px solid var(--border);
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+    }
+    
+    .priority-badge {
+        padding: 4px 12px;
+        border-radius: 16px;
+        font-size: 11px;
+        font-weight: 600;
+        color: white;
+        text-transform: uppercase;
+    }
+    
+    .priority-high { background: var(--danger); }
+    .priority-medium { background: var(--warning); }
+    .priority-low { background: var(--accent); }
+    .status-pill {
+        padding: 4px 12px;
+        border-radius: 16px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: white;
+        margin-left: 8px;
+    }
+    .status-pending { background: var(--muted); }
+    .status-approved { background: var(--accent); }
+    .status-declined { background: var(--danger); }
+
+    .patient-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 8px;
+    }
+    
+    .patient-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 16px;
+    }
+    
+    .symptoms-text {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 12px;
+        margin: 12px 0;
+        border-left: 3px solid var(--primary);
+    }
+    
+    .btn {
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-approve {
+        background: var(--accent);
+        color: white;
+    }
+    
+    .btn-approve:hover {
+        background: #27ae60;
+        color: white;
+    }
+    
+    .btn-decline {
+        background: var(--danger);
+        color: white;
+    }
+    
+    .btn-decline:hover {
+        background: #c0392b;
+        color: white;
+    }
+    
+    .btn-view {
+        background: var(--primary);
+        color: white;
+    }
+    
+    .btn-view:hover {
+        background: #1e5bbf;
+        color: white;
+    }
+    
+    .filters-bar {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 24px;
+    }
+    
+    .filter-chip {
+        display: inline-block;
+        padding: 6px 12px;
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        margin-right: 8px;
+        margin-bottom: 8px;
+        cursor: pointer;
+        background: white;
+        font-size: 13px;
+        transition: all 0.3s ease;
+    }
+    
+    .filter-chip.active {
+        border-color: var(--primary);
+        background: var(--primary);
+        color: white;
+    }
+    
+    .filter-chip:hover {
+        border-color: var(--primary);
+        background: var(--primary);
+        color: white;
+    }
+    
+    .request-urgent {
+        border-left: 4px solid var(--danger);
+    }
+    
+    .request-medium {
+        border-left: 4px solid var(--warning);
+    }
+    
+    .request-low {
+        border-left: 4px solid var(--accent);
+    }
+    
+    @@media (max-width: 768px) {
+        .request-actions {
+            flex-direction: column;
+        }
+        .patient-info {
+            flex-direction: column;
+            text-align: center;
+        }
+    }
+</style>
+
+<div class="container requests-container" style="margin-top: 24px;">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="d-flex" style="align-items:center; justify-content:space-between; margin-bottom: 24px;">
+                <div>
+                    <h2 style="margin:0;">Demandes de rendez-vous</h2>
+                    <p class="text-muted" style="margin:4px 0;">Gérer les demandes des patients</p>
+                </div>
+                <div>
+                    <a href="@Url.Action("Index", "Secretary")" class="btn btn-secondary">
+                        <span class="glyphicon glyphicon-arrow-left"></span>
+                        Retour au tableau de bord
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-bar">
+        <div class="row">
+            <div class="col-md-8">
+                <strong style="display: block; margin-bottom: 8px;">Filtrer par:</strong>
+                <span class="filter-chip active" data-filter="all">Toutes</span>
+                <span class="filter-chip" data-filter="urgent">Urgentes</span>
+                <span class="filter-chip" data-filter="medium">Moyennes</span>
+                <span class="filter-chip" data-filter="low">Faibles</span>
+                <span class="filter-chip" data-filter="today">Aujourd'hui</span>
+            </div>
+            <div class="col-md-4">
+                <input type="text" id="searchPatient" class="form-control" placeholder="Rechercher un patient..." style="border-radius: 8px;">
+            </div>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success" style="border-radius: 8px;">
+            <span class="glyphicon glyphicon-ok-circle"></span>
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <!-- Requests List -->
+    <div id="requestsList">
+        @if (Model != null && Model.Count > 0)
+        {
+            foreach (var request in Model)
+            {
+                var priorityClass = request.UrgencyLevel == "Élevé" ? "request-urgent" : 
+                                   request.UrgencyLevel == "Moyen" ? "request-medium" : "request-low";
+                var badgeClass = request.UrgencyLevel == "Élevé" ? "priority-high" : 
+                                request.UrgencyLevel == "Moyen" ? "priority-medium" : "priority-low";
+                var patientDisplayName = (request.PatientNom + " " + request.PatientPrenom).Trim();
+                var encodedName = System.Web.HttpUtility.JavaScriptStringEncode(patientDisplayName);
+                var statusLabel = string.IsNullOrWhiteSpace(request.Status) ? "En attente" : request.Status;
+                var statusClass = statusLabel.Equals("Approuvé", StringComparison.InvariantCultureIgnoreCase) ? "status-approved" :
+                    statusLabel.Equals("Refusé", StringComparison.InvariantCultureIgnoreCase) ? "status-declined" : "status-pending";
+
+                <div class="request-item @priorityClass" data-priority="@(request.UrgencyLevel ?? string.Empty).ToLowerInvariant()" data-patient="@patientDisplayName" data-request="@request.RequestId">
+                    <div class="request-header">
+                        <div class="patient-info">
+                            <div class="patient-avatar">
+                                @getInitials(request.PatientNom, request.PatientPrenom)
+                            </div>
+                            <div>
+                                <h4 style="margin: 0;">@patientDisplayName</h4>
+                                <p style="margin: 0; color: var(--muted);">
+                                    <span class="glyphicon glyphicon-phone"></span> @(request.PatientTelephone ?? "Non renseigné")
+                                </p>
+                            </div>
+                            <div style="margin-left: auto; display:flex; gap:8px;">
+                                <span class="priority-badge @badgeClass">@request.UrgencyLevel</span>
+                                <span class="status-pill @statusClass status-pill-text">@statusLabel</span>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <small class="text-muted">
+                                    <span class="glyphicon glyphicon-time"></span>
+                                    @request.DateDemande.ToString("dd/MM/yyyy à HH:mm")
+                                </small>
+                            </div>
+                            <div class="col-sm-6 text-right">
+                                <small class="text-muted">
+                                    <span class="glyphicon glyphicon-user-md"></span>
+                                    @request.PreferredSpecialty
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="request-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <strong>Symptômes décrits:</strong>
+                                <div class="symptoms-text">
+                                    @request.SymptomsDescription
+                                </div>
+                                
+                                @if (!string.IsNullOrEmpty(request.AdditionalComments))
+                                {
+                                    <strong>Commentaires additionnels:</strong>
+                                    <p style="margin: 8px 0; color: var(--muted);">@request.AdditionalComments</p>
+                                }
+                            </div>
+                            <div class="col-md-4">
+                                @if (request.PreferredDate.HasValue)
+                                {
+                                    <div style="margin-bottom: 12px;">
+                                        <strong>Date souhaitée:</strong><br>
+                                        <span class="text-muted">@request.PreferredDate.Value.ToString("dd/MM/yyyy")</span>
+                                    </div>
+                                }
+                                
+                                @if (request.PreferredTime.HasValue)
+                                {
+                                    <div>
+                                        <strong>Heure souhaitée:</strong><br>
+                                        <span class="text-muted">@request.PreferredTime.Value.ToString(@"hh\:mm")</span>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="request-actions">
+                        <button class="btn btn-view" onclick="viewDetails(@request.RequestId)">
+                            <span class="glyphicon glyphicon-eye-open"></span>
+                            Voir détails
+                        </button>
+                        <button class="btn btn-approve" onclick="approveRequest(@request.RequestId, '@encodedName')">
+                            <span class="glyphicon glyphicon-ok"></span>
+                            Approuver
+                        </button>
+                        <button class="btn btn-decline" onclick="declineRequest(@request.RequestId, '@encodedName')">
+                            <span class="glyphicon glyphicon-remove"></span>
+                            Refuser
+                        </button>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="text-center" style="padding: 60px; background: white; border-radius: 12px; border: 1px solid var(--border);">
+                <span class="glyphicon glyphicon-inbox" style="font-size: 64px; color: #ccc;"></span>
+                <h3 style="margin: 24px 0 8px; color: var(--muted);">Aucune demande en attente</h3>
+                <p class="text-muted">Toutes les demandes de rendez-vous ont été traitées.</p>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Approve Modal -->
+<div class="modal fade" id="approveModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Approuver la demande</h4>
+            </div>
+            <div class="modal-body">
+                <p>Approuver la demande de rendez-vous pour <strong id="approvePatientName"></strong>?</p>
+                
+                <div class="form-group">
+                    <label>Date du rendez-vous:</label>
+                    <input type="date" id="appointmentDate" class="form-control" min="@DateTime.Now.ToString("yyyy-MM-dd")">
+                </div>
+                
+                <div class="form-group">
+                    <label>Heure du rendez-vous:</label>
+                    <input type="time" id="appointmentTime" class="form-control">
+                </div>
+                
+                <div class="form-group">
+                    <label>Médecin assigné:</label>
+                    <select id="assignedDoctor" class="form-control">
+                        <option value="">-- Sélectionner un médecin --</option>
+                    </select>
+                    <small class="text-muted" id="doctorSelectHint" style="display:block; margin-top:4px;">Liste chargée depuis la base de données</small>
+                </div>
+                
+                <div class="form-group">
+                    <label>Commentaires:</label>
+                    <textarea id="approveComments" class="form-control" rows="2" placeholder="Commentaires pour le patient..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-approve" onclick="confirmApprove()">
+                    <span class="glyphicon glyphicon-ok"></span> Confirmer l'approbation
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Decline Modal -->
+<div class="modal fade" id="declineModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Refuser la demande</h4>
+            </div>
+            <div class="modal-body">
+                <p>Refuser la demande de rendez-vous pour <strong id="declinePatientName"></strong>?</p>
+                
+                <div class="form-group">
+                    <label>Raison du refus:</label>
+                    <select id="declineReason" class="form-control">
+                        <option value="">-- Sélectionner une raison --</option>
+                        <option value="Aucun créneau disponible">Aucun créneau disponible</option>
+                        <option value="Spécialité non disponible">Spécialité non disponible</option>
+                        <option value="Informations insuffisantes">Informations insuffisantes</option>
+                        <option value="Autre">Autre</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Commentaires:</label>
+                    <textarea id="declineComments" class="form-control" rows="3" placeholder="Explication détaillée..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-decline" onclick="confirmDecline()">
+                    <span class="glyphicon glyphicon-remove"></span> Confirmer le refus
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    var currentRequestId = 0;
+    var doctorsCache = [];
+
+    function loadDoctors(callback) {
+        $.getJSON('@Url.Action("GetDoctors", "Secretary")', function(data) {
+            doctorsCache = data || [];
+            renderDoctorOptions(doctorsCache);
+            if (typeof callback === 'function') {
+                callback();
+            }
+            if (doctorsCache.length === 0) {
+                $('#doctorSelectHint').text('Aucun médecin trouvé').addClass('text-danger');
+            } else {
+                $('#doctorSelectHint').text('Liste chargée depuis la base de données').removeClass('text-danger');
+            }
+        }).fail(function() {
+            $('#doctorSelectHint').text('Erreur lors du chargement des médecins').addClass('text-danger');
+        });
+    }
+
+    function renderDoctorOptions(data) {
+        var select = $('#assignedDoctor');
+        select.empty();
+        select.append('<option value="">-- Sélectionner un médecin --</option>');
+        $.each(data || [], function(_, doctor) {
+            var label = doctor.name + (doctor.specialite ? ' - ' + doctor.specialite : '');
+            select.append($('<option>').val(doctor.id).text(label));
+        });
+    }
+    
+    // Filter functionality
+    $('.filter-chip').click(function() {
+        $('.filter-chip').removeClass('active');
+        $(this).addClass('active');
+        
+        var filter = $(this).data('filter');
+        filterRequests(filter);
+    });
+    
+    // Search functionality
+    $('#searchPatient').on('input', function() {
+        var searchTerm = $(this).val().toLowerCase();
+        $('.request-item').each(function() {
+            var patientName = $(this).data('patient').toLowerCase();
+            if (patientName.includes(searchTerm)) {
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+        });
+    });
+    
+    function filterRequests(filter) {
+        $('.request-item').each(function() {
+            var priority = $(this).data('priority');
+            var show = false;
+            
+            switch(filter) {
+                case 'all':
+                    show = true;
+                    break;
+                case 'urgent':
+                    show = priority === 'élevé';
+                    break;
+                case 'medium':
+                    show = priority === 'moyen';
+                    break;
+                case 'low':
+                    show = priority === 'faible';
+                    break;
+                case 'today':
+                    // You can implement date filtering logic here
+                    show = true;
+                    break;
+            }
+            
+            if (show) {
+                $(this).fadeIn();
+            } else {
+                $(this).fadeOut();
+            }
+        });
+    }
+    
+    function viewDetails(requestId) {
+        // Implement view details functionality
+        window.location.href = '@Url.Action("ViewRequest", "Secretary")' + '?id=' + requestId;
+    }
+    
+    function approveRequest(requestId, patientName) {
+        currentRequestId = requestId;
+        $('#approvePatientName').text(patientName);
+        $('#approveModal').modal('show');
+
+        if (doctorsCache.length === 0) {
+            loadDoctors();
+        } else {
+            renderDoctorOptions(doctorsCache);
+        }
+    }
+    
+    function declineRequest(requestId, patientName) {
+        currentRequestId = requestId;
+        $('#declinePatientName').text(patientName);
+        $('#declineModal').modal('show');
+    }
+    
+    function confirmApprove() {
+        var appointmentDate = $('#appointmentDate').val();
+        var appointmentTime = $('#appointmentTime').val();
+        var doctorId = $('#assignedDoctor').val();
+        var comments = $('#approveComments').val();
+        
+        if (!appointmentDate || !appointmentTime || !doctorId) {
+            alert('Veuillez renseigner la date, l\'heure et le médecin assigné.');
+            return;
+        }
+        
+        $.post('@Url.Action("ApproveRequest", "Secretary")', {
+            requestId: currentRequestId,
+            appointmentDate: appointmentDate,
+            appointmentTime: appointmentTime,
+            doctorId: doctorId,
+            comments: comments
+        }, function(result) {
+            if (result.success) {
+                $('#approveModal').modal('hide');
+                var $card = $('.request-item[data-request="' + currentRequestId + '"]');
+                setStatusPill($card, 'Approuvé');
+                disableActions($card);
+                showFeedback('success', 'Demande approuvée avec succès.');
+            } else {
+                showFeedback('error', result.message || 'Erreur lors de l\'approbation');
+            }
+        });
+    }
+    
+    function confirmDecline() {
+        var reason = $('#declineReason').val();
+        var comments = $('#declineComments').val();
+        
+        if (!reason) {
+            alert('Veuillez sélectionner une raison pour le refus.');
+            return;
+        }
+        
+        var fullReason = reason;
+        if (comments) {
+            fullReason += ': ' + comments;
+        }
+        
+        $.post('@Url.Action("DeclineRequest", "Secretary")', {
+            requestId: currentRequestId,
+            reason: fullReason
+        }, function(result) {
+            if (result.success) {
+                $('#declineModal').modal('hide');
+                var $card = $('.request-item[data-request="' + currentRequestId + '"]');
+                setStatusPill($card, 'Refusé');
+                disableActions($card);
+                showFeedback('success', 'Demande refusée.');
+            } else {
+                showFeedback('error', result.message || 'Erreur lors du refus');
+            }
+        });
+    }
+    
+    function setStatusPill($card, status) {
+        var css = 'status-pending';
+        if (status.toLowerCase() === 'approuvé' || status.toLowerCase() === 'confirmé') {
+            css = 'status-approved';
+        } else if (status.toLowerCase() === 'refusé') {
+            css = 'status-declined';
+        }
+
+        var pill = $card.find('.status-pill');
+        pill.removeClass('status-pending status-approved status-declined').addClass(css).text(status);
+    }
+
+    function disableActions($card) {
+        $card.find('.request-actions button').prop('disabled', true).addClass('disabled');
+    }
+
+    function showFeedback(type, message) {
+        var alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+        $('#actionFeedback')
+            .removeClass('alert-success alert-danger')
+            .addClass(alertClass)
+            .text(message)
+            .fadeIn();
+
+        setTimeout(function () { $('#actionFeedback').fadeOut(); }, 4000);
+    }
+    
+    $(document).ready(function() {
+        loadDoctors();
+        // Auto-refresh every 2 minutes to check for new requests
+        setInterval(function() {
+            // You can implement AJAX refresh here
+        }, 120000);
+    });
+</script>
+}

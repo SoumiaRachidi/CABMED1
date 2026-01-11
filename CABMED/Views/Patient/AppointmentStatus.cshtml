@@ -1,0 +1,367 @@
+@model CABMED.ViewModels.AppointmentRequestViewModel
+@{
+    ViewBag.Title = "Statut de votre demande";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var request = ViewBag.AppointmentRequest as CABMED.ViewModels.AppointmentRequestViewModel;
+    var status = request?.Status ?? "En attente";
+    var isApproved = string.Equals(status, "Approuvé", StringComparison.InvariantCultureIgnoreCase);
+    var isDeclined = string.Equals(status, "Refusé", StringComparison.InvariantCultureIgnoreCase);
+    var statusClass = isApproved ? "status-approved" : isDeclined ? "status-declined" : "status-waiting";
+    var statusTitle = isApproved ? "Demande approuvée" : isDeclined ? "Demande refusée" : "Demande en attente";
+    var statusMessage = isApproved
+        ? "Votre demande a été validée. Nous vous avons assigné un créneau prochainement."
+        : isDeclined
+            ? "Votre demande n'a pas pu être acceptée. Consultez les détails ci-dessous."
+            : "Votre demande de rendez-vous a été soumise avec succès ! Notre secrétariat l'examine actuellement et vous contactera sous peu.";
+}
+
+<style>
+    /* Status page styling */
+    :root {
+        --primary:#2b7de9;        
+        --accent:#2ecc71;         
+        --warning:#e67e22;        
+        --danger:#e74c3c;         
+        --muted:#6c757d;
+        --bg:#ffffff;
+        --card:#f8f9fa;
+        --border:#e9ecef;
+    }
+
+    .status-container {
+        background: var(--bg);
+        max-width: 700px;
+        margin: 40px auto;
+        padding: 30px;
+    }
+
+    .status-card {
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        background: var(--card);
+        padding: 40px;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,.08);
+        margin-bottom: 24px;
+    }
+
+    .status-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 24px;
+        color: white;
+        font-size: 36px;
+    }
+
+    .status-waiting { background: var(--warning); animation: pulse 2s infinite; }
+    .status-approved { background: var(--accent); }
+    .status-declined { background: var(--danger); }
+
+    @@keyframes pulse {
+        0% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.05); opacity: 0.8; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+
+    .status-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 16px;
+    }
+
+    .status-message {
+        font-size: 16px;
+        color: var(--muted);
+        line-height: 1.6;
+        margin-bottom: 32px;
+    }
+
+    .request-details {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 24px;
+        text-align: left;
+        margin-bottom: 24px;
+    }
+
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .detail-row:last-child { border-bottom: none; }
+
+    .detail-label { font-weight: 600; color: #333; }
+    .detail-value { color: var(--muted); text-align: right; max-width: 60%; }
+
+    .btn-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        border-radius: 10px;
+        padding: 12px 24px;
+        font-weight: 600;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: #1e5bbf; color: white; text-decoration: none; }
+    .btn-secondary { background: #6c757d; color: white; }
+    .btn-secondary:hover { background: #5a6268; color: white; text-decoration: none; }
+
+    .timeline {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 24px;
+    }
+
+    .timeline-item {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 20px;
+        position: relative;
+    }
+
+    .timeline-item:last-child { margin-bottom: 0; }
+
+    .timeline-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 16px;
+        margin-right: 16px;
+        flex-shrink: 0;
+    }
+
+    .timeline-content h5 { margin: 0 0 4px 0; font-weight: 600; color: #333; }
+    .timeline-content p { margin: 0; color: var(--muted); font-size: 14px; }
+
+    .timeline-done { background: var(--accent); }
+    .timeline-current { background: var(--warning); animation: pulse 2s infinite; }
+    .timeline-pending { background: #ddd; color: #999 !important; }
+
+    @@media (max-width: 768px) {
+        .status-container { padding: 20px; margin: 20px auto; }
+        .btn-actions { flex-direction: column; }
+        .detail-row { flex-direction: column; gap: 4px; }
+        .detail-value { text-align: left; max-width: 100%; }
+    }
+</style>
+
+<div class="container status-container">
+    <div class="status-card">
+        <div class="status-icon @statusClass">
+            <span class="glyphicon @(isApproved ? "glyphicon-ok" : isDeclined ? "glyphicon-remove" : "glyphicon-hourglass")"></span>
+        </div>
+        <h2 class="status-title">@statusTitle</h2>
+        <p class="status-message">@statusMessage</p>
+        
+        @if (ViewBag.SuccessMessage != null)
+        {
+            <div class="alert alert-success" style="border-radius: 8px; margin-bottom: 24px;">
+                <span class="glyphicon glyphicon-ok-circle"></span>
+                @ViewBag.SuccessMessage
+            </div>
+        }
+
+        <div class="btn-actions">
+            <a href="@Url.Action("Index", "Patient")" class="btn btn-primary">
+                <span class="glyphicon glyphicon-home"></span>
+                Retour au tableau de bord
+            </a>
+            <a href="@Url.Action("MyAppointments", "Patient")" class="btn btn-secondary">
+                <span class="glyphicon glyphicon-list-alt"></span>
+                Mes rendez-vous
+            </a>
+        </div>
+    </div>
+
+    @if (request != null)
+    {
+        <div class="request-details">
+            <h4 style="margin-top: 0; margin-bottom: 16px;">
+                <span class="glyphicon glyphicon-file-text"></span>
+                Détails de votre demande
+            </h4>
+            
+            <div class="detail-row">
+                <span class="detail-label">Date de soumission:</span>
+                <span class="detail-value">@request.DateDemande.ToString("dd/MM/yyyy à HH:mm")</span>
+            </div>
+            
+            <div class="detail-row">
+                <span class="detail-label">Spécialité demandée:</span>
+                <span class="detail-value">@request.PreferredSpecialty</span>
+            </div>
+            
+            <div class="detail-row">
+                <span class="detail-label">Niveau d'urgence:</span>
+                <span class="detail-value">
+                    @if (request.UrgencyLevel == "Élevé")
+                    {
+                        <span style="color: #dc3545; font-weight: 600;">@request.UrgencyLevel</span>
+                    }
+                    else if (request.UrgencyLevel == "Moyen")
+                    {
+                        <span style="color: #ffc107; font-weight: 600;">@request.UrgencyLevel</span>
+                    }
+                    else
+                    {
+                        <span style="color: #28a745; font-weight: 600;">@request.UrgencyLevel</span>
+                    }
+                </span>
+            </div>
+            
+            @if (request.PreferredDate.HasValue)
+            {
+                <div class="detail-row">
+                    <span class="detail-label">Date souhaitée:</span>
+                    <span class="detail-value">@request.PreferredDate.Value.ToString("dd/MM/yyyy")</span>
+                </div>
+            }
+            
+            @if (request.PreferredTime.HasValue)
+            {
+                <div class="detail-row">
+                    <span class="detail-label">Heure souhaitée:</span>
+                    <span class="detail-value">@request.PreferredTime.Value.ToString(@"hh\:mm")</span>
+                </div>
+            }
+
+            @if (request.ConfirmedStartDateTime.HasValue)
+            {
+                <div class="detail-row">
+                    <span class="detail-label">Créneau confirmé:</span>
+                    <span class="detail-value">@request.ConfirmedStartDateTime.Value.ToString("dd/MM/yyyy à HH:mm")</span>
+                </div>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(request.AssignedDoctor))
+            {
+                <div class="detail-row">
+                    <span class="detail-label">Médecin assigné:</span>
+                    <span class="detail-value">@request.AssignedDoctor</span>
+                </div>
+            }
+            
+            @if (!string.IsNullOrWhiteSpace(request.SecretaryComments))
+            {
+                <div class="detail-row">
+                    <span class="detail-label">Commentaire du secrétariat:</span>
+                    <span class="detail-value">@request.SecretaryComments</span>
+                </div>
+            }
+            
+            <div class="detail-row">
+                <span class="detail-label">Statut:</span>
+                <span class="detail-value">
+                    <span style="background: @(isApproved ? "var(--accent)" : isDeclined ? "var(--danger)" : "var(--warning)"); color: white; padding: 4px 12px; border-radius: 16px; font-size: 12px; font-weight: 600;">
+                        @status
+                    </span>
+                </span>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="request-details">
+            <p class="text-muted" style="margin:0;">
+                Aucune demande récente n'a été trouvée. Retournez au tableau de bord pour en soumettre une nouvelle.
+            </p>
+        </div>
+    }
+
+    <div class="timeline">
+        <h4 style="margin-top: 0; margin-bottom: 20px;">
+            <span class="glyphicon glyphicon-time"></span>
+            Suivi de votre demande
+        </h4>
+        
+        <div class="timeline-item">
+            <div class="timeline-icon timeline-done">
+                <span class="glyphicon glyphicon-ok"></span>
+            </div>
+            <div class="timeline-content">
+                <h5>Demande soumise</h5>
+                <p>Votre demande a été enregistrée avec succès</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-icon @(isApproved || isDeclined ? "timeline-done" : "timeline-current")">
+                <span class="glyphicon glyphicon-hourglass"></span>
+            </div>
+            <div class="timeline-content">
+                <h5>En cours d'examen</h5>
+                <p>Notre secrétariat examine votre demande et recherche un créneau approprié</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-icon @(isApproved ? "timeline-done" : isDeclined ? "timeline-pending" : "timeline-pending")">
+                <span class="glyphicon glyphicon-phone"></span>
+            </div>
+            <div class="timeline-content">
+                <h5>Contact téléphonique</h5>
+                <p>@(isApproved ? "Vous serez contacté(e) pour confirmer les derniers détails." : "Vous serez contacté(e) dès qu'un créneau sera trouvé.")</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-icon @(isApproved && request?.ConfirmedStartDateTime.HasValue == true ? "timeline-done" : isApproved ? "timeline-current" : "timeline-pending")">
+                <span class="glyphicon glyphicon-calendar"></span>
+            </div>
+            <div class="timeline-content">
+                <h5>Rendez-vous confirmé</h5>
+                <p>
+                    @if (isApproved && request?.ConfirmedStartDateTime.HasValue == true)
+                    {
+                        <span>Rendez-vous fixé au @request.ConfirmedStartDateTime.Value.ToString("dd/MM/yyyy à HH:mm").</span>
+                    }
+                    else if (isApproved)
+                    {
+                        <span>Nous finalisons les derniers détails du créneau.</span>
+                    }
+                    else if (isDeclined)
+                    {
+                        <span>Soumettez une nouvelle demande en choisissant un autre créneau.</span>
+                    }
+                    else
+                    {
+                        <span>Votre rendez-vous sera ajouté à votre planning personnel dès validation.</span>
+                    }
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div style="background: #e3f2fd; border: 1px solid #bbdefb; border-radius: 8px; padding: 16px; text-align: center;">
+        <span class="glyphicon glyphicon-info-sign" style="color: #1976d2; margin-right: 8px;"></span>
+        <strong>Délai habituel :</strong> 2-4 heures en semaine, 24h le week-end.
+        <br><small style="color: #666; margin-top: 4px; display: block;">
+            En cas d'urgence médicale, contactez directement les services d'urgence.
+        </small>
+    </div>
+</div>
