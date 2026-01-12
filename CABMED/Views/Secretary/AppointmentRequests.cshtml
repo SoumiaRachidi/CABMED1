@@ -12,21 +12,21 @@
 }
 
 <style>
-    /* Professional Purple Medical Theme - Matching Secretary Dashboard */
+    /* Professional Orange Medical Theme - Matching Secretary Dashboard */
     :root {
-        --primary-purple: #7132CA;
-        --light-purple: #C47BE4;
-        --dark-purple: #301CA0;
-        --pink-accent: #F29AAE;
+     --primary-orange: #ea580c;
+        --light-orange: #fb923c;
+   --dark-orange: #c2410c;
+        --orange-accent: #f97316;
         --white: #FFFFFF;
         --light-bg: #F7F8FC;
-        --dark-text: #2C2C54;
+    --dark-text: #2C2C54;
         --light-text: #8B8BA7;
-        --card-shadow: 0 4px 20px rgba(113, 50, 202, 0.12);
-        --hover-shadow: 0 8px 35px rgba(113, 50, 202, 0.2);
-        --gradient-primary: linear-gradient(135deg, #7132CA 0%, #C47BE4 100%);
-        --border-color: rgba(113, 50, 202, 0.12);
-        --success: #5FCF80;
+  --card-shadow: 0 4px 20px rgba(234, 88, 12, 0.12);
+        --hover-shadow: 0 8px 35px rgba(234, 88, 12, 0.2);
+        --gradient-primary: linear-gradient(135deg, #ea580c 0%, #fb923c 100%);
+        --border-color: rgba(234, 88, 12, 0.12);
+     --success: #5FCF80;
         --danger: #ff6b6b;
     }
 
@@ -35,21 +35,21 @@
     }
 
     .requests-container { 
-        background: var(--light-bg); 
+    background: var(--light-bg); 
         max-width: 1400px;
         margin: 0 auto;
-        padding: 30px 20px;
+ padding: 30px 20px;
     }
     
     /* Page Header */
     .page-header-custom {
-        background: var(--gradient-primary);
+     background: var(--gradient-primary);
         color: white;
-        padding: 40px;
+     padding: 40px;
         border-radius: 20px;
         margin-bottom: 30px;
         box-shadow: var(--card-shadow);
-        position: relative;
+    position: relative;
         overflow: hidden;
     }
 
@@ -102,18 +102,18 @@
     /* Request Cards */
     .request-item {
         border: 1px solid var(--border-color);
-        border-radius: 18px;
+ border-radius: 18px;
         background: white;
         margin-bottom: 24px;
         overflow: hidden;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: var(--card-shadow);
+   box-shadow: var(--card-shadow);
     }
     
     .request-item:hover {
         transform: translateY(-4px);
-        box-shadow: var(--hover-shadow);
-        border-color: var(--primary-purple);
+ box-shadow: var(--hover-shadow);
+        border-color: var(--primary-orange);
     }
     
     .request-header {
@@ -147,15 +147,15 @@
     }
     
     .priority-high { 
-        background: linear-gradient(135deg, var(--pink-accent) 0%, var(--danger) 100%); 
+        background: linear-gradient(135deg, var(--orange-accent) 0%, var(--danger) 100%); 
     }
     
     .priority-medium { 
         background: var(--gradient-primary); 
-    }
+  }
     
     .priority-low { 
-        background: linear-gradient(135deg, var(--success) 0%, #43A047 100%); 
+    background: linear-gradient(135deg, var(--success) 0%, #43A047 100%); 
     }
 
     .status-pill {
@@ -185,13 +185,13 @@
         height: 50px;
         border-radius: 50%;
         background: var(--gradient-primary);
-        display: flex;
-        align-items: center;
+   display: flex;
+   align-items: center;
         justify-content: center;
-        color: white;
-        font-weight: 700;
+ color: white;
+      font-weight: 700;
         font-size: 18px;
-        box-shadow: 0 4px 15px rgba(113, 50, 202, 0.25);
+   box-shadow: 0 4px 15px rgba(234, 88, 12, 0.25);
     }
     
     .symptoms-text {
@@ -199,7 +199,7 @@
         border-radius: 12px;
         padding: 16px;
         margin: 14px 0;
-        border-left: 4px solid var(--primary-purple);
+     border-left: 4px solid var(--primary-orange);
     }
     
     .assigned-doctor {
@@ -215,7 +215,7 @@
     }
     
     .assigned-doctor .glyphicon {
-        color: var(--primary-purple);
+        color: var(--primary-orange);
     }
     
     /* Buttons */
@@ -258,14 +258,14 @@
     .btn-view {
         background: var(--gradient-primary);
         color: white;
-        box-shadow: 0 4px 15px rgba(113, 50, 202, 0.3);
+        box-shadow: 0 4px 15px rgba(234, 88, 12, 0.3);
     }
     
     .btn-view:hover {
-        background: linear-gradient(135deg, var(--dark-purple) 0%, var(--primary-purple) 100%);
-        color: white;
+ background: linear-gradient(135deg, var(--dark-orange) 0%, var(--primary-orange) 100%);
+     color: white;
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(113, 50, 202, 0.4);
+    box-shadow: 0 6px 20px rgba(234, 88, 12, 0.4);
     }
     
     /* Filters Bar */
@@ -294,17 +294,17 @@
     }
     
     .filter-chip.active {
-        border-color: var(--primary-purple);
+        border-color: var(--primary-orange);
         background: var(--gradient-primary);
         color: white;
-        box-shadow: 0 4px 15px rgba(113, 50, 202, 0.3);
+     box-shadow: 0 4px 15px rgba(234, 88, 12, 0.3);
     }
     
     .filter-chip:hover {
-        border-color: var(--primary-purple);
+border-color: var(--primary-orange);
         background: var(--gradient-primary);
         color: white;
-        transform: translateY(-2px);
+    transform: translateY(-2px);
     }
 
     .form-control {
@@ -315,8 +315,8 @@
     }
 
     .form-control:focus {
-        border-color: var(--primary-purple);
-        box-shadow: 0 0 0 4px rgba(113, 50, 202, 0.1);
+        border-color: var(--primary-orange);
+  box-shadow: 0 0 0 4px rgba(234, 88, 12, 0.1);
         outline: none;
     }
     
@@ -342,21 +342,21 @@
     
     /* Urgent Request Styling */
     .request-urgent {
-        border-left: 5px solid var(--pink-accent);
-        animation: pulse-border 2s infinite;
+        border-left: 5px solid var(--orange-accent);
+    animation: pulse-border 2s infinite;
     }
 
     @@keyframes pulse-border {
-        0%, 100% { border-left-color: var(--pink-accent); }
+  0%, 100% { border-left-color: var(--orange-accent); }
         50% { border-left-color: var(--danger); }
     }
     
     .request-medium {
-        border-left: 5px solid var(--primary-purple);
+      border-left: 5px solid var(--primary-orange);
     }
     
-    .request-low {
-        border-left: 5px solid var(--success);
+ .request-low {
+    border-left: 5px solid var(--success);
     }
 
     /* Empty State */
@@ -371,7 +371,7 @@
 
     .empty-state .glyphicon {
         font-size: 72px;
-        color: rgba(113, 50, 202, 0.15);
+        color: rgba(234, 88, 12, 0.15);
         margin-bottom: 20px;
     }
 
@@ -554,7 +554,7 @@
                              !statusLabel.Equals("Refusé", StringComparison.InvariantCultureIgnoreCase))
                         {
                             <button class="btn btn-approve" onclick="approveRequest(@request.RequestId, '@encodedName')">
-                                <span class="glyphicon glyphicon-ok"></span>
+                                <span class=" glyphicon glyphicon-ok"></span>
                                 Approuver
                             </button>
                             <button class="btn btn-decline" onclick="declineRequest(@request.RequestId, '@encodedName')">
@@ -581,9 +581,9 @@
 <div class="modal fade" id="approveModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content" style="border-radius: 18px; border: none;">
-            <div class="modal-header" style="background: var(--gradient-primary); color: white; border-radius: 18px 18px 0 0;">
-                <button type="button" class="close" data-dismiss="modal" style="color: white; opacity: 0.9;">&times;</button>
-                <h4 class="modal-title"><span class="glyphicon glyphicon-ok-circle"></span> Approuver la demande</h4>
+    <div class="modal-header" style="background: var(--gradient-primary); color: white; border-radius: 18px 18px 0 0;">
+              <button type="button" class="close" data-dismiss="modal" style="color: white; opacity: 0.9;">&times;</button>
+         <h4 class="modal-title"><span class="glyphicon glyphicon-ok-circle"></span> Approuver la demande</h4>
             </div>
             <div class="modal-body">
                 <p>Approuver la demande de rendez-vous pour <strong id="approvePatientName"></strong>?</p>
@@ -727,7 +727,7 @@
                 case 'medium':
                     show = priority === 'moyen';
                     break;
-                case 'low':
+                case 'low',
                     show = priority === 'faible';
                     break;
                 case 'today':

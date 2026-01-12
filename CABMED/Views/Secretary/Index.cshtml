@@ -6,20 +6,20 @@
 }
 
 <style>
-    /* Professional Purple Medical Theme - Matching Patient Dashboard */
+    /* Secretary Orange Theme */
     :root {
-        --primary-purple: #7132CA;
-        --light-purple: #C47BE4;
-        --dark-purple: #301CA0;
-        --pink-accent: #F29AAE;
+        --primary-orange: #ea580c;
+        --light-orange: #fb923c;
+        --dark-orange: #c2410c;
+        --orange-accent: #f97316;
         --white: #FFFFFF;
         --light-bg: #F7F8FC;
         --dark-text: #2C2C54;
         --light-text: #8B8BA7;
-        --card-shadow: 0 4px 20px rgba(113, 50, 202, 0.12);
-        --hover-shadow: 0 8px 35px rgba(113, 50, 202, 0.2);
-        --gradient-primary: linear-gradient(135deg, #7132CA 0%, #C47BE4 100%);
-        --gradient-dark: linear-gradient(135deg, #301CA0 0%, #7132CA 100%);
+        --card-shadow: 0 4px 20px rgba(234, 88, 12, 0.12);
+        --hover-shadow: 0 8px 35px rgba(234, 88, 12, 0.2);
+        --gradient-primary: linear-gradient(135deg, #ea580c 0%, #fb923c 100%);
+        --gradient-dark: linear-gradient(135deg, #c2410c 0%, #ea580c 100%);
     }
 
     body {
@@ -108,7 +108,7 @@
 
     .quick-actions .btn-primary {
         background: var(--white);
-        color: var(--primary-purple);
+        color: var(--primary-orange);
     }
 
     .quick-actions .btn-warning {
@@ -149,7 +149,7 @@
         padding: 28px;
         box-shadow: var(--card-shadow);
         transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        border: 1px solid rgba(113, 50, 202, 0.08);
+        border: 1px solid rgba(234, 88, 12, 0.08);
         position: relative;
         overflow: hidden;
     }
@@ -167,7 +167,7 @@
     .stat-card:hover {
         transform: translateY(-8px);
         box-shadow: var(--hover-shadow);
-        border-color: var(--primary-purple);
+        border-color: var(--primary-orange);
     }
 
     .stat-card-header {
@@ -190,7 +190,7 @@
     }
 
     .stat-icon.purple { background: var(--gradient-primary); }
-    .stat-icon.pink { background: linear-gradient(135deg, #F29AAE 0%, #C47BE4 100%); }
+    .stat-icon.pink { background: linear-gradient(135deg, #fb923c 0%, #f97316 100%); }
     .stat-icon.dark { background: var(--gradient-dark); }
 
     .stat-info {
@@ -200,7 +200,7 @@
     .stat-value {
         font-size: 38px;
         font-weight: 700;
-        color: var(--primary-purple);
+        color: var(--primary-orange);
         line-height: 1;
         margin-bottom: 6px;
     }
@@ -215,7 +215,7 @@
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        color: var(--primary-purple);
+        color: var(--primary-orange);
         font-size: 13px;
         font-weight: 600;
         text-decoration: none;
@@ -225,7 +225,7 @@
 
     .stat-link:hover {
         gap: 10px;
-        color: var(--dark-purple);
+        color: var(--dark-orange);
     }
 
     /* Content Grid */
@@ -242,7 +242,7 @@
         border-radius: 18px;
         padding: 32px;
         box-shadow: var(--card-shadow);
-        border: 1px solid rgba(113, 50, 202, 0.08);
+        border: 1px solid rgba(234, 88, 12, 0.08);
     }
 
     .section-title {
@@ -256,7 +256,7 @@
     }
 
     .section-title .glyphicon {
-        color: var(--primary-purple);
+        color: var(--primary-orange);
         font-size: 20px;
     }
 
@@ -297,22 +297,18 @@
 
     .action-tile:hover {
         transform: translateY(-5px);
-        border-color: var(--primary-purple);
-        box-shadow: 0 8px 25px rgba(113, 50, 202, 0.2);
+        border-color: var(--primary-orange);
+    box-shadow: 0 8px 25px rgba(234, 88, 12, 0.2);
     }
 
     .action-tile .glyphicon {
         font-size: 32px;
-        display: block;
+   display: block;
         margin-bottom: 12px;
-        position: relative;
+ position: relative;
         z-index: 1;
         transition: all 0.3s ease;
-        color: var(--primary-purple);
-    }
-
-    .action-tile:hover .glyphicon {
-        transform: scale(1.1);
+      color: var(--primary-orange);
     }
 
     .action-tile span:last-child {
@@ -324,48 +320,48 @@
     }
 
     .action-tile .badge {
-        position: absolute;
+   position: absolute;
         top: 10px;
         right: 10px;
-        background: var(--primary-purple);
+      background: var(--primary-orange);
         color: white;
         padding: 4px 10px;
-        border-radius: 12px;
+   border-radius: 12px;
         font-size: 11px;
         z-index: 2;
     }
 
     /* Urgent Requests Card */
     .urgent-card {
-        background: white;
-        border-radius: 18px;
+      background: white;
+   border-radius: 18px;
         padding: 32px;
-        box-shadow: var(--card-shadow);
-        border: 1px solid rgba(113, 50, 202, 0.08);
+  box-shadow: var(--card-shadow);
+        border: 1px solid rgba(234, 88, 12, 0.08);
     }
 
     .request-item {
-        background: linear-gradient(135deg, #F7F8FC 0%, #F0F1F7 100%);
-        border-left: 4px solid var(--primary-purple);
-        border-radius: 10px;
+      background: linear-gradient(135deg, #F7F8FC 0%, #F0F1F7 100%);
+        border-left: 4px solid var(--primary-orange);
+  border-radius: 10px;
         padding: 20px;
-        margin-bottom: 14px;
+   margin-bottom: 14px;
         transition: all 0.3s ease;
     }
 
     .request-item:hover {
         transform: translateX(8px);
-        box-shadow: 0 4px 18px rgba(113, 50, 202, 0.15);
+        box-shadow: 0 4px 18px rgba(234, 88, 12, 0.15);
     }
 
     .request-item.urgent {
-        border-left-color: var(--pink-accent);
-        animation: pulse 2s infinite;
+        border-left-color: var(--orange-accent);
+     animation: pulse 2s infinite;
     }
 
     @@keyframes pulse {
-        0%, 100% { box-shadow: 0 0 0 0 rgba(242, 154, 174, 0.4); }
-        50% { box-shadow: 0 0 0 10px rgba(242, 154, 174, 0); }
+        0%, 100% { box-shadow: 0 0 0 0 rgba(234, 88, 12, 0.4); }
+     50% { box-shadow: 0 0 0 10px rgba(234, 88, 12, 0); }
     }
 
     .priority-badge {
@@ -377,8 +373,8 @@
         display: inline-block;
     }
 
-    .priority-high { background: linear-gradient(135deg, #F29AAE 0%, #ff6b6b 100%); }
-    .priority-medium { background: linear-gradient(135deg, #C47BE4 0%, #7132CA 100%); }
+    .priority-high { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
+    .priority-medium { background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%); }
     .priority-low { background: linear-gradient(135deg, #5FCF80 0%, #43A047 100%); }
 
     .empty-state {
@@ -388,9 +384,9 @@
 
     .empty-state .glyphicon {
         font-size: 48px;
-        color: rgba(113, 50, 202, 0.15);
-        margin-bottom: 15px;
-    }
+        color: rgba(234, 88, 12, 0.15);
+    margin-bottom: 15px;
+  }
 
     @@media (max-width: 992px) {
         .content-grid {
@@ -433,14 +429,14 @@
                 <span class="glyphicon glyphicon-list-alt"></span> Demandes de RDV
                 @if (pendingCount > 0)
                 {
-                    <span class="badge" style="background: #fff; color: var(--primary-purple);">@pendingCount</span>
+                    <span class="badge" style="background: #fff; color: var(--primary-orange);">@pendingCount</span>
                 }
             </a>
             <a href="@Url.Action("ManageAppointments", "Secretary")" class="btn btn-info">
                 <span class="glyphicon glyphicon-calendar"></span> Gérer les RDV
             </a>
-            <a href="@Url.Action("PatientsList", "Admin")" class="btn btn-success">
-                <span class="glyphicon glyphicon-user"></span> Liste des patients
+            <a href="@Url.Action("PatientsList", "Secretary")" class="btn btn-success">
+                <span class="glyphicon glyphicon-folder-open"></span> Dossiers patients
             </a>
             <a href="@Url.Action("Logout", "Auth")" class="btn btn-default">
                 <span class="glyphicon glyphicon-log-out"></span> Déconnexion
@@ -521,9 +517,9 @@
                     <span class="glyphicon glyphicon-calendar"></span>
                     <span>RDV d'aujourd'hui</span>
                 </a>
-                <a href="@Url.Action("PatientsList", "Admin")" class="action-tile">
-                    <span class="glyphicon glyphicon-search"></span>
-                    <span>Rechercher patient</span>
+                <a href="@Url.Action("PatientsList", "Secretary")" class="action-tile">
+                    <span class="glyphicon glyphicon-folder-open"></span>
+                    <span>Dossiers patients</span>
                 </a>
             </div>
         </div>
@@ -570,10 +566,10 @@
                 </div>
                 
                 <div style="text-align: center; margin-top: 20px;">
-                    <a href="@Url.Action("AppointmentRequests", "Secretary")" style="color: var(--primary-purple); font-weight: 600; text-decoration: none;">
-                        Voir toutes les demandes (@pendingCount) ?
-                    </a>
-                </div>
+          <a href="@Url.Action("AppointmentRequests", "Secretary")" style="color: var(--primary-orange); font-weight: 600; text-decoration: none;">
+          Voir toutes les demandes (@pendingCount) ?
+         </a>
+    </div>
             }
             else
             {

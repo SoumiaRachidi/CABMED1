@@ -5,19 +5,19 @@
 }
 
 <style>
-    /* Professional Purple Medical Theme */
+    /* Professional Orange Medical Theme */
     :root {
-        --primary-purple: #7132CA;
-        --light-purple: #C47BE4;
-        --dark-purple: #301CA0;
-        --pink-accent: #F29AAE;
+        --primary-orange: #ea580c;
+        --light-orange: #fb923c;
+        --dark-orange: #c2410c;
+        --orange-accent: #f97316;
         --white: #FFFFFF;
         --light-bg: #F7F8FC;
         --dark-text: #2C2C54;
         --light-text: #8B8BA7;
-        --card-shadow: 0 4px 20px rgba(113, 50, 202, 0.12);
-        --hover-shadow: 0 8px 35px rgba(113, 50, 202, 0.2);
-        --gradient-primary: linear-gradient(135deg, #7132CA 0%, #C47BE4 100%);
+        --card-shadow: 0 4px 20px rgba(234, 88, 12, 0.12);
+        --hover-shadow: 0 8px 35px rgba(234, 88, 12, 0.2);
+        --gradient-primary: linear-gradient(135deg, #ea580c 0%, #fb923c 100%);
     }
 
     .appointments-container {
@@ -68,7 +68,7 @@
     /* Filter Bar */
     .filter-bar {
         background: white;
-        border: 1px solid rgba(113, 50, 202, 0.08);
+        border: 1px solid rgba(234, 88, 12, 0.08);
         border-radius: 16px;
         padding: 25px;
         margin-bottom: 28px;
@@ -77,15 +77,15 @@
 
     .search-input {
         border-radius: 10px;
-        border: 2px solid rgba(113, 50, 202, 0.15);
+        border: 2px solid rgba(234, 88, 12, 0.15);
         padding: 12px 16px;
         font-size: 14px;
         transition: all 0.3s ease;
     }
 
     .search-input:focus {
-        border-color: var(--primary-purple);
-        box-shadow: 0 0 0 4px rgba(113, 50, 202, 0.1);
+        border-color: var(--primary-orange);
+        box-shadow: 0 0 0 4px rgba(234, 88, 12, 0.1);
         outline: none;
     }
 
@@ -95,7 +95,7 @@
         border-radius: 16px;
         overflow: hidden;
         box-shadow: var(--card-shadow);
-        border: 1px solid rgba(113, 50, 202, 0.08);
+        border: 1px solid rgba(234, 88, 12, 0.08);
     }
 
     .appointments-table table {
@@ -117,12 +117,12 @@
     }
 
     .appointments-table tbody tr {
-        border-bottom: 1px solid rgba(113, 50, 202, 0.08);
+        border-bottom: 1px solid rgba(234, 88, 12, 0.08);
         transition: all 0.3s ease;
     }
 
     .appointments-table tbody tr:hover {
-        background-color: rgba(113, 50, 202, 0.03);
+        background-color: rgba(234, 88, 12, 0.03);
         transform: translateX(3px);
     }
 
@@ -141,7 +141,7 @@
     }
 
     .status-confirmed { background: linear-gradient(135deg, #5FCF80 0%, #43A047 100%); }
-    .status-pending { background: linear-gradient(135deg, #C47BE4 0%, #7132CA 100%); }
+    .status-pending { background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%); }
     .status-cancelled { background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%); }
 
     .empty-state {
@@ -154,7 +154,7 @@
 
     .empty-state-icon {
         font-size: 80px;
-        color: rgba(113, 50, 202, 0.12);
+        color: rgba(234, 88, 12, 0.12);
         margin-bottom: 24px;
     }
 </style>
@@ -231,7 +231,7 @@
                             data-doctor="@(doctor != null ? (doctor.Prenom + " " + doctor.Nom).ToLower() : "")">
                             
                             <td>
-                                <strong style="color: var(--primary-purple);">@rdv.DateHeureDebut.ToString("dd/MM/yyyy")</strong><br>
+                                <strong style="color: var(--primary-orange);">@rdv.DateHeureDebut.ToString("dd/MM/yyyy")</strong><br>
                                 <small class="text-muted">@rdv.DateHeureDebut.ToString("HH:mm") - @rdv.DateHeureFin.ToString("HH:mm")</small>
                             </td>
                             
@@ -312,9 +312,9 @@
 
     <!-- Back Button -->
     <div class="text-center" style="margin-top: 35px;">
-        <a href="@Url.Action("Index", "Secretary")" class="btn btn-default btn-lg" style="border-radius: 12px; padding: 13px 32px; border: 2px solid rgba(113, 50, 202, 0.15); background: white; color: #7132CA; font-weight: 600;">
+    <a href="@Url.Action("Index", "Secretary")" class="btn btn-default btn-lg" style="border-radius: 12px; padding: 13px 32px; border: 2px solid rgba(234, 88, 12, 0.15); background: white; color: #ea580c; font-weight: 600;">
             <span class="glyphicon glyphicon-arrow-left"></span>
-            Retour au tableau de bord
+       Retour au tableau de bord
         </a>
     </div>
 

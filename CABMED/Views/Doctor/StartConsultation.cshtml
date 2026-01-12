@@ -4,111 +4,648 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container" style="max-width: 900px; margin-top: 30px;">
-    <div class="panel panel-primary">
-        <div class="panel-heading">
-            <h3 class="panel-title">
-                <span class="glyphicon glyphicon-plus-sign"></span>
-                Nouvelle consultation médicale
-            </h3>
-        </div>
-        <div class="panel-body">
-            
-            <!-- Patient Information Card -->
-            <div class="panel panel-info" style="margin-bottom: 20px;">
-                <div class="panel-heading">
-                    <strong>Informations patient</strong>
-                </div>
-                <div class="panel-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <p><strong>Nom complet:</strong> @Model.PatientPrenom @Model.PatientNom</p>
-                            <p><strong>Téléphone:</strong> @Model.PatientTelephone</p>
-                        </div>
-                        <div class="col-md-6">
-                            @if (Model.PatientDateNaissance.HasValue)
-                            {
-                                <p><strong>Date de naissance:</strong> @Model.PatientDateNaissance.Value.ToString("dd/MM/yyyy")</p>
-                            }
-                            <p><strong>Motif du RDV:</strong> @Model.Motif</p>
-                        </div>
-                    </div>
-                    @if (!string.IsNullOrEmpty(Model.PatientAntecedents))
-                    {
-                        <div class="alert alert-warning" style="margin-top: 10px; margin-bottom: 0;">
-                            <strong>Antécédents médicaux:</strong>
-                            <p style="margin-bottom: 0;">@Model.PatientAntecedents</p>
-                        </div>
-                    }
-                </div>
-            </div>
+<style>
+    /* Modern Consultation Form Theme */
+    :root {
+      --doctor-primary: #059669;
+    --doctor-primary-dark: #047857;
+        --doctor-primary-light: #10b981;
+        --doctor-accent: #34d399;
+        --success: #10b981;
+        --info: #3b82f6;
+     --warning: #f59e0b;
+        --white: #ffffff;
+        --gray-50: #f8fafc;
+        --gray-100: #f1f5f9;
+        --gray-200: #e2e8f0;
+        --gray-300: #cbd5e1;
+    --gray-400: #94a3b8;
+   --gray-600: #475569;
+        --gray-700: #334155;
+        --gray-900: #0f172a;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+    }
 
-            @using (Html.BeginForm("StartConsultation", "Doctor", FormMethod.Post, new { @class = "form-horizontal" }))
-            {
-                @Html.AntiForgeryToken()
-                @Html.HiddenFor(m => m.RendezVousId)
-                @Html.HiddenFor(m => m.MedecinId)
+    body {
+      background: var(--gray-50);
+    }
 
-                <div class="form-group">
-                    @Html.LabelFor(m => m.DateConsultation, new { @class = "col-sm-3 control-label" })
-                    <div class="col-sm-9">
-                        @Html.TextBoxFor(m => m.DateConsultation, "{0:yyyy-MM-ddTHH:mm}", new { @class = "form-control", type = "datetime-local" })
-                        @Html.ValidationMessageFor(m => m.DateConsultation, "", new { @class = "text-danger" })
-                    </div>
-                </div>
+    .consultation-container {
+     max-width: 1000px;
+        margin: 30px auto;
+        padding: 0 20px;
+    }
 
-                <div class="form-group">
-                    @Html.LabelFor(m => m.Symptoms, new { @class = "col-sm-3 control-label" })
-                    <div class="col-sm-9">
-                        @Html.TextAreaFor(m => m.Symptoms, 4, 50, new { @class = "form-control", placeholder = "Décrivez les symptômes présentés par le patient..." })
-                        @Html.ValidationMessageFor(m => m.Symptoms, "", new { @class = "text-danger" })
-                        <small class="help-block">
-                            <span class="glyphicon glyphicon-info-sign"></span>
-                            Ce champ sera utilisé pour le dossier médical du patient
-                        </small>
-                    </div>
-                </div>
+    /* Header Section */
+    .consultation-header {
+        background: linear-gradient(135deg, var(--doctor-primary) 0%, var(--doctor-primary-dark) 100%);
+  color: white;
+        padding: 40px;
+        border-radius: 16px 16px 0 0;
+        box-shadow: var(--shadow-xl);
+      position: relative;
+        overflow: hidden;
+    }
 
-                <div class="form-group">
-                    @Html.LabelFor(m => m.Diagnostic, new { @class = "col-sm-3 control-label" })
-                    <div class="col-sm-9">
-                        @Html.TextAreaFor(m => m.Diagnostic, 5, 50, new { @class = "form-control", placeholder = "Entrez votre diagnostic médical..." })
-                        @Html.ValidationMessageFor(m => m.Diagnostic, "", new { @class = "text-danger" })
-                        <small class="help-block">
-                            <span class="glyphicon glyphicon-info-sign"></span>
-                            Diagnostic principal de la consultation
-                        </small>
-                    </div>
-                </div>
+    .consultation-header::before {
+     content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+  width: 350px;
+        height: 350px;
+        background: rgba(255, 255, 255, 0.08);
+      border-radius: 50%;
+    }
 
-                <div class="form-group">
-                    @Html.LabelFor(m => m.Notes, new { @class = "col-sm-3 control-label" })
-                    <div class="col-sm-9">
-                        @Html.TextAreaFor(m => m.Notes, 6, 50, new { @class = "form-control", placeholder = "Notes complémentaires, observations, recommandations..." })
-                        @Html.ValidationMessageFor(m => m.Notes, "", new { @class = "text-danger" })
-                        <small class="help-block">Notes médicales confidentielles (optionnel)</small>
-                    </div>
-                </div>
+    .consultation-header .content {
+        position: relative;
+        z-index: 1;
+    }
 
-                <div class="form-group">
-                    <div class="col-sm-offset-3 col-sm-9">
-                        <button type="submit" class="btn btn-primary btn-lg">
-                            <span class="glyphicon glyphicon-ok"></span>
-                            Enregistrer la consultation
-                        </button>
-                        <a href="@Url.Action("Index", "Doctor")" class="btn btn-default btn-lg">
-                            <span class="glyphicon glyphicon-remove"></span>
-                            Annuler
-                        </a>
-                    </div>
-                </div>
-            }
+    .consultation-header h1 {
+        margin: 0 0 10px 0;
+        font-size: 28px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .consultation-header p {
+margin: 0;
+     opacity: 0.95;
+        font-size: 15px;
+    }
+
+    /* Patient Info Card */
+    .patient-info-section {
+        background: white;
+        border: 1px solid var(--gray-200);
+    border-radius: 12px;
+        padding: 24px;
+        margin: -20px 0 30px 0;
+    position: relative;
+        z-index: 2;
+        box-shadow: var(--shadow-lg);
+    }
+
+    .patient-info-header {
+  display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 20px;
+        padding-bottom: 16px;
+        border-bottom: 2px solid var(--gray-200);
+    }
+
+    .patient-avatar-large {
+        width: 64px;
+        height: 64px;
+ border-radius: 12px;
+        background: linear-gradient(135deg, var(--doctor-primary), var(--doctor-primary-light));
+        display: flex;
+  align-items: center;
+        justify-content: center;
+    color: white;
+        font-weight: 700;
+ font-size: 24px;
+     flex-shrink: 0;
+    }
+
+    .patient-header-info h3 {
+        margin: 0 0 4px 0;
+  font-size: 20px;
+        font-weight: 700;
+        color: var(--gray-900);
+    }
+
+    .patient-header-info p {
+     margin: 0;
+        color: var(--gray-600);
+    font-size: 14px;
+    }
+
+ .patient-details-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+
+    .detail-item {
+    display: flex;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+ .detail-icon {
+    width: 36px;
+   height: 36px;
+        background: var(--gray-100);
+        border-radius: 8px;
+        display: flex;
+ align-items: center;
+    justify-content: center;
+        color: var(--doctor-primary);
+      flex-shrink: 0;
+    }
+
+    .detail-content {
+        flex: 1;
+    }
+
+    .detail-label {
+  font-size: 12px;
+        color: var(--gray-600);
+        text-transform: uppercase;
+      font-weight: 600;
+        letter-spacing: 0.5px;
+        margin-bottom: 4px;
+    }
+
+  .detail-value {
+    font-size: 14px;
+      color: var(--gray-900);
+font-weight: 600;
+    }
+
+ .medical-history {
+        background: #fef3c7;
+        border: 1px solid #fbbf24;
+   border-radius: 10px;
+        padding: 16px;
+        margin-top: 16px;
+    }
+
+    .medical-history-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      margin-bottom: 8px;
+        color: #92400e;
+        font-weight: 700;
+        font-size: 14px;
+    }
+
+    .medical-history-content {
+        color: #78350f;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    /* Form Card */
+    .form-card {
+  background: white;
+        border: 1px solid var(--gray-200);
+ border-radius: 0 0 16px 16px;
+        padding: 40px;
+        box-shadow: var(--shadow-xl);
+    }
+
+    /* Form Sections */
+    .form-section {
+        margin-bottom: 32px;
+    }
+
+    .form-section-title {
+        font-size: 18px;
+    font-weight: 700;
+        color: var(--gray-900);
+        margin-bottom: 20px;
+  padding-bottom: 12px;
+        border-bottom: 2px solid var(--gray-200);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .form-section-title .glyphicon {
+        color: var(--doctor-primary);
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+  }
+
+.form-group label {
+        display: block;
+  font-weight: 600;
+        color: var(--gray-700);
+        margin-bottom: 8px;
+        font-size: 14px;
+    }
+
+    .form-group label .required {
+        color: #ef4444;
+        margin-left: 4px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid var(--gray-200);
+        border-radius: 10px;
+    font-size: 15px;
+        transition: all 0.3s ease;
+        background: white;
+    }
+
+    .form-control:focus {
+      outline: none;
+        border-color: var(--doctor-primary);
+      box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.1);
+  }
+
+    .form-control::placeholder {
+     color: var(--gray-400);
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 100px;
+      font-family: inherit;
+        line-height: 1.6;
+    }
+
+    .help-text {
+        font-size: 13px;
+        color: var(--gray-600);
+        margin-top: 6px;
+        display: flex;
+    align-items: center;
+        gap: 6px;
+  }
+
+    .help-text .glyphicon {
+        font-size: 11px;
+        color: var(--doctor-primary);
+    }
+
+    /* Buttons */
+    .form-actions {
+        display: flex;
+        gap: 12px;
+  padding-top: 24px;
+  border-top: 2px solid var(--gray-200);
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, var(--doctor-primary), var(--doctor-primary-light));
+     color: white;
+     border: none;
+        padding: 16px 32px;
+    border-radius: 12px;
+        font-weight: 600;
+        font-size: 15px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        cursor: pointer;
+flex: 1;
+    }
+
+    .btn-submit:hover {
+   background: linear-gradient(135deg, var(--doctor-primary-dark), var(--doctor-primary));
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(5, 150, 105, 0.4);
+    }
+
+    .btn-cancel {
+        background: white;
+        color: var(--gray-700);
+        border: 2px solid var(--gray-200);
+ padding: 16px 32px;
+  border-radius: 12px;
+        font-weight: 600;
+        font-size: 15px;
+        transition: all 0.3s ease;
+        display: inline-flex;
+   align-items: center;
+        justify-content: center;
+        gap: 10px;
+    text-decoration: none;
+      flex: 1;
+    }
+
+    .btn-cancel:hover {
+    border-color: var(--gray-400);
+        background: var(--gray-50);
+        color: var(--gray-900);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow);
+   text-decoration: none;
+    }
+
+    /* Info Alert */
+    .info-alert {
+        background: #dbeafe;
+        border: 1px solid #60a5fa;
+  border-radius: 12px;
+        padding: 16px 20px;
+     margin-top: 24px;
+        display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    }
+
+    .info-alert-icon {
+        width: 40px;
+     height: 40px;
+   background: #3b82f6;
+        border-radius: 10px;
+display: flex;
+     align-items: center;
+        justify-content: center;
+        color: white;
+        flex-shrink: 0;
+  }
+
+    .info-alert-content {
+     flex: 1;
+    }
+
+    .info-alert-content strong {
+        display: block;
+        color: #1e40af;
+        font-size: 14px;
+    margin-bottom: 4px;
+    }
+
+    .info-alert-content p {
+        margin: 0;
+        color: #1e3a8a;
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    /* Validation */
+    .text-danger {
+        color: #ef4444;
+        font-size: 12px;
+        margin-top: 4px;
+        display: block;
+    }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+ .consultation-header {
+ padding: 30px 24px;
+        }
+
+        .consultation-header h1 {
+      font-size: 24px;
+        }
+
+        .form-card {
+ padding: 24px;
+        }
+
+        .patient-info-header {
+            flex-direction: column;
+     text-align: center;
+ }
+
+        .patient-details-grid {
+       grid-template-columns: 1fr;
+        }
+
+   .form-actions {
+         flex-direction: column;
+        }
+    }
+
+    /* Animation */
+    @@keyframes slideUp {
+        from {
+            opacity: 0;
+   transform: translateY(20px);
+        }
+   to {
+            opacity: 1;
+  transform: translateY(0);
+        }
+    }
+
+    .form-card {
+     animation: slideUp 0.4s ease-out;
+    }
+</style>
+
+<div class="consultation-container">
+    <!-- Header -->
+    <div class="consultation-header">
+        <div class="content">
+            <h1>
+         <span class="glyphicon glyphicon-plus-sign"></span>
+        Nouvelle consultation médicale
+         </h1>
+<p>Remplissez les informations médicales pour cette consultation</p>
         </div>
     </div>
 
-    <div class="alert alert-info">
-        <span class="glyphicon glyphicon-info-sign"></span>
-        <strong>Info:</strong> Après l'enregistrement, vous serez redirigé vers la page de prescription pour ajouter des ordonnances si nécessaire.
+    @{
+        var initials = "";
+    if (!string.IsNullOrEmpty(Model.PatientPrenom) && !string.IsNullOrEmpty(Model.PatientNom))
+        {
+        initials = Model.PatientPrenom[0].ToString().ToUpper() + Model.PatientNom[0].ToString().ToUpper();
+     }
+        else if (!string.IsNullOrEmpty(Model.PatientNom))
+    {
+         initials = Model.PatientNom[0].ToString().ToUpper();
+  }
+    }
+
+    <!-- Patient Info Card -->
+    <div class="patient-info-section">
+        <div class="patient-info-header">
+     <div class="patient-avatar-large">@initials</div>
+            <div class="patient-header-info">
+  <h3>@Model.PatientPrenom @Model.PatientNom</h3>
+    <p>Dossier médical du patient</p>
+        </div>
+        </div>
+
+        <div class="patient-details-grid">
+            <div class="detail-item">
+        <div class="detail-icon">
+        <span class="glyphicon glyphicon-phone"></span>
+     </div>
+      <div class="detail-content">
+   <div class="detail-label">Téléphone</div>
+   <div class="detail-value">@Model.PatientTelephone</div>
+      </div>
+      </div>
+
+   @if (Model.PatientDateNaissance.HasValue)
+      {
+     <div class="detail-item">
+   <div class="detail-icon">
+          <span class="glyphicon glyphicon-calendar"></span>
+      </div>
+         <div class="detail-content">
+   <div class="detail-label">Date de naissance</div>
+      <div class="detail-value">@Model.PatientDateNaissance.Value.ToString("dd/MM/yyyy")</div>
+     </div>
+    </div>
+    }
+
+  <div class="detail-item">
+    <div class="detail-icon">
+      <span class="glyphicon glyphicon-list-alt"></span>
+                </div>
+       <div class="detail-content">
+             <div class="detail-label">Motif du rendez-vous</div>
+       <div class="detail-value">@Model.Motif</div>
+  </div>
+  </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.PatientAntecedents))
+        {
+    <div class="medical-history">
+          <div class="medical-history-header">
+          <span class="glyphicon glyphicon-warning-sign"></span>
+                    Antécédents médicaux
+       </div>
+                <div class="medical-history-content">@Model.PatientAntecedents</div>
+   </div>
+        }
+    </div>
+
+    <!-- Form Card -->
+    <div class="form-card">
+        @using (Html.BeginForm("StartConsultation", "Doctor", FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(m => m.RendezVousId)
+  @Html.HiddenFor(m => m.MedecinId)
+
+  <!-- Section 1: Date & Time -->
+            <div class="form-section">
+       <div class="form-section-title">
+       <span class="glyphicon glyphicon-time"></span>
+  Date et heure de consultation
+       </div>
+
+       <div class="form-group">
+         @Html.LabelFor(m => m.DateConsultation)
+        <span class="required">*</span>
+     @Html.TextBoxFor(m => m.DateConsultation, "{0:yyyy-MM-ddTHH:mm}", new
+       {
+    @class = "form-control",
+       type = "datetime-local",
+      required = "required"
+              })
+   @Html.ValidationMessageFor(m => m.DateConsultation, "", new { @class = "text-danger" })
+          <div class="help-text">
+   <span class="glyphicon glyphicon-info-sign"></span>
+    Sélectionnez la date et l'heure de la consultation
+              </div>
+       </div>
+       </div>
+
+            <!-- Section 2: Symptoms -->
+            <div class="form-section">
+       <div class="form-section-title">
+  <span class="glyphicon glyphicon-heart"></span>
+       Symptômes présentés
+      </div>
+
+      <div class="form-group">
+          @Html.LabelFor(m => m.Symptoms)
+   <span class="required">*</span>
+     @Html.TextAreaFor(m => m.Symptoms, new
+              {
+   @class = "form-control",
+  rows = 5,
+               placeholder = "Décrivez les symptômes présentés par le patient : douleurs, fièvre, toux, etc.",
+             required = "required"
+           })
+            @Html.ValidationMessageFor(m => m.Symptoms, "", new { @class = "text-danger" })
+   <div class="help-text">
+    <span class="glyphicon glyphicon-info-sign"></span>
+    Description détaillée des symptômes pour le dossier médical
+          </div>
+         </div>
+ </div>
+
+    <!-- Section 3: Diagnosis -->
+      <div class="form-section">
+        <div class="form-section-title">
+           <span class="glyphicon glyphicon-check"></span>
+   Diagnostic médical
+ </div>
+
+         <div class="form-group">
+         @Html.LabelFor(m => m.Diagnostic)
+        <span class="required">*</span>
+       @Html.TextAreaFor(m => m.Diagnostic, new
+    {
+  @class = "form-control",
+          rows = 5,
+          placeholder = "Entrez votre diagnostic médical principal...",
+              required = "required"
+        })
+     @Html.ValidationMessageFor(m => m.Diagnostic, "", new { @class = "text-danger" })
+              <div class="help-text">
+ <span class="glyphicon glyphicon-info-sign"></span>
+ Diagnostic principal établi après examen du patient
+        </div>
+           </div>
+    </div>
+
+            <!-- Section 4: Notes -->
+        <div class="form-section">
+            <div class="form-section-title">
+  <span class="glyphicon glyphicon-comment"></span>
+         Notes complémentaires
+      </div>
+
+     <div class="form-group">
+            @Html.LabelFor(m => m.Notes)
+   @Html.TextAreaFor(m => m.Notes, new
+            {
+  @class = "form-control",
+        rows = 6,
+      placeholder = "Notes complémentaires, observations, recommandations, traitement prescrit..."
+   })
+     @Html.ValidationMessageFor(m => m.Notes, "", new { @class = "text-danger" })
+          <div class="help-text">
+       <span class="glyphicon glyphicon-info-sign"></span>
+       Notes médicales confidentielles et recommandations (optionnel)
+       </div>
+              </div>
+   </div>
+
+          <!-- Submit Buttons -->
+<div class="form-actions">
+       <button type="submit" class="btn-submit">
+           <span class="glyphicon glyphicon-ok"></span>
+   Enregistrer la consultation
+              </button>
+           <a href="@Url.Action("Index", "Doctor")" class="btn-cancel">
+       <span class="glyphicon glyphicon-remove"></span>
+         Annuler
+   </a>
+            </div>
+    }
+    </div>
+
+    <!-- Info Alert -->
+    <div class="info-alert">
+      <div class="info-alert-icon">
+  <span class="glyphicon glyphicon-info-sign"></span>
+        </div>
+        <div class="info-alert-content">
+<strong>Information importante</strong>
+            <p>Après l'enregistrement de cette consultation, vous serez automatiquement redirigé vers la page de prescription pour ajouter des ordonnances si nécessaire.</p>
+        </div>
     </div>
 </div>
 

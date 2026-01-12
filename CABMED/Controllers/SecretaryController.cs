@@ -477,15 +477,81 @@ namespace CABMED.Controllers
 
             ViewBag.UserName = Session["UserName"] as string;
 
-            // Statistics
-            ViewBag.TotalAppointmentsToday = _db.RendezVous.Count(r => System.Data.Entity.DbFunctions.TruncateTime(r.DateHeureDebut) == DateTime.Today);
-            ViewBag.TotalAppointmentsWeek = _db.RendezVous.Count(r => r.DateHeureDebut >= DateTime.Today.AddDays(-7));
-            ViewBag.TotalAppointmentsMonth = _db.RendezVous.Count(r => r.DateHeureDebut >= DateTime.Today.AddDays(-30));
-            ViewBag.PendingRequests = GetPendingRequestsCount();
-            ViewBag.TotalPatients = _db.Users.Count(u => u.Role != null && u.Role.ToLower() == "patient");
-            ViewBag.TotalDoctors = _db.Users.Count(u => u.Role != null && u.Role.ToLower() == "medecin");
+            // Calculate dates BEFORE the query (fix for EF LINQ to Entities error)
+            var today = DateTime.Today;
+            var weekAgo = today.AddDays(-7);
+    var monthAgo = today.AddDays(-30);
+
+       // Statistics
+ ViewBag.TotalAppointmentsToday = _db.RendezVous.Count(r => System.Data.Entity.DbFunctions.TruncateTime(r.DateHeureDebut) == today);
+ ViewBag.TotalAppointmentsWeek = _db.RendezVous.Count(r => r.DateHeureDebut >= weekAgo);
+            ViewBag.TotalAppointmentsMonth = _db.RendezVous.Count(r => r.DateHeureDebut >= monthAgo);
+   ViewBag.PendingRequests = GetPendingRequestsCount();
+        ViewBag.TotalPatients = _db.Users.Count(u => u.Role != null && u.Role.ToLower() == "patient");
+     ViewBag.TotalDoctors = _db.Users.Count(u => u.Role != null && u.Role.ToLower() == "medecin");
 
             return View();
+        }
+
+        // GET: Secretary/PatientHistory?patientId=123
+        /// <summary>
+        /// View patient medical history and records (Secretary access)
+        /// </summary>
+        public ActionResult PatientHistory(int patientId)
+        {
+            var role = (Session["Role"] as string)?.ToLower();
+            if (role != "secretaire")
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            var patient = _db.Users.FirstOrDefault(u => u.UserId == patientId && u.Role.ToLower() == "patient");
+            if (patient == null)
+            {
+                return HttpNotFound();
+            }
+
+            ViewBag.UserName = Session["UserName"] as string;
+            ViewBag.PatientName = (patient.Prenom + " " + patient.Nom).Trim();
+            ViewBag.PatientEmail = patient.Email;
+            ViewBag.PatientPhone = patient.Telephone;
+            ViewBag.PatientDateNaissance = patient.DateNaissance;
+            ViewBag.PatientId = patient.UserId;
+
+            // Get all consultations for this patient
+            var consultations = _db.Consultations
+                .Include("RendezVous")
+                .Include("Users") // Doctor
+                .Include("Prescriptions")
+                .Include("ResultatsExamens")
+                .Where(c => c.RendezVous.PatientId == patientId)
+                .OrderByDescending(c => c.DateConsultation ?? c.RendezVous.DateHeureDebut)
+                .ToList();
+
+            return View(consultations);
+        }
+
+        // GET: Secretary/PatientsList
+        /// <summary>
+        /// List all patients for secretary to view records
+        /// </summary>
+        public ActionResult PatientsList()
+        {
+            var role = (Session["Role"] as string)?.ToLower();
+            if (role != "secretaire")
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            ViewBag.UserName = Session["UserName"] as string;
+
+            var patients = _db.Users
+                .Where(u => u.Role != null && u.Role.ToLower() == "patient" && u.IsActive == true)
+                .OrderBy(u => u.Nom)
+                .ThenBy(u => u.Prenom)
+                .ToList();
+
+            return View(patients);
         }
 
         private int GetPendingRequestsCount()

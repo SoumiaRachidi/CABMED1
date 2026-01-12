@@ -597,22 +597,39 @@ namespace CABMED.Controllers
 
         private static void ApplyRequestMetadata(AppointmentViewModel target, AppointmentRequestViewModel request)
         {
-            target.RequestStatus = request.Status;
-            target.DateDemande = request.DateDemande;
-            target.UrgencyLevel = request.UrgencyLevel;
-            target.PreferredSpecialty = request.PreferredSpecialty;
-            target.SymptomsDescription = request.SymptomsDescription;
-            target.AssignedDoctor = request.AssignedDoctor;
+            // IMPORTANT: Store the original database status FIRST before any overwrites
+            var originalDatabaseStatus = target.Statut;
+            
+ target.DateDemande = request.DateDemande;
+ target.UrgencyLevel = request.UrgencyLevel;
+          target.PreferredSpecialty = request.PreferredSpecialty;
+     target.SymptomsDescription = request.SymptomsDescription;
+  target.AssignedDoctor = request.AssignedDoctor;
             target.AssignedDoctorId = request.AssignedDoctorId;
-            target.SecretaryComments = request.SecretaryComments;
-            target.ProcessedDate = request.ProcessedDate;
-            target.ProcessedBy = request.ProcessedBy;
+       target.SecretaryComments = request.SecretaryComments;
+     target.ProcessedDate = request.ProcessedDate;
+ target.ProcessedBy = request.ProcessedBy;
 
             if (request.ConfirmedStartDateTime.HasValue)
-            {
-                target.DateHeureDebut = request.ConfirmedStartDateTime.Value;
-                target.DateHeureFin = request.ConfirmedEndDateTime ?? request.ConfirmedStartDateTime.Value.AddMinutes(30);
+ {
+    target.DateHeureDebut = request.ConfirmedStartDateTime.Value;
+target.DateHeureFin = request.ConfirmedEndDateTime ?? request.ConfirmedStartDateTime.Value.AddMinutes(30);
+         }
+   
+            // FIX: Always prioritize the database status over the request status
+   // Database has the real-time status (Confirme, Termine, Annule)
+   // Request status is stale and outdated after secretary approval
+            if (!string.IsNullOrEmpty(originalDatabaseStatus))
+    {
+          // Use the actual database status - it's authoritative
+         target.RequestStatus = originalDatabaseStatus;
+       target.Statut = originalDatabaseStatus;
             }
+    else
+            {
+   // Only use request status for pending requests not yet in RendezVous table
+           target.RequestStatus = request.Status;
+  }
         }
 
         private static AppointmentViewModel MapRequestToViewModel(AppointmentRequestViewModel request)

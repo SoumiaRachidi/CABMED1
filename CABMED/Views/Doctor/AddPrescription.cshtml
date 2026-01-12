@@ -5,154 +5,707 @@
     var existingPrescriptions = ViewBag.ExistingPrescriptions as List<CABMED.Models.Prescriptions>;
 }
 
-<div class="container" style="max-width: 900px; margin-top: 30px;">
-    
+<style>
+    /* Modern Prescription Form Theme */
+    :root {
+      --doctor-primary: #059669;
+  --doctor-primary-dark: #047857;
+     --doctor-primary-light: #10b981;
+        --doctor-accent: #34d399;
+        --success: #10b981;
+        --info: #3b82f6;
+  --warning: #f59e0b;
+        --white: #ffffff;
+  --gray-50: #f8fafc;
+        --gray-100: #f1f5f9;
+        --gray-200: #e2e8f0;
+        --gray-300: #cbd5e1;
+        --gray-400: #94a3b8;
+    --gray-600: #475569;
+        --gray-700: #334155;
+   --gray-900: #0f172a;
+        --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+    }
+
+  body {
+        background: var(--gray-50);
+    }
+
+    .prescription-container {
+    max-width: 1000px;
+        margin: 30px auto;
+     padding: 0 20px;
+  }
+
+    /* Success Message */
+    .success-message {
+  background: #d1fae5;
+ border: 1px solid #34d399;
+   border-radius: 12px;
+        padding: 16px 20px;
+        margin-bottom: 24px;
+        display: flex;
+align-items: center;
+        gap: 12px;
+ animation: slideDown 0.4s ease-out;
+    }
+
+  .success-message-icon {
+        width: 40px;
+        height: 40px;
+      background: var(--success);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+      justify-content: center;
+  color: white;
+        flex-shrink: 0;
+    }
+
+  .success-message-text {
+        color: #065f46;
+        font-weight: 600;
+    font-size: 14px;
+    }
+
+    @@keyframes slideDown {
+        from {
+         opacity: 0;
+   transform: translateY(-10px);
+        }
+        to {
+      opacity: 1;
+  transform: translateY(0);
+    }
+    }
+
+    /* Header Section */
+    .prescription-header {
+     background: linear-gradient(135deg, var(--doctor-primary) 0%, var(--doctor-primary-dark) 100%);
+     color: white;
+        padding: 40px;
+        border-radius: 16px 16px 0 0;
+        box-shadow: var(--shadow-xl);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .prescription-header::before {
+  content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 350px;
+      height: 350px;
+        background: rgba(255, 255, 255, 0.08);
+      border-radius: 50%;
+    }
+
+    .prescription-header .content {
+        position: relative;
+      z-index: 1;
+    }
+
+    .prescription-header h1 {
+        margin: 0 0 10px 0;
+        font-size: 28px;
+        font-weight: 700;
+     display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+  .prescription-header p {
+        margin: 0;
+     opacity: 0.95;
+        font-size: 15px;
+    }
+
+  /* Consultation Info Card */
+    .consultation-info {
+        background: white;
+ border: 1px solid var(--gray-200);
+      border-radius: 12px;
+        padding: 24px;
+margin: -20px 0 30px 0;
+        position: relative;
+        z-index: 2;
+    box-shadow: var(--shadow-lg);
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+   gap: 20px;
+    }
+
+    .info-item {
+        display: flex;
+   align-items: flex-start;
+        gap: 12px;
+    }
+
+    .info-icon {
+   width: 40px;
+        height: 40px;
+        background: var(--gray-100);
+        border-radius: 10px;
+   display: flex;
+        align-items: center;
+        justify-content: center;
+  color: var(--doctor-primary);
+        flex-shrink: 0;
+    }
+
+    .info-content {
+        flex: 1;
+    }
+
+    .info-label {
+   font-size: 12px;
+      color: var(--gray-600);
+     text-transform: uppercase;
+     font-weight: 600;
+        letter-spacing: 0.5px;
+margin-bottom: 4px;
+    }
+
+    .info-value {
+        font-size: 14px;
+        color: var(--gray-900);
+  font-weight: 600;
+    }
+
+    /* Existing Prescriptions Section */
+    .existing-prescriptions {
+   background: white;
+        border: 1px solid var(--gray-200);
+        border-radius: 16px;
+        margin-bottom: 30px;
+        overflow: hidden;
+        box-shadow: var(--shadow);
+    }
+
+    .existing-header {
+      background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
+   padding: 20px 24px;
+        border-bottom: 2px solid var(--gray-200);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .existing-title {
+        font-size: 16px;
+    font-weight: 700;
+color: var(--gray-900);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 0;
+    }
+
+    .existing-badge {
+        background: var(--doctor-primary);
+        color: white;
+      padding: 4px 12px;
+        border-radius: 20px;
+     font-size: 12px;
+        font-weight: 600;
+    }
+
+    .prescriptions-table {
+      width: 100%;
+    }
+
+    .prescriptions-table thead {
+        background: var(--gray-50);
+  }
+
+    .prescriptions-table thead th {
+        padding: 16px 20px;
+    font-weight: 600;
+  text-transform: uppercase;
+    font-size: 12px;
+        letter-spacing: 0.5px;
+    color: var(--gray-700);
+      border-bottom: 2px solid var(--gray-200);
+    }
+
+    .prescriptions-table tbody td {
+        padding: 16px 20px;
+     color: var(--gray-700);
+ font-size: 14px;
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+ .prescriptions-table tbody tr:hover {
+        background: rgba(5, 150, 105, 0.02);
+    }
+
+    .medicine-name {
+        font-weight: 700;
+        color: var(--gray-900);
+    }
+
+    /* Form Card */
+ .form-card {
+        background: white;
+        border: 1px solid var(--gray-200);
+        border-radius: 0 0 16px 16px;
+        padding: 40px;
+    box-shadow: var(--shadow-xl);
+    }
+
+    /* Form Section */
+    .form-section-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--gray-900);
+        margin-bottom: 24px;
+    padding-bottom: 12px;
+        border-bottom: 2px solid var(--gray-200);
+        display: flex;
+        align-items: center;
+ gap: 10px;
+    }
+
+    .form-section-title .glyphicon {
+        color: var(--doctor-primary);
+    }
+
+    .form-group {
+        margin-bottom: 24px;
+    }
+
+    .form-group label {
+   display: block;
+        font-weight: 600;
+        color: var(--gray-700);
+     margin-bottom: 8px;
+        font-size: 14px;
+    }
+
+    .form-group label .required {
+        color: #ef4444;
+        margin-left: 4px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid var(--gray-200);
+        border-radius: 10px;
+font-size: 15px;
+        transition: all 0.3s ease;
+     background: white;
+    }
+
+    .form-control:focus {
+   outline: none;
+        border-color: var(--doctor-primary);
+     box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.1);
+    }
+
+    .form-control::placeholder {
+      color: var(--gray-400);
+    }
+
+    textarea.form-control {
+ resize: vertical;
+     min-height: 80px;
+  font-family: inherit;
+        line-height: 1.6;
+    }
+
+    .help-text {
+      font-size: 13px;
+     color: var(--gray-600);
+   margin-top: 6px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .help-text .glyphicon {
+        font-size: 11px;
+    }
+
+    /* Buttons */
+    .btn-add {
+        background: linear-gradient(135deg, var(--doctor-primary), var(--doctor-primary-light));
+        color: white;
+   border: none;
+        padding: 14px 28px;
+        border-radius: 12px;
+     font-weight: 600;
+        font-size: 15px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+    }
+
+.btn-add:hover {
+    background: linear-gradient(135deg, var(--doctor-primary-dark), var(--doctor-primary));
+  transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(5, 150, 105, 0.4);
+    }
+
+    /* Bottom Actions */
+    .bottom-actions {
+        background: white;
+ border: 1px solid var(--gray-200);
+        border-radius: 16px;
+    padding: 32px;
+    margin-top: 24px;
+        box-shadow: var(--shadow);
+        text-align: center;
+    }
+
+    .info-message {
+        background: #dbeafe;
+        border-radius: 10px;
+        padding: 16px;
+      margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+justify-content: center;
+        gap: 10px;
+        color: #1e40af;
+        font-weight: 600;
+      font-size: 14px;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 12px;
+    justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-view {
+        background: linear-gradient(135deg, var(--doctor-primary), var(--doctor-primary-light));
+        color: white;
+        border: none;
+      padding: 16px 32px;
+    border-radius: 12px;
+        font-weight: 600;
+  font-size: 15px;
+        transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+        display: inline-flex;
+   align-items: center;
+   gap: 10px;
+        text-decoration: none;
+    }
+
+    .btn-view:hover {
+   background: linear-gradient(135deg, var(--doctor-primary-dark), var(--doctor-primary));
+        color: white;
+        transform: translateY(-2px);
+   box-shadow: 0 6px 20px rgba(5, 150, 105, 0.4);
+        text-decoration: none;
+    }
+
+    .btn-finish {
+background: white;
+        color: var(--info);
+        border: 2px solid var(--info);
+        padding: 16px 32px;
+   border-radius: 12px;
+        font-weight: 600;
+        font-size: 15px;
+     transition: all 0.3s ease;
+        display: inline-flex;
+  align-items: center;
+        gap: 10px;
+        text-decoration: none;
+    }
+
+    .btn-finish:hover {
+        background: var(--info);
+   color: white;
+    transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+ text-decoration: none;
+    }
+
+    /* Validation */
+    .text-danger {
+  color: #ef4444;
+        font-size: 12px;
+        margin-top: 4px;
+        display: block;
+    }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+   .prescription-header {
+            padding: 30px 24px;
+        }
+
+      .prescription-header h1 {
+      font-size: 24px;
+     }
+
+        .form-card {
+            padding: 24px;
+        }
+
+        .consultation-info {
+            grid-template-columns: 1fr;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+     .btn-view,
+        .btn-finish {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    /* Animation */
+    @@keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .form-card {
+        animation: slideUp 0.4s ease-out;
+    }
+</style>
+
+<div class="prescription-container">
     @if (TempData["SuccessMessage"] != null)
-    {
-        <div class="alert alert-success alert-dismissible">
-            <button type="button" class="close" data-dismiss="alert">&times;</button>
-            <span class="glyphicon glyphicon-ok-circle"></span>
-            @TempData["SuccessMessage"]
+ {
+        <div class="success-message">
+            <div class="success-message-icon">
+     <span class="glyphicon glyphicon-ok"></span>
+    </div>
+         <div class="success-message-text">@TempData["SuccessMessage"]</div>
         </div>
     }
 
-    <div class="panel panel-success">
-        <div class="panel-heading">
-            <h3 class="panel-title">
-                <span class="glyphicon glyphicon-list-alt"></span>
-                Créer une ordonnance (Prescription)
-            </h3>
+    <!-- Header -->
+    <div class="prescription-header">
+        <div class="content">
+       <h1>
+              <span class="glyphicon glyphicon-list-alt"></span>
+  Créer une ordonnance
+     </h1>
+            <p>Prescrivez les médicaments nécessaires pour le traitement du patient</p>
         </div>
-        <div class="panel-body">
-            
-            <!-- Consultation Info -->
-            <div class="well well-sm">
-                <div class="row">
-                    <div class="col-md-6">
-                        <p><strong>Patient:</strong> @Model.PatientName</p>
-                        <p><strong>Médecin:</strong> @Model.DoctorName</p>
-                    </div>
-                    <div class="col-md-6">
-                        @if (!string.IsNullOrEmpty(Model.DoctorSpecialite))
-                        {
-                            <p><strong>Spécialité:</strong> @Model.DoctorSpecialite</p>
-                        }
-                        <p><strong>Date:</strong> @Model.DatePrescription.ToString("dd/MM/yyyy")</p>
-                    </div>
-                </div>
-            </div>
+    </div>
 
-            <!-- Existing Prescriptions -->
+    <!-- Consultation Info -->
+    <div class="consultation-info">
+        <div class="info-item">
+    <div class="info-icon">
+     <span class="glyphicon glyphicon-user"></span>
+            </div>
+       <div class="info-content">
+     <div class="info-label">Patient</div>
+           <div class="info-value">@Model.PatientName</div>
+            </div>
+        </div>
+
+      <div class="info-item">
+            <div class="info-icon">
+       <span class="glyphicon glyphicon-user-md"></span>
+            </div>
+      <div class="info-content">
+        <div class="info-label">Médecin</div>
+ <div class="info-value">@Model.DoctorName</div>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.DoctorSpecialite))
+        {
+          <div class="info-item">
+          <div class="info-icon">
+          <span class="glyphicon glyphicon-heart"></span>
+         </div>
+     <div class="info-content">
+       <div class="info-label">Spécialité</div>
+             <div class="info-value">@Model.DoctorSpecialite</div>
+    </div>
+            </div>
+        }
+
+        <div class="info-item">
+            <div class="info-icon">
+         <span class="glyphicon glyphicon-calendar"></span>
+   </div>
+      <div class="info-content">
+ <div class="info-label">Date</div>
+      <div class="info-value">@Model.DatePrescription.ToString("dd/MM/yyyy")</div>
+  </div>
+        </div>
+    </div>
+
+    <!-- Existing Prescriptions -->
+  @if (existingPrescriptions != null && existingPrescriptions.Count > 0)
+    {
+        <div class="existing-prescriptions">
+            <div class="existing-header">
+       <h3 class="existing-title">
+      <span class="glyphicon glyphicon-ok-circle"></span>
+    Médicaments déjà prescrits
+      </h3>
+       <span class="existing-badge">@existingPrescriptions.Count</span>
+    </div>
+  <table class="prescriptions-table">
+     <thead>
+       <tr>
+           <th>Médicament</th>
+        <th>Posologie & Détails</th>
+      </tr>
+  </thead>
+    <tbody>
+   @foreach (var prescription in existingPrescriptions)
+       {
+    <tr>
+         <td><span class="medicine-name">@prescription.Medicament</span></td>
+ <td>@prescription.Posologie</td>
+     </tr>
+     }
+   </tbody>
+  </table>
+        </div>
+    }
+
+    <!-- Form Card -->
+    <div class="form-card">
+    <div class="form-section-title">
+      <span class="glyphicon glyphicon-plus"></span>
+        Ajouter un médicament
+      </div>
+
+        @using (Html.BeginForm("AddPrescription", "Doctor", FormMethod.Post))
+        {
+      @Html.AntiForgeryToken()
+         @Html.HiddenFor(m => m.ConsultationId)
+
+       <div class="form-group">
+   @Html.LabelFor(m => m.Medicament)
+          <span class="required">*</span>
+    @Html.TextBoxFor(m => m.Medicament, new
+         {
+    @class = "form-control",
+  placeholder = "Ex: Paracétamol 500mg, Amoxicilline 1g, Ibuprofène 400mg...",
+            required = "required"
+       })
+  @Html.ValidationMessageFor(m => m.Medicament, "", new { @class = "text-danger" })
+          <div class="help-text">
+             <span class="glyphicon glyphicon-info-sign"></span>
+     Nom du médicament avec le dosage
+             </div>
+      </div>
+
+            <div class="form-group">
+       @Html.LabelFor(m => m.Posologie)
+          <span class="required">*</span>
+                @Html.TextBoxFor(m => m.Posologie, new
+      {
+        @class = "form-control",
+         placeholder = "Ex: 1 comprimé, 2 gélules, 10ml, 5mg...",
+   required = "required"
+      })
+             @Html.ValidationMessageFor(m => m.Posologie, "", new { @class = "text-danger" })
+        <div class="help-text">
+    <span class="glyphicon glyphicon-info-sign"></span>
+         Quantité par prise
+       </div>
+      </div>
+
+         <div class="form-group">
+          @Html.LabelFor(m => m.Frequence)
+   <span class="required">*</span>
+        @Html.TextBoxFor(m => m.Frequence, new
+          {
+@class = "form-control",
+    placeholder = "Ex: 3 fois par jour, toutes les 8 heures, matin et soir...",
+           required = "required"
+            })
+                @Html.ValidationMessageFor(m => m.Frequence, "", new { @class = "text-danger" })
+  <div class="help-text">
+                 <span class="glyphicon glyphicon-info-sign"></span>
+       Fréquence de prise du médicament
+        </div>
+      </div>
+
+            <div class="form-group">
+     @Html.LabelFor(m => m.Duree)
+     <span class="required">*</span>
+           @Html.TextBoxFor(m => m.Duree, new
+         {
+        @class = "form-control",
+    placeholder = "Ex: 7 jours, 2 semaines, 1 mois, jusqu'à amélioration...",
+  required = "required"
+     })
+   @Html.ValidationMessageFor(m => m.Duree, "", new { @class = "text-danger" })
+        <div class="help-text">
+   <span class="glyphicon glyphicon-info-sign"></span>
+  Durée du traitement
+                </div>
+ </div>
+
+      <div class="form-group">
+       @Html.LabelFor(m => m.Instructions)
+ @Html.TextAreaFor(m => m.Instructions, new
+          {
+           @class = "form-control",
+        placeholder = "Ex: À prendre pendant les repas, ne pas conduire après la prise, ne pas mélanger avec de l'alcool...",
+               rows = 4
+     })
+          @Html.ValidationMessageFor(m => m.Instructions, "", new { @class = "text-danger" })
+  <div class="help-text">
+        <span class="glyphicon glyphicon-info-sign"></span>
+         Instructions spéciales et précautions (optionnel)
+      </div>
+         </div>
+
+          <div style="text-align: center; padding-top: 16px; border-top: 2px solid var(--gray-200);">
+      <button type="submit" class="btn-add">
+   <span class="glyphicon glyphicon-plus"></span>
+         Ajouter ce médicament
+           </button>
+    </div>
+        }
+    </div>
+
+    <!-- Bottom Actions -->
+    <div class="bottom-actions">
+  <div class="info-message">
+            <span class="glyphicon glyphicon-info-sign"></span>
+     Vous pouvez ajouter plusieurs médicaments à cette ordonnance
+        </div>
+
+        <div class="action-buttons">
             @if (existingPrescriptions != null && existingPrescriptions.Count > 0)
-            {
-                <div class="panel panel-default" style="margin-bottom: 20px;">
-                    <div class="panel-heading">
-                        <strong>Médicaments déjà prescrits (@existingPrescriptions.Count)</strong>
-                    </div>
-                    <div class="panel-body">
-                        <table class="table table-striped table-condensed">
-                            <thead>
-                                <tr>
-                                    <th>Médicament</th>
-                                    <th>Posologie</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var prescription in existingPrescriptions)
-                                {
-                                    <tr>
-                                        <td><strong>@prescription.Medicament</strong></td>
-                                        <td>@prescription.Posologie</td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            }
+     {
+             <a href="@Url.Action("ViewPrescription", "Doctor", new { id = Model.ConsultationId })" class="btn-view">
+          <span class="glyphicon glyphicon-file"></span>
+         Voir l'ordonnance complète
+       </a>
+     }
 
-            <!-- Prescription Form -->
-            @using (Html.BeginForm("AddPrescription", "Doctor", FormMethod.Post, new { @class = "form-horizontal" }))
-            {
-                @Html.AntiForgeryToken()
-                @Html.HiddenFor(m => m.ConsultationId)
-
-                <h4 style="margin-top: 20px; margin-bottom: 15px; border-bottom: 2px solid #5cb85c; padding-bottom: 5px;">
-                    <span class="glyphicon glyphicon-plus"></span> Ajouter un médicament
-                </h4>
-
-                <div class="form-group">
-                    @Html.LabelFor(m => m.Medicament, new { @class = "col-sm-3 control-label" })
-                    <div class="col-sm-9">
-                        @Html.TextBoxFor(m => m.Medicament, new { @class = "form-control", placeholder = "Ex: Paracétamol 500mg, Amoxicilline 1g..." })
-                        @Html.ValidationMessageFor(m => m.Medicament, "", new { @class = "text-danger" })
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    @Html.LabelFor(m => m.Posologie, new { @class = "col-sm-3 control-label" })
-                    <div class="col-sm-9">
-                        @Html.TextBoxFor(m => m.Posologie, new { @class = "form-control", placeholder = "Ex: 1 comprimé, 2 gélules, 10ml..." })
-                        @Html.ValidationMessageFor(m => m.Posologie, "", new { @class = "text-danger" })
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    @Html.LabelFor(m => m.Frequence, new { @class = "col-sm-3 control-label" })
-                    <div class="col-sm-9">
-                        @Html.TextBoxFor(m => m.Frequence, new { @class = "form-control", placeholder = "Ex: 3 fois par jour, toutes les 8 heures, matin et soir..." })
-                        @Html.ValidationMessageFor(m => m.Frequence, "", new { @class = "text-danger" })
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    @Html.LabelFor(m => m.Duree, new { @class = "col-sm-3 control-label" })
-                    <div class="col-sm-9">
-                        @Html.TextBoxFor(m => m.Duree, new { @class = "form-control", placeholder = "Ex: 7 jours, 2 semaines, 1 mois..." })
-                        @Html.ValidationMessageFor(m => m.Duree, "", new { @class = "text-danger" })
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    @Html.LabelFor(m => m.Instructions, new { @class = "col-sm-3 control-label" })
-                    <div class="col-sm-9">
-                        @Html.TextAreaFor(m => m.Instructions, 3, 50, new { @class = "form-control", placeholder = "Ex: À prendre pendant les repas, ne pas conduire après la prise..." })
-                        @Html.ValidationMessageFor(m => m.Instructions, "", new { @class = "text-danger" })
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <div class="col-sm-offset-3 col-sm-9">
-                        <button type="submit" class="btn btn-success btn-lg">
-                            <span class="glyphicon glyphicon-plus"></span>
-                            Ajouter ce médicament
-                        </button>
-                    </div>
-                </div>
-            }
-
-            <hr />
-
-            <div class="text-center">
-                <p class="text-muted">
-                    <span class="glyphicon glyphicon-info-sign"></span>
-                    Vous pouvez ajouter plusieurs médicaments à cette ordonnance
-                </p>
-                
-                @if (existingPrescriptions != null && existingPrescriptions.Count > 0)
-                {
-                    <a href="@Url.Action("ViewPrescription", "Doctor", new { id = Model.ConsultationId })" class="btn btn-success btn-lg" style="margin-right: 10px;">
-                        <span class="glyphicon glyphicon-file"></span>
-                        Voir l'ordonnance
-                    </a>
-                }
-                
-                <a href="@Url.Action("Index", "Doctor")" class="btn btn-primary btn-lg">
-                    <span class="glyphicon glyphicon-ok"></span>
-                    Terminer la consultation
-                </a>
-            </div>
-        </div>
+   <a href="@Url.Action("CompleteConsultation", "Doctor", new { id = Model.ConsultationId })" class="btn-finish">
+     <span class="glyphicon glyphicon-ok"></span>
+                Terminer la consultation
+         </a>
+   </div>
     </div>
 </div>
 

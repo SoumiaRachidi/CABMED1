@@ -704,6 +704,45 @@ namespace CABMED.Controllers
             return RedirectToAction("PatientHistory", new { patientId = patientId });
         }
 
+        // GET: Doctor/CompleteConsultation/{consultationId}
+        /// <summary>
+        /// Mark consultation as complete and update appointment status to "Termine"
+        /// </summary>
+        public ActionResult CompleteConsultation(int id)
+        {
+            if (!CheckDoctorAccess())
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            var doctorId = Session["UserID"] as int?;
+            if (doctorId == null)
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            var consultation = db.Consultations
+                .Include(c => c.RendezVous)
+                .FirstOrDefault(c => c.ConsultationId == id && c.MedecinId == doctorId.Value);
+
+            if (consultation == null)
+            {
+                TempData["ErrorMessage"] = "Consultation introuvable";
+                return RedirectToAction("Index");
+            }
+
+            // Update the appointment status to "Termine"
+            var rendezVous = consultation.RendezVous;
+            if (rendezVous != null)
+            {
+                rendezVous.Statut = "Termine";
+                db.SaveChanges();
+                TempData["SuccessMessage"] = "Consultation terminée avec succès. Le statut du rendez-vous a été mis à jour.";
+            }
+
+            return RedirectToAction("Index");
+        }
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)

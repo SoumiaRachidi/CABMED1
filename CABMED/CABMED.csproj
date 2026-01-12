@@ -252,6 +252,7 @@
     <Content Include="Docs\Staff-Edit-Delete-Updates.md" />
     <Content Include="Docs\Modern-Navbar-Update.md" />
     <Content Include="Docs\Unified-Admin-Color-Scheme.md" />
+    <Content Include="Docs\Secretary-Patient-Dossier-Access.md" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />
@@ -307,6 +308,8 @@
     <Content Include="Views\Admin\PatientDetails.cshtml" />
     <Content Include="Views\Secretary\CreateAppointment.cshtml" />
     <Content Include="Views\Secretary\ViewRequestDetails.cshtml" />
+    <Content Include="Views\Secretary\PatientsList.cshtml" />
+    <Content Include="Views\Secretary\PatientHistory.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
