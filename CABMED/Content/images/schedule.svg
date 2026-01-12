@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 350" width="400" height="350">
+  <!-- Schedule / availability / calendar illustration -->
+  <defs>
+    <linearGradient id="calendarGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2D3E6E;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#4A5F8F;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <circle cx="200" cy="175" r="140" fill="#E8F0FF" opacity="0.3"/>
+  
+  <!-- Calendar -->
+  <rect x="100" y="90" width="200" height="200" fill="white" stroke="url(#calendarGrad)" stroke-width="4" rx="12"/>
+  
+  <!-- Calendar header -->
+  <rect x="100" y="90" width="200" height="50" fill="url(#calendarGrad)" rx="12"/>
+  <rect x="100" y="115" width="200" height="25" fill="url(#calendarGrad)"/>
+  
+  <!-- Calendar rings -->
+  <circle cx="130" cy="95" r="8" fill="#FF6B4A"/>
+  <rect x="126" y="85" width="8" height="15" fill="#FF6B4A" rx="2"/>
+  <circle cx="270" cy="95" r="8" fill="#FF6B4A"/>
+  <rect x="266" y="85" width="8" height="15" fill="#FF6B4A" rx="2"/>
+  
+  <!-- Calendar text header -->
+  <text x="200" y="125" text-anchor="middle" fill="white" font-size="18" font-weight="bold" font-family="Arial">MEDX</text>
+  
+  <!-- Calendar grid - days -->
+  <line x1="120" y1="160" x2="280" y2="160" stroke="#E8ECF1" stroke-width="2"/>
+  <line x1="120" y1="190" x2="280" y2="190" stroke="#E8ECF1" stroke-width="2"/>
+  <line x1="120" y1="220" x2="280" y2="220" stroke="#E8ECF1" stroke-width="2"/>
+  <line x1="120" y1="250" x2="280" y2="250" stroke="#E8ECF1" stroke-width="2"/>
+  
+  <!-- Calendar appointments (dots) -->
+  <circle cx="140" cy="175" r="5" fill="#FF6B4A"/>
+  <circle cx="180" cy="175" r="5" fill="#FF6B4A"/>
+  <circle cx="260" cy="175" r="5" fill="#2D3E6E"/>
+  
+  <circle cx="140" cy="205" r="5" fill="#2D3E6E"/>
+  <circle cx="220" cy="205" r="5" fill="#FF6B4A"/>
+  <circle cx="260" cy="205" r="5" fill="#FF6B4A"/>
+  
+  <circle cx="160" cy="235" r="5" fill="#2D3E6E"/>
+  <circle cx="200" cy="235" r="5" fill="#FF6B4A"/>
+  <circle cx="240" cy="235" r="5" fill="#FF6B4A"/>
+  
+  <circle cx="140" cy="265" r="5" fill="#FF6B4A"/>
+  <circle cx="180" cy="265" r="5" fill="#2D3E6E"/>
+  <circle cx="220" cy="265" r="5" fill="#FF6B4A"/>
+  
+  <!-- Clock illustration -->
+  <circle cx="320" cy="250" r="35" fill="white" stroke="#FF6B4A" stroke-width="3"/>
+  <line x1="320" y1="250" x2="320" y2="230" stroke="#FF6B4A" stroke-width="3" stroke-linecap="round"/>
+  <line x1="320" y1="250" x2="335" y2="255" stroke="#2D3E6E" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="320" cy="250" r="4" fill="#FF6B4A"/>
+  
+  <!-- 24/7 availability badge -->
+  <circle cx="80" cy="250" r="30" fill="#FF6B4A"/>
+  <text x="80" y="255" text-anchor="middle" fill="white" font-size="16" font-weight="bold" font-family="Arial">6/7</text>
+</svg>

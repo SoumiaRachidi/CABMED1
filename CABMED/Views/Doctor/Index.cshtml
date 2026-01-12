@@ -31,6 +31,7 @@
                                 <th>Patient</th>
                                 <th>Téléphone</th>
                                 <th>Motif</th>
+                                <th style="width:110px;">Statut</th>
                                 <th style="width:260px;">Actions</th>
                             </tr>
                         </thead>
@@ -64,6 +65,7 @@
                                 <th>Patient</th>
                                 <th>Téléphone</th>
                                 <th>Motif</th>
+                                <th style="width:110px;">Statut</th>
                                 <th style="width:260px;">Actions</th>
                             </tr>
                         </thead>
@@ -100,23 +102,52 @@
         function buildActions(rendezVousId, consultationId) {
             var html = '';
 
-            html += '<button type="button" class="btn btn-xs btn-info" disabled="disabled">View records</button> ';
+            // View patient records button
+            html += '<a href="@Url.Action("ViewRecords","Doctor")/' + rendezVousId + '" ' +
+                    'class="btn btn-xs btn-info" title="Voir l\'historique médical">' +
+                    '<span class="glyphicon glyphicon-folder-open"></span> View records' +
+                    '</a> ';
 
-            // Start consultation (simple POST form)
-            html += '<form method="post" action="@Url.Action("StartConsultation","Doctor")" style="display:inline; margin:0 4px;">' +
-                '<input type="hidden" name="rendezVousId" value="' + rendezVousId + '" />' +
-                '@Html.AntiForgeryToken()'.replace(/"/g, '&quot;') +
-                '<button type="submit" class="btn btn-xs btn-primary">Start consultation</button>' +
-                '</form> ';
-
-            if (consultationId) {
-                html += '<a href="' + '@Url.Action("CreatePrescription", "Doctor")' + '?consultationId=' + consultationId + '" ' +
-                        'class="btn btn-xs btn-success">Prescribe</a> ';
+            // Start consultation button - redirects to consultation form
+            if (!consultationId) {
+                html += '<a href="@Url.Action("StartConsultation","Doctor")/' + rendezVousId + '" ' +
+                        'class="btn btn-xs btn-primary">' +
+                        '<span class="glyphicon glyphicon-pencil"></span> Start consultation' +
+                        '</a> ';
             } else {
-                html += '<button type="button" class="btn btn-xs btn-default" disabled="disabled" title="Start consultation first">Prescribe</button> ';
+                html += '<span class="label label-success">Consultation démarrée</span> ';
+            }
+
+            // Prescribe button - only enabled if consultation exists
+            if (consultationId) {
+                html += '<a href="@Url.Action("AddPrescription","Doctor")/' + consultationId + '" ' +
+                        'class="btn btn-xs btn-success">' +
+                        '<span class="glyphicon glyphicon-list-alt"></span> Prescribe' +
+                        '</a>';
+            } else {
+                html += '<button type="button" class="btn btn-xs btn-default" disabled="disabled" ' +
+                        'title="Démarrez d\'abord la consultation">' +
+                        '<span class="glyphicon glyphicon-list-alt"></span> Prescribe' +
+                        '</button>';
             }
 
             return html;
+        }
+
+        function formatStatus(status) {
+            var value = (status || 'En attente');
+            var normalized = value.toLowerCase();
+            var css = 'label-default';
+
+            if (normalized.indexOf('confirm') === 0 || normalized.indexOf('approuv') === 0) {
+                css = 'label-success';
+            } else if (normalized.indexOf('refus') === 0 || normalized.indexOf('annul') === 0) {
+                css = 'label-danger';
+            } else if (normalized.indexOf('attente') === 0) {
+                css = 'label-warning';
+            }
+
+            return '<span class="label ' + css + '">' + value + '</span>';
         }
 
         function fetchTodayAppointments(){
@@ -132,11 +163,13 @@
                         data.forEach(function(a){
                             var info = formatDateFromNet(a.DateHeureDebut);
                             var heureDebut = a.HeureDebut || (info ? info.time : '');
+                            var status = a.Statut || '—';
                             var row = '<tr>'+
                                 '<td><strong>'+ heureDebut +'</strong></td>'+
                                 '<td>'+ (a.PatientPrenom || '') +' '+ (a.PatientNom || '') +'</td>'+
                                 '<td>'+ (a.PatientTelephone || 'N/A') +'</td>'+
-                                '<td>'+ (a.Motif || '—') +'</td>'+
+                                '<td>'+ (a.Motif || '-') +'</td>'+
+                                '<td>'+ formatStatus(a.Statut) +'</td>'+
                                 '<td>'+ buildActions(a.RendezVousId, a.ConsultationId) +'</td>'+
                                 '</tr>';
                             tb.append(row);
@@ -167,12 +200,14 @@
                             var info = formatDateFromNet(a.DateHeureDebut);
                             var date = info ? info.date : '';
                             var heure = a.HeureDebut || (info ? info.time : '');
+                            var status = a.Statut || '—';
                             var row = '<tr>'+
                                 '<td>'+ date +'</td>'+
                                 '<td><strong>'+ heure +'</strong></td>'+
                                 '<td>'+ (a.PatientPrenom || '') +' '+ (a.PatientNom || '') +'</td>'+
                                 '<td>'+ (a.PatientTelephone || 'N/A') +'</td>'+
-                                '<td>'+ (a.Motif || '—') +'</td>'+
+                                '<td>'+ (a.Motif || '-') +'</td>'+
+                                '<td>'+ formatStatus(a.Statut) +'</td>'+
                                 '<td>'+ buildActions(a.RendezVousId, a.ConsultationId) +'</td>'+
                                 '</tr>';
                             tb.append(row);

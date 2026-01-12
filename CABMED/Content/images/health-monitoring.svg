@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 350" width="400" height="350">
+  <!-- Health monitoring / medical tracking illustration -->
+  <defs>
+    <linearGradient id="monitorGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2D3E6E;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#4A5F8F;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <circle cx="200" cy="175" r="140" fill="#E8F0FF" opacity="0.3"/>
+  
+  <!-- Doctor figure -->
+  <circle cx="150" cy="140" r="28" fill="#2D3E6E"/>
+  <rect x="132" y="168" width="36" height="55" fill="#2D3E6E" rx="5"/>
+  <!-- White coat -->
+  <rect x="127" y="175" width="46" height="50" fill="white" rx="3"/>
+  
+  <!-- Patient figure (elderly) -->
+  <circle cx="250" cy="150" r="25" fill="#C4C4C4"/>
+  <rect x="232" y="175" width="36" height="50" fill="#C4C4C4" rx="5"/>
+  <!-- Walking stick -->
+  <line x1="270" y1="200" x2="280" y2="230" stroke="#8B8B8B" stroke-width="3" stroke-linecap="round"/>
+  
+  <!-- Medical chart/clipboard -->
+  <rect x="170" y="100" width="60" height="80" fill="white" stroke="url(#monitorGrad)" stroke-width="3" rx="5"/>
+  <line x1="180" y1="120" x2="220" y2="120" stroke="#FF6B4A" stroke-width="3" stroke-linecap="round"/>
+  <line x1="180" y1="135" x2="220" y2="135" stroke="#FF6B4A" stroke-width="2" stroke-linecap="round"/>
+  <line x1="180" y1="148" x2="210" y2="148" stroke="#FF6B4A" stroke-width="2" stroke-linecap="round"/>
+  <line x1="180" y1="161" x2="220" y2="161" stroke="#2D3E6E" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- Heart rate monitor line -->
+  <path d="M 100 260 L 120 260 L 130 250 L 140 270 L 150 240 L 160 260 L 300 260" 
+        stroke="#FF6B4A" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Medical cross -->
+  <rect x="195" y="85" width="10" height="25" fill="#FF6B4A"/>
+  <rect x="185" y="95" width="30" height="10" fill="#FF6B4A"/>
+  
+  <!-- Caring hands illustration -->
+  <circle cx="200" cy="290" r="30" fill="#FFB4A0" opacity="0.3"/>
+  <path d="M 185 285 Q 200 270 215 285" fill="none" stroke="#FF6B4A" stroke-width="3" stroke-linecap="round"/>
+</svg>

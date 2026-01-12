@@ -6,324 +6,596 @@
 }
 
 <style>
-    /* Professional medical minimalist theme - consistent with other dashboards */
+    /* Professional Purple Medical Theme - Matching Patient Dashboard */
     :root {
-        --primary:#2b7de9;        /* light blue */
-        --accent:#2ecc71;         /* medical green */
-        --warning:#e67e22;        /* orange */
-        --danger:#e74c3c;         /* red */
-        --muted:#6c757d;
-        --bg:#ffffff;
-        --card:#f8f9fa;
-        --border:#e9ecef;
+        --primary-purple: #7132CA;
+        --light-purple: #C47BE4;
+        --dark-purple: #301CA0;
+        --pink-accent: #F29AAE;
+        --white: #FFFFFF;
+        --light-bg: #F7F8FC;
+        --dark-text: #2C2C54;
+        --light-text: #8B8BA7;
+        --card-shadow: 0 4px 20px rgba(113, 50, 202, 0.12);
+        --hover-shadow: 0 8px 35px rgba(113, 50, 202, 0.2);
+        --gradient-primary: linear-gradient(135deg, #7132CA 0%, #C47BE4 100%);
+        --gradient-dark: linear-gradient(135deg, #301CA0 0%, #7132CA 100%);
     }
-    .secretary-dashboard { background: var(--bg); }
-    .metric-card { border:1px solid var(--border); border-radius:12px; background: var(--card); padding:22px; box-shadow:0 2px 8px rgba(0,0,0,.03); }
-    .metric-card .value { font-size:40px; font-weight:700; margin:6px 0; }
-    .metric-card .label { color: var(--muted); }
-    .metric-icon { width:44px; height:44px; display:flex; align-items:center; justify-content:center; border-radius:10px; color:#fff; }
-    .metric-icon.primary { background: var(--primary); }
-    .metric-icon.accent { background: var(--accent); }
-    .metric-icon.warning { background: var(--warning); }
-    .metric-icon.danger { background: var(--danger); }
 
-    .quick-actions .btn { border-radius:10px; padding:14px 18px; font-weight:600; margin-right:8px; margin-bottom:8px; }
-    .panel-clean { border:1px solid var(--border); border-radius:12px; background: var(--card); }
-    .panel-clean .panel-heading { padding:16px 18px; border-bottom:1px solid var(--border); background:#fff; border-radius:12px 12px 0 0; }
-    .panel-clean .panel-body { padding:18px; }
+    body {
+        background: var(--light-bg);
+    }
 
-    .form-control { border-radius:10px; }
-    .request-card { 
-        border-left:4px solid var(--warning); 
-        background:#fff; 
-        padding:16px; 
-        margin:8px 0; 
-        border-radius:8px; 
-        box-shadow:0 1px 3px rgba(0,0,0,.1);
+    .secretary-dashboard {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 30px 20px;
+    }
+
+    /* Welcome Header */
+    .welcome-header {
+        background: var(--gradient-primary);
+        border-radius: 20px;
+        padding: 45px;
+        color: white;
+        margin-bottom: 35px;
+        box-shadow: var(--card-shadow);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .welcome-header::before {
+        content: '';
+        position: absolute;
+        top: -60%;
+        right: -8%;
+        width: 350px;
+        height: 350px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 50%;
+    }
+
+    .welcome-header::after {
+        content: '';
+        position: absolute;
+        bottom: -40%;
+        left: -5%;
+        width: 280px;
+        height: 280px;
+        background: rgba(196, 123, 228, 0.15);
+        border-radius: 50%;
+    }
+
+    .welcome-header h1 {
+        margin: 0 0 12px 0;
+        font-size: 34px;
+        font-weight: 700;
+        position: relative;
+        z-index: 1;
+    }
+
+    .welcome-header p {
+        margin: 0;
+        font-size: 16px;
+        opacity: 0.95;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Quick Action Buttons */
+    .quick-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 25px;
+        flex-wrap: wrap;
+        position: relative;
+        z-index: 1;
+    }
+
+    .quick-actions .btn {
+        border-radius: 12px;
+        padding: 12px 24px;
+        font-weight: 600;
+        border: none;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .quick-actions .btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 25px rgba(0, 0, 0, 0.18);
+    }
+
+    .quick-actions .btn-primary {
+        background: var(--white);
+        color: var(--primary-purple);
+    }
+
+    .quick-actions .btn-warning {
+        background: rgba(255, 255, 255, 0.25);
+        color: white;
+        border: 2px solid rgba(255, 255, 255, 0.4);
+    }
+
+    .quick-actions .btn-info {
+        background: rgba(255, 255, 255, 0.25);
+        color: white;
+        border: 2px solid rgba(255, 255, 255, 0.4);
+    }
+
+    .quick-actions .btn-success {
+        background: rgba(255, 255, 255, 0.25);
+        color: white;
+        border: 2px solid rgba(255, 255, 255, 0.4);
+    }
+
+    .quick-actions .btn-default {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 2px solid rgba(255, 255, 255, 0.35);
+    }
+
+    /* Stats Cards */
+    .stats-section {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 25px;
+        margin-bottom: 35px;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 18px;
+        padding: 28px;
+        box-shadow: var(--card-shadow);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid rgba(113, 50, 202, 0.08);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--gradient-primary);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--hover-shadow);
+        border-color: var(--primary-purple);
+    }
+
+    .stat-card-header {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        margin-bottom: 18px;
+    }
+
+    .stat-icon {
+        width: 62px;
+        height: 62px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 26px;
+        color: white;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+    }
+
+    .stat-icon.purple { background: var(--gradient-primary); }
+    .stat-icon.pink { background: linear-gradient(135deg, #F29AAE 0%, #C47BE4 100%); }
+    .stat-icon.dark { background: var(--gradient-dark); }
+
+    .stat-info {
+        flex: 1;
+    }
+
+    .stat-value {
+        font-size: 38px;
+        font-weight: 700;
+        color: var(--primary-purple);
+        line-height: 1;
+        margin-bottom: 6px;
+    }
+
+    .stat-label {
+        font-size: 14px;
+        color: var(--light-text);
+        font-weight: 500;
+    }
+
+    .stat-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--primary-purple);
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        margin-top: 12px;
         transition: all 0.3s ease;
     }
-    .request-card:hover { transform: translateY(-2px); box-shadow:0 4px 12px rgba(0,0,0,.15); }
-    .request-card.urgent { border-left-color: var(--danger); }
-    .request-card.low { border-left-color: var(--accent); }
-    
+
+    .stat-link:hover {
+        gap: 10px;
+        color: var(--dark-purple);
+    }
+
+    /* Content Grid */
+    .content-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 28px;
+        margin-bottom: 35px;
+    }
+
+    /* Action Tiles */
+    .action-tiles {
+        background: white;
+        border-radius: 18px;
+        padding: 32px;
+        box-shadow: var(--card-shadow);
+        border: 1px solid rgba(113, 50, 202, 0.08);
+    }
+
+    .section-title {
+        font-size: 19px;
+        font-weight: 700;
+        color: var(--dark-text);
+        margin-bottom: 22px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .section-title .glyphicon {
+        color: var(--primary-purple);
+        font-size: 20px;
+    }
+
+    .tiles-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .action-tile {
+        background: linear-gradient(135deg, #F7F8FC 0%, #F0F1F7 100%);
+        border-radius: 14px;
+        padding: 24px;
+        text-align: center;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        text-decoration: none;
+        display: block;
+        border: 2px solid transparent;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .action-tile::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: var(--gradient-primary);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .action-tile:hover::before {
+        opacity: 0.08;
+    }
+
+    .action-tile:hover {
+        transform: translateY(-5px);
+        border-color: var(--primary-purple);
+        box-shadow: 0 8px 25px rgba(113, 50, 202, 0.2);
+    }
+
+    .action-tile .glyphicon {
+        font-size: 32px;
+        display: block;
+        margin-bottom: 12px;
+        position: relative;
+        z-index: 1;
+        transition: all 0.3s ease;
+        color: var(--primary-purple);
+    }
+
+    .action-tile:hover .glyphicon {
+        transform: scale(1.1);
+    }
+
+    .action-tile span:last-child {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--dark-text);
+        position: relative;
+        z-index: 1;
+    }
+
+    .action-tile .badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: var(--primary-purple);
+        color: white;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 11px;
+        z-index: 2;
+    }
+
+    /* Urgent Requests Card */
+    .urgent-card {
+        background: white;
+        border-radius: 18px;
+        padding: 32px;
+        box-shadow: var(--card-shadow);
+        border: 1px solid rgba(113, 50, 202, 0.08);
+    }
+
+    .request-item {
+        background: linear-gradient(135deg, #F7F8FC 0%, #F0F1F7 100%);
+        border-left: 4px solid var(--primary-purple);
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 14px;
+        transition: all 0.3s ease;
+    }
+
+    .request-item:hover {
+        transform: translateX(8px);
+        box-shadow: 0 4px 18px rgba(113, 50, 202, 0.15);
+    }
+
+    .request-item.urgent {
+        border-left-color: var(--pink-accent);
+        animation: pulse 2s infinite;
+    }
+
+    @@keyframes pulse {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(242, 154, 174, 0.4); }
+        50% { box-shadow: 0 0 0 10px rgba(242, 154, 174, 0); }
+    }
+
     .priority-badge {
-        padding: 4px 12px;
-        border-radius: 16px;
-        font-size: 12px;
+        padding: 5px 12px;
+        border-radius: 14px;
+        font-size: 11px;
         font-weight: 600;
         color: white;
+        display: inline-block;
     }
-    .priority-high { background: var(--danger); }
-    .priority-medium { background: var(--warning); }
-    .priority-low { background: var(--accent); }
+
+    .priority-high { background: linear-gradient(135deg, #F29AAE 0%, #ff6b6b 100%); }
+    .priority-medium { background: linear-gradient(135deg, #C47BE4 0%, #7132CA 100%); }
+    .priority-low { background: linear-gradient(135deg, #5FCF80 0%, #43A047 100%); }
+
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+    }
+
+    .empty-state .glyphicon {
+        font-size: 48px;
+        color: rgba(113, 50, 202, 0.15);
+        margin-bottom: 15px;
+    }
+
+    @@media (max-width: 992px) {
+        .content-grid {
+            grid-template-columns: 1fr;
+        }
+    }
 
     @@media (max-width: 768px) {
-        .metric-card { margin-bottom:16px; }
-        .quick-actions .btn { display:block; width:100%; margin-right:0; }
+        .stats-section {
+            grid-template-columns: 1fr;
+        }
+        
+        .tiles-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .welcome-header {
+            padding: 30px 20px;
+        }
+
+        .quick-actions {
+            flex-direction: column;
+        }
+
+        .quick-actions .btn {
+            width: 100%;
+        }
     }
 </style>
 
-<div class="container secretary-dashboard" style="margin-top: 24px;">
-    <div class="row">
-        <div class="col-md-12">
-            <div class="d-flex" style="align-items:center; justify-content:space-between;">
-                <div>
-                    <h2 style="margin:0;">Espace Secrétaire</h2>
-                    <p class="text-muted" style="margin:4px 0 16px;">Bienvenue, @ViewBag.UserName</p>
-                </div>
-                <div class="quick-actions">
-                    <a href="@Url.Action("AppointmentRequests", "Secretary")" class="btn btn-warning">
-                        <span class="glyphicon glyphicon-list-alt"></span> Demandes de RDV
-                        @if (pendingCount > 0)
-                        {
-                            <span class="badge" style="background: #fff; color: var(--warning); margin-left: 4px;">@pendingCount</span>
-                        }
-                    </a>
-                    <a href="@Url.Action("ManageAppointments", "Secretary")" class="btn btn-info">
-                        <span class="glyphicon glyphicon-calendar"></span> Gérer les RDV
-                    </a>
-                    <a href="@Url.Action("PatientsList", "Admin")" class="btn btn-success">
-                        <span class="glyphicon glyphicon-user"></span> Liste des patients
-                    </a>
-                    <a href="@Url.Action("Logout", "Auth")" class="btn btn-default">
-                        <span class="glyphicon glyphicon-log-out"></span> Déconnexion
-                    </a>
-                </div>
-            </div>
+<div class="secretary-dashboard">
+    
+    <!-- Welcome Header - Purple Gradient -->
+    <div class="welcome-header">
+        <h1>Espace Secrétaire</h1>
+        <p>Bienvenue, @ViewBag.UserName - Gérez les demandes de rendez-vous et le planning</p>
+        
+        <div class="quick-actions">
+            <a href="@Url.Action("AppointmentRequests", "Secretary")" class="btn btn-warning">
+                <span class="glyphicon glyphicon-list-alt"></span> Demandes de RDV
+                @if (pendingCount > 0)
+                {
+                    <span class="badge" style="background: #fff; color: var(--primary-purple);">@pendingCount</span>
+                }
+            </a>
+            <a href="@Url.Action("ManageAppointments", "Secretary")" class="btn btn-info">
+                <span class="glyphicon glyphicon-calendar"></span> Gérer les RDV
+            </a>
+            <a href="@Url.Action("PatientsList", "Admin")" class="btn btn-success">
+                <span class="glyphicon glyphicon-user"></span> Liste des patients
+            </a>
+            <a href="@Url.Action("Logout", "Auth")" class="btn btn-default">
+                <span class="glyphicon glyphicon-log-out"></span> Déconnexion
+            </a>
         </div>
     </div>
 
-    <!-- Metrics -->
-    <div class="row" style="margin-top: 8px;">
-        <div class="col-md-4">
-            <div class="metric-card">
-                <div class="d-flex" style="gap:12px; align-items:center;">
-                    <div class="metric-icon warning">
-                        <span class="glyphicon glyphicon-hourglass"></span>
-                    </div>
-                    <div>
-                        <div class="value" style="color: var(--warning);">@(ViewBag.PendingRequests ?? 0)</div>
-                        <div class="label">Demandes en attente</div>
-                    </div>
+    <!-- Stats Cards - Purple Theme -->
+    <div class="stats-section">
+        <div class="stat-card">
+            <div class="stat-card-header">
+                <div class="stat-icon pink">
+                    <span class="glyphicon glyphicon-hourglass"></span>
                 </div>
-                <div class="text-right" style="margin-top:10px;">
-                    <a href="@Url.Action("AppointmentRequests", "Secretary")" class="btn btn-link">Traiter maintenant</a>
+                <div class="stat-info">
+                    <div class="stat-value">@(ViewBag.PendingRequests ?? 0)</div>
+                    <div class="stat-label">Demandes en attente</div>
                 </div>
             </div>
+            <a href="@Url.Action("AppointmentRequests", "Secretary")" class="stat-link">
+                Traiter maintenant <span class="glyphicon glyphicon-chevron-right"></span>
+            </a>
         </div>
-        <div class="col-md-4">
-            <div class="metric-card">
-                <div class="d-flex" style="gap:12px; align-items:center;">
-                    <div class="metric-icon accent">
-                        <span class="glyphicon glyphicon-ok-sign"></span>
-                    </div>
-                    <div>
-                        <div class="value" style="color: var(--accent);">@(ViewBag.ApprovedToday ?? 0)</div>
-                        <div class="label">Approuvées aujourd'hui</div>
-                    </div>
+
+        <div class="stat-card">
+            <div class="stat-card-header">
+                <div class="stat-icon purple">
+                    <span class="glyphicon glyphicon-ok-sign"></span>
                 </div>
-                <div class="text-right" style="margin-top:10px;">
-                    <a href="@Url.Action("TodayAppointments", "Secretary")" class="btn btn-link">Voir détails</a>
+                <div class="stat-info">
+                    <div class="stat-value">@(ViewBag.ApprovedToday ?? 0)</div>
+                    <div class="stat-label">Approuvées aujourd'hui</div>
                 </div>
             </div>
+            <a href="@Url.Action("TodayAppointments", "Secretary")" class="stat-link">
+                Voir détails <span class="glyphicon glyphicon-chevron-right"></span>
+            </a>
         </div>
-        <div class="col-md-4">
-            <div class="metric-card">
-                <div class="d-flex" style="gap:12px; align-items:center;">
-                    <div class="metric-icon primary">
-                        <span class="glyphicon glyphicon-stats"></span>
-                    </div>
-                    <div>
-                        <div class="value" style="color: var(--primary);">@(ViewBag.TotalRequestsToday ?? 0)</div>
-                        <div class="label">Total demandes aujourd'hui</div>
-                    </div>
+
+        <div class="stat-card">
+            <div class="stat-card-header">
+                <div class="stat-icon dark">
+                    <span class="glyphicon glyphicon-stats"></span>
                 </div>
-                <div class="text-right" style="margin-top:10px;">
-                    <a href="@Url.Action("Reports", "Secretary")" class="btn btn-link">Voir rapport</a>
+                <div class="stat-info">
+                    <div class="stat-value">@(ViewBag.TotalRequestsToday ?? 0)</div>
+                    <div class="stat-label">Total aujourd'hui</div>
                 </div>
             </div>
+            <a href="@Url.Action("Reports", "Secretary")" class="stat-link">
+                Voir rapport <span class="glyphicon glyphicon-chevron-right"></span>
+            </a>
         </div>
     </div>
 
-    <!-- Quick Actions Section -->
-    <div class="row" style="margin-top:24px;">
-        <div class="col-md-6">
-            <div class="panel-clean">
-                <div class="panel-heading">
-                    <strong><span class="glyphicon glyphicon-flash"></span> Actions rapides</strong>
-                </div>
-                <div class="panel-body">
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <a href="@Url.Action("AppointmentRequests", "Secretary")" class="btn btn-warning btn-block">
-                                <span class="glyphicon glyphicon-list-alt"></span><br>
-                                Traiter les demandes
-                                @if (pendingCount > 0)
-                                {
-                                    <br><small>(@pendingCount en attente)</small>
-                                }
-                            </a>
-                        </div>
-                        <div class="col-sm-6">
-                            <a href="@Url.Action("CreateAppointment", "Secretary")" class="btn btn-primary btn-block">
-                                <span class="glyphicon glyphicon-plus"></span><br>
-                                Nouveau RDV direct
-                            </a>
-                        </div>
-                    </div>
-                    <div class="row" style="margin-top:12px;">
-                        <div class="col-sm-6">
-                            <a href="@Url.Action("TodayAppointments", "Secretary")" class="btn btn-info btn-block">
-                                <span class="glyphicon glyphicon-calendar"></span><br>
-                                RDV d'aujourd'hui
-                            </a>
-                        </div>
-                        <div class="col-sm-6">
-                            <a href="@Url.Action("PatientsList", "Admin")" class="btn btn-success btn-block">
-                                <span class="glyphicon glyphicon-search"></span><br>
-                                Rechercher patient
-                            </a>
-                        </div>
-                    </div>
-                </div>
+    <!-- Main Content Grid -->
+    <div class="content-grid">
+        <!-- Quick Actions -->
+        <div class="action-tiles">
+            <div class="section-title">
+                <span class="glyphicon glyphicon-flash"></span>
+                Actions rapides
             </div>
-        </div>
-        <div class="col-md-6">
-            <div class="panel-clean">
-                <div class="panel-heading">
-                    <strong><span class="glyphicon glyphicon-exclamation-sign"></span> Demandes urgentes</strong>
-                </div>
-                <div class="panel-body">
-                    @if (pendingCount > 0 && nextPending != null)
+            <div class="tiles-grid">
+                <a href="@Url.Action("AppointmentRequests", "Secretary")" class="action-tile" style="position: relative;">
+                    <span class="glyphicon glyphicon-list-alt"></span>
+                    <span>Traiter les demandes</span>
+                    @if (pendingCount > 0)
                     {
-                        var urgencyClass = nextPending.UrgencyLevel == "Élevé" ? "priority-high" : nextPending.UrgencyLevel == "Moyen" ? "priority-medium" : "priority-low";
-                        var minutesPending = Math.Max(1, (int)(DateTime.Now - nextPending.DateDemande).TotalMinutes);
-                        <div class="request-card @(nextPending.UrgencyLevel == "Élevé" ? "urgent" : nextPending.UrgencyLevel == "Moyen" ? "" : "low")">
-                            <div class="d-flex" style="justify-content:space-between; align-items:flex-start;">
-                                <div>
-                                    <h5 style="margin:0 0 8px 0;">
-                                        <span class="priority-badge @urgencyClass">@nextPending.UrgencyLevel</span>
-                                        @nextPending.PatientNom @nextPending.PatientPrenom
-                                    </h5>
-                                    <p style="margin:0; color: var(--muted); font-size:14px;">
-                                        @nextPending.SymptomsDescription
-                                    </p>
-                                    <small class="text-muted">Il y a @minutesPending min</small>
-                                </div>
-                                <div>
-                                    <a href="@Url.Action("AppointmentRequests", "Secretary")" class="btn btn-sm btn-warning">Traiter</a>
-                                </div>
+                        <span class="badge">@pendingCount</span>
+                    }
+                </a>
+                <a href="@Url.Action("CreateAppointment", "Secretary")" class="action-tile">
+                    <span class="glyphicon glyphicon-plus"></span>
+                    <span>Nouveau RDV direct</span>
+                </a>
+                <a href="@Url.Action("TodayAppointments", "Secretary")" class="action-tile">
+                    <span class="glyphicon glyphicon-calendar"></span>
+                    <span>RDV d'aujourd'hui</span>
+                </a>
+                <a href="@Url.Action("PatientsList", "Admin")" class="action-tile">
+                    <span class="glyphicon glyphicon-search"></span>
+                    <span>Rechercher patient</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Urgent Requests -->
+        <div class="urgent-card">
+            <div class="section-title">
+                <span class="glyphicon glyphicon-exclamation-sign"></span>
+                Demandes urgentes
+            </div>
+            
+            @if (pendingCount > 0 && nextPending != null)
+            {
+                var urgencyClass = nextPending.UrgencyLevel == "Élevé" ? "priority-high" : 
+                                   nextPending.UrgencyLevel == "Moyen" ? "priority-medium" : "priority-low";
+                var minutesPending = Math.Max(1, (int)(DateTime.Now - nextPending.DateDemande).TotalMinutes);
+                var isUrgent = nextPending.UrgencyLevel == "Élevé";
+                
+                <div class="request-item @(isUrgent ? "urgent" : "")">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 15px;">
+                        <div style="flex: 1;">
+                            <div style="margin-bottom: 10px;">
+                                <span class="priority-badge @urgencyClass">@nextPending.UrgencyLevel</span>
                             </div>
+                            <h5 style="margin: 0 0 8px 0; font-size: 16px; font-weight: 700; color: var(--dark-text);">
+                                @nextPending.PatientNom @nextPending.PatientPrenom
+                            </h5>
+                            <p style="margin: 0 0 8px 0; color: var(--light-text); font-size: 14px;">
+                                @nextPending.SymptomsDescription
+                            </p>
+                            <small style="color: var(--light-text);">
+                                <span class="glyphicon glyphicon-time"></span>
+                                Il y a @minutesPending min
+                            </small>
                         </div>
-                        <div class="text-center" style="margin-top:16px;">
-                            <a href="@Url.Action("AppointmentRequests", "Secretary")" class="btn btn-link">
-                                Voir toutes les demandes (@pendingCount)
+                        <div>
+                            <a href="@Url.Action("AppointmentRequests", "Secretary")" 
+                               class="btn btn-sm" 
+                               style="background: var(--gradient-primary); color: white; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 600;">
+                                Traiter
                             </a>
                         </div>
-                    }
-                    else
-                    {
-                        <div class="text-center text-muted" style="padding:20px;">
-                            <span class="glyphicon glyphicon-ok-circle" style="font-size:32px; color: var(--accent);"></span>
-                            <p style="margin-top:12px;">Aucune demande urgente</p>
-                            <small>Toutes les demandes ont été traitées</small>
-                        </div>
-                    }
+                    </div>
                 </div>
-            </div>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <a href="@Url.Action("AppointmentRequests", "Secretary")" style="color: var(--primary-purple); font-weight: 600; text-decoration: none;">
+                        Voir toutes les demandes (@pendingCount) ?
+                    </a>
+                </div>
+            }
+            else
+            {
+                <div class="empty-state">
+                    <span class="glyphicon glyphicon-ok-circle"></span>
+                    <h4 style="color: var(--light-text); margin: 10px 0;">Aucune demande urgente</h4>
+                    <p style="color: #B8B8CC; margin: 0;">Toutes les demandes ont été traitées</p>
+                </div>
+            }
         </div>
     </div>
 
-    <!-- Today's Schedule Overview -->
-    <div class="row" style="margin-top:24px;">
-        <div class="col-md-12">
-            <div class="panel-clean">
-                <div class="panel-heading">
-                    <strong><span class="glyphicon glyphicon-time"></span> Planning du jour</strong>
-                    <span class="pull-right">
-                        <small class="text-muted">@DateTime.Now.ToString("dddd dd MMMM yyyy")</small>
-                    </span>
-                </div>
-                <div class="panel-body">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div style="text-align:center; padding:20px;">
-                                <div class="metric-icon primary" style="margin:0 auto 12px;">
-                                    <span class="glyphicon glyphicon-time"></span>
-                                </div>
-                                <h5>9h00 - 12h00</h5>
-                                <p class="text-muted">Consultations matinales</p>
-                                <small>Dr. Martin, Dr. Dupuis</small>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div style="text-align:center; padding:20px;">
-                                <div class="metric-icon accent" style="margin:0 auto 12px;">
-                                    <span class="glyphicon glyphicon-time"></span>
-                                </div>
-                                <h5>14h00 - 17h00</h5>
-                                <p class="text-muted">Consultations après-midi</p>
-                                <small>Dr. Laurent, Dr. Bernard</small>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div style="text-align:center; padding:20px;">
-                                <div class="metric-icon warning" style="margin:0 auto 12px;">
-                                    <span class="glyphicon glyphicon-phone"></span>
-                                </div>
-                                <h5>Urgences</h5>
-                                <p class="text-muted">Dr. Martin (garde)</p>
-                                <small>Disponible toute la journée</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <div class="services-pills">
+        <div class="container">
+            <p>
+                <strong>créneaux horaires</strong> supplémentaires • 
+                <strong>suivi</strong> de vos rendez-vous • 
+                <strong>gestion</strong> des ordonnances
+            </p>
         </div>
     </div>
 
-    <!-- Statistics and Tips -->
-    <div class="row" style="margin-top:24px;">
-        <div class="col-md-12">
-            <div class="panel-clean">
-                <div class="panel-heading">
-                    <strong><span class="glyphicon glyphicon-info-sign"></span> Conseils et bonnes pratiques</strong>
-                    <span class="pull-right"><small class="text-muted">@pendingCount demandes en file</small></span>
-                </div>
-                <div class="panel-body">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div style="text-align:center; padding:20px;">
-                                <div class="metric-icon accent" style="margin:0 auto 12px;">
-                                    <span class="glyphicon glyphicon-clock"></span>
-                                </div>
-                                <h5>Traitement rapide</h5>
-                                <p class="text-muted">Traitez les demandes urgentes en moins de 2h pour optimiser la satisfaction patient.</p>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div style="text-align:center; padding:20px;">
-                                <div class="metric-icon primary" style="margin:0 auto 12px;">
-                                    <span class="glyphicon glyphicon-phone"></span>
-                                </div>
-                                <h5>Communication</h5>
-                                <p class="text-muted">Contactez toujours le patient pour confirmer les détails du rendez-vous.</p>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div style="text-align:center; padding:20px;">
-                                <div class="metric-icon warning" style="margin:0 auto 12px;">
-                                    <span class="glyphicon glyphicon-calendar"></span>
-                                </div>
-                                <h5>Planification</h5>
-                                <p class="text-muted">Vérifiez la disponibilité des médecins avant d'assigner un rendez-vous.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 
 @section Scripts {

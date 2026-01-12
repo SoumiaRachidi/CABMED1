@@ -12,67 +12,154 @@
 }
 
 <style>
-    /* Professional appointment management styling */
+    /* Professional Purple Medical Theme - Matching Secretary Dashboard */
     :root {
-        --primary:#2b7de9;        
-        --accent:#2ecc71;         
-        --warning:#e67e22;        
-        --danger:#e74c3c;         
-        --muted:#6c757d;
-        --bg:#ffffff;
-        --card:#f8f9fa;
-        --border:#e9ecef;
+        --primary-purple: #7132CA;
+        --light-purple: #C47BE4;
+        --dark-purple: #301CA0;
+        --pink-accent: #F29AAE;
+        --white: #FFFFFF;
+        --light-bg: #F7F8FC;
+        --dark-text: #2C2C54;
+        --light-text: #8B8BA7;
+        --card-shadow: 0 4px 20px rgba(113, 50, 202, 0.12);
+        --hover-shadow: 0 8px 35px rgba(113, 50, 202, 0.2);
+        --gradient-primary: linear-gradient(135deg, #7132CA 0%, #C47BE4 100%);
+        --border-color: rgba(113, 50, 202, 0.12);
+        --success: #5FCF80;
+        --danger: #ff6b6b;
     }
 
-    .requests-container { background: var(--bg); }
+    body {
+        background: var(--light-bg);
+    }
+
+    .requests-container { 
+        background: var(--light-bg); 
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 30px 20px;
+    }
     
-    .request-item {
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        background: white;
-        margin-bottom: 20px;
+    /* Page Header */
+    .page-header-custom {
+        background: var(--gradient-primary);
+        color: white;
+        padding: 40px;
+        border-radius: 20px;
+        margin-bottom: 30px;
+        box-shadow: var(--card-shadow);
+        position: relative;
         overflow: hidden;
+    }
+
+    .page-header-custom::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 50%;
+    }
+
+    .page-header-custom h2 {
+        margin: 0;
+        font-size: 32px;
+        font-weight: 700;
+        position: relative;
+        z-index: 1;
+    }
+
+    .page-header-custom p {
+        margin: 8px 0 0 0;
+        opacity: 0.95;
+        font-size: 15px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .btn-back {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 2px solid rgba(255, 255, 255, 0.35);
+        border-radius: 12px;
+        padding: 10px 20px;
+        font-weight: 600;
         transition: all 0.3s ease;
+        position: relative;
+        z-index: 1;
+    }
+
+    .btn-back:hover {
+        background: rgba(255, 255, 255, 0.3);
+        color: white;
+        border-color: rgba(255, 255, 255, 0.5);
+        transform: translateX(-5px);
+    }
+
+    /* Request Cards */
+    .request-item {
+        border: 1px solid var(--border-color);
+        border-radius: 18px;
+        background: white;
+        margin-bottom: 24px;
+        overflow: hidden;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: var(--card-shadow);
     }
     
     .request-item:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(0,0,0,.15);
+        transform: translateY(-4px);
+        box-shadow: var(--hover-shadow);
+        border-color: var(--primary-purple);
     }
     
     .request-header {
-        padding: 20px;
-        border-bottom: 1px solid var(--border);
-        background: var(--card);
+        padding: 24px;
+        border-bottom: 1px solid var(--border-color);
+        background: linear-gradient(135deg, #F7F8FC 0%, #F0F1F7 100%);
     }
     
     .request-body {
-        padding: 20px;
+        padding: 24px;
     }
     
     .request-actions {
-        padding: 16px 20px;
-        background: #f8f9fa;
-        border-top: 1px solid var(--border);
+        padding: 18px 24px;
+        background: #F7F8FC;
+        border-top: 1px solid var(--border-color);
         display: flex;
-        gap: 8px;
+        gap: 10px;
         justify-content: flex-end;
     }
     
+    /* Priority Badges */
     .priority-badge {
-        padding: 4px 12px;
+        padding: 6px 14px;
         border-radius: 16px;
         font-size: 11px;
         font-weight: 600;
         color: white;
         text-transform: uppercase;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     }
     
-    .priority-high { background: var(--danger); }
-    .priority-medium { background: var(--warning); }
-    .priority-low { background: var(--accent); }
+    .priority-high { 
+        background: linear-gradient(135deg, var(--pink-accent) 0%, var(--danger) 100%); 
+    }
+    
+    .priority-medium { 
+        background: var(--gradient-primary); 
+    }
+    
+    .priority-low { 
+        background: linear-gradient(135deg, var(--success) 0%, #43A047 100%); 
+    }
+
     .status-pill {
-        padding: 4px 12px;
+        padding: 6px 14px;
         border-radius: 16px;
         font-size: 11px;
         font-weight: 600;
@@ -80,147 +167,261 @@
         color: white;
         margin-left: 8px;
     }
-    .status-pending { background: var(--muted); }
-    .status-approved { background: var(--accent); }
+
+    .status-pending { background: var(--light-text); }
+    .status-approved { background: var(--success); }
     .status-declined { background: var(--danger); }
 
+    /* Patient Info */
     .patient-info {
         display: flex;
         align-items: center;
-        gap: 12px;
-        margin-bottom: 8px;
+        gap: 16px;
+        margin-bottom: 12px;
     }
     
     .patient-avatar {
-        width: 40px;
-        height: 40px;
+        width: 50px;
+        height: 50px;
         border-radius: 50%;
-        background: var(--primary);
+        background: var(--gradient-primary);
         display: flex;
         align-items: center;
         justify-content: center;
         color: white;
-        font-weight: 600;
-        font-size: 16px;
+        font-weight: 700;
+        font-size: 18px;
+        box-shadow: 0 4px 15px rgba(113, 50, 202, 0.25);
     }
     
     .symptoms-text {
-        background: #f8f9fa;
-        border-radius: 8px;
-        padding: 12px;
-        margin: 12px 0;
-        border-left: 3px solid var(--primary);
+        background: linear-gradient(135deg, #F7F8FC 0%, #F0F1F7 100%);
+        border-radius: 12px;
+        padding: 16px;
+        margin: 14px 0;
+        border-left: 4px solid var(--primary-purple);
     }
     
-    .btn {
+    .assigned-doctor {
+        font-size: 13px;
+        color: var(--light-text);
+        margin-top: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px;
+        background: linear-gradient(135deg, #F7F8FC 0%, #F0F1F7 100%);
         border-radius: 8px;
-        padding: 8px 16px;
+    }
+    
+    .assigned-doctor .glyphicon {
+        color: var(--primary-purple);
+    }
+    
+    /* Buttons */
+    .btn {
+        border-radius: 10px;
+        padding: 10px 20px;
         font-weight: 600;
         border: none;
         cursor: pointer;
         transition: all 0.3s ease;
+        font-size: 14px;
     }
     
     .btn-approve {
-        background: var(--accent);
+        background: linear-gradient(135deg, var(--success) 0%, #43A047 100%);
         color: white;
+        box-shadow: 0 4px 15px rgba(95, 207, 128, 0.3);
     }
     
     .btn-approve:hover {
-        background: #27ae60;
+        background: linear-gradient(135deg, #43A047 0%, #2E7D32 100%);
         color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(95, 207, 128, 0.4);
     }
     
     .btn-decline {
-        background: var(--danger);
+        background: linear-gradient(135deg, var(--danger) 0%, #c0392b 100%);
         color: white;
+        box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
     }
     
     .btn-decline:hover {
-        background: #c0392b;
+        background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
         color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
     }
     
     .btn-view {
-        background: var(--primary);
+        background: var(--gradient-primary);
         color: white;
+        box-shadow: 0 4px 15px rgba(113, 50, 202, 0.3);
     }
     
     .btn-view:hover {
-        background: #1e5bbf;
+        background: linear-gradient(135deg, var(--dark-purple) 0%, var(--primary-purple) 100%);
         color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(113, 50, 202, 0.4);
     }
     
+    /* Filters Bar */
     .filters-bar {
         background: white;
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 20px;
-        margin-bottom: 24px;
+        border: 1px solid var(--border-color);
+        border-radius: 18px;
+        padding: 24px;
+        margin-bottom: 28px;
+        box-shadow: var(--card-shadow);
     }
     
     .filter-chip {
         display: inline-block;
-        padding: 6px 12px;
-        border: 1px solid var(--border);
+        padding: 8px 16px;
+        border: 2px solid var(--border-color);
         border-radius: 20px;
-        margin-right: 8px;
-        margin-bottom: 8px;
+        margin-right: 10px;
+        margin-bottom: 10px;
         cursor: pointer;
         background: white;
-        font-size: 13px;
+        font-size: 14px;
+        font-weight: 600;
         transition: all 0.3s ease;
+        color: var(--dark-text);
     }
     
     .filter-chip.active {
-        border-color: var(--primary);
-        background: var(--primary);
+        border-color: var(--primary-purple);
+        background: var(--gradient-primary);
         color: white;
+        box-shadow: 0 4px 15px rgba(113, 50, 202, 0.3);
     }
     
     .filter-chip:hover {
-        border-color: var(--primary);
-        background: var(--primary);
+        border-color: var(--primary-purple);
+        background: var(--gradient-primary);
         color: white;
+        transform: translateY(-2px);
+    }
+
+    .form-control {
+        border: 2px solid var(--border-color);
+        border-radius: 12px;
+        padding: 10px 16px;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: var(--primary-purple);
+        box-shadow: 0 0 0 4px rgba(113, 50, 202, 0.1);
+        outline: none;
     }
     
-    .request-urgent {
+    /* Alert Messages */
+    .alert {
+        border-radius: 12px;
+        border: none;
+        padding: 16px 20px;
+        box-shadow: var(--card-shadow);
+    }
+
+    .alert-success {
+        background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+        color: #155724;
+        border-left: 4px solid var(--success);
+    }
+
+    .alert-danger {
+        background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+        color: #721c24;
         border-left: 4px solid var(--danger);
     }
     
+    /* Urgent Request Styling */
+    .request-urgent {
+        border-left: 5px solid var(--pink-accent);
+        animation: pulse-border 2s infinite;
+    }
+
+    @@keyframes pulse-border {
+        0%, 100% { border-left-color: var(--pink-accent); }
+        50% { border-left-color: var(--danger); }
+    }
+    
     .request-medium {
-        border-left: 4px solid var(--warning);
+        border-left: 5px solid var(--primary-purple);
     }
     
     .request-low {
-        border-left: 4px solid var(--accent);
+        border-left: 5px solid var(--success);
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+        background: white;
+        border-radius: 18px;
+        border: 1px solid var(--border-color);
+        box-shadow: var(--card-shadow);
+    }
+
+    .empty-state .glyphicon {
+        font-size: 72px;
+        color: rgba(113, 50, 202, 0.15);
+        margin-bottom: 20px;
+    }
+
+    .empty-state h3 {
+        color: var(--dark-text);
+        margin: 20px 0 10px;
+        font-weight: 700;
+    }
+
+    .empty-state p {
+        color: var(--light-text);
     }
     
     @@media (max-width: 768px) {
         .request-actions {
             flex-direction: column;
         }
+        
+        .btn {
+            width: 100%;
+        }
+
         .patient-info {
             flex-direction: column;
             text-align: center;
         }
+
+        .page-header-custom {
+            padding: 30px 20px;
+        }
+
+        .filters-bar {
+            padding: 20px;
+        }
     }
 </style>
 
-<div class="container requests-container" style="margin-top: 24px;">
-    <div class="row">
-        <div class="col-md-12">
-            <div class="d-flex" style="align-items:center; justify-content:space-between; margin-bottom: 24px;">
-                <div>
-                    <h2 style="margin:0;">Demandes de rendez-vous</h2>
-                    <p class="text-muted" style="margin:4px 0;">Gérer les demandes des patients</p>
-                </div>
-                <div>
-                    <a href="@Url.Action("Index", "Secretary")" class="btn btn-secondary">
-                        <span class="glyphicon glyphicon-arrow-left"></span>
-                        Retour au tableau de bord
-                    </a>
-                </div>
+<div class="container requests-container">
+    <!-- Page Header - Purple Gradient -->
+    <div class="page-header-custom">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+            <div>
+                <h2>Demandes de rendez-vous</h2>
+                <p>Gérer les demandes des patients</p>
+            </div>
+            <div>
+                <a href="@Url.Action("Index", "Secretary")" class="btn-back">
+                    <span class="glyphicon glyphicon-arrow-left"></span>
+                    Retour au tableau de bord
+                </a>
             </div>
         </div>
     </div>
@@ -229,7 +430,7 @@
     <div class="filters-bar">
         <div class="row">
             <div class="col-md-8">
-                <strong style="display: block; margin-bottom: 8px;">Filtrer par:</strong>
+                <strong style="display: block; margin-bottom: 12px; color: var(--dark-text); font-size: 15px;">Filtrer par:</strong>
                 <span class="filter-chip active" data-filter="all">Toutes</span>
                 <span class="filter-chip" data-filter="urgent">Urgentes</span>
                 <span class="filter-chip" data-filter="medium">Moyennes</span>
@@ -237,18 +438,21 @@
                 <span class="filter-chip" data-filter="today">Aujourd'hui</span>
             </div>
             <div class="col-md-4">
-                <input type="text" id="searchPatient" class="form-control" placeholder="Rechercher un patient..." style="border-radius: 8px;">
+                <input type="text" id="searchPatient" class="form-control" placeholder="Rechercher un patient...">
             </div>
         </div>
     </div>
 
+    <!-- Success/Error Messages -->
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="alert alert-success" style="border-radius: 8px;">
+        <div class="alert alert-success">
             <span class="glyphicon glyphicon-ok-circle"></span>
             @TempData["SuccessMessage"]
         </div>
     }
+
+    <div id="actionFeedback" class="alert" style="display:none;"></div>
 
     <!-- Requests List -->
     <div id="requestsList">
@@ -272,27 +476,29 @@
                             <div class="patient-avatar">
                                 @getInitials(request.PatientNom, request.PatientPrenom)
                             </div>
-                            <div>
-                                <h4 style="margin: 0;">@patientDisplayName</h4>
-                                <p style="margin: 0; color: var(--muted);">
+                            <div style="flex: 1;">
+                                <h4 style="margin: 0 0 6px 0; color: var(--dark-text); font-size: 18px; font-weight: 700;">
+                                    @patientDisplayName
+                                </h4>
+                                <p style="margin: 0; color: var(--light-text);">
                                     <span class="glyphicon glyphicon-phone"></span> @(request.PatientTelephone ?? "Non renseigné")
                                 </p>
                             </div>
-                            <div style="margin-left: auto; display:flex; gap:8px;">
+                            <div style="display:flex; gap:10px; flex-wrap: wrap;">
                                 <span class="priority-badge @badgeClass">@request.UrgencyLevel</span>
                                 <span class="status-pill @statusClass status-pill-text">@statusLabel</span>
                             </div>
                         </div>
                         
-                        <div class="row">
+                        <div class="row" style="margin-top: 14px;">
                             <div class="col-sm-6">
-                                <small class="text-muted">
+                                <small style="color: var(--light-text);">
                                     <span class="glyphicon glyphicon-time"></span>
                                     @request.DateDemande.ToString("dd/MM/yyyy à HH:mm")
                                 </small>
                             </div>
                             <div class="col-sm-6 text-right">
-                                <small class="text-muted">
+                                <small style="color: var(--light-text);">
                                     <span class="glyphicon glyphicon-user-md"></span>
                                     @request.PreferredSpecialty
                                 </small>
@@ -303,33 +509,37 @@
                     <div class="request-body">
                         <div class="row">
                             <div class="col-md-8">
-                                <strong>Symptômes décrits:</strong>
+                                <strong style="color: var(--dark-text); font-size: 14px;">Symptômes décrits:</strong>
                                 <div class="symptoms-text">
                                     @request.SymptomsDescription
                                 </div>
                                 
                                 @if (!string.IsNullOrEmpty(request.AdditionalComments))
                                 {
-                                    <strong>Commentaires additionnels:</strong>
-                                    <p style="margin: 8px 0; color: var(--muted);">@request.AdditionalComments</p>
+                                    <strong style="color: var(--dark-text); font-size: 14px;">Commentaires additionnels:</strong>
+                                    <p style="margin: 10px 0; color: var(--light-text);">@request.AdditionalComments</p>
                                 }
                             </div>
                             <div class="col-md-4">
                                 @if (request.PreferredDate.HasValue)
                                 {
-                                    <div style="margin-bottom: 12px;">
-                                        <strong>Date souhaitée:</strong><br>
-                                        <span class="text-muted">@request.PreferredDate.Value.ToString("dd/MM/yyyy")</span>
+                                    <div style="margin-bottom: 14px;">
+                                        <strong style="color: var(--dark-text); font-size: 14px;">Date souhaitée:</strong><br>
+                                        <span style="color: var(--light-text);">@request.PreferredDate.Value.ToString("dd/MM/yyyy")</span>
                                     </div>
                                 }
                                 
                                 @if (request.PreferredTime.HasValue)
                                 {
-                                    <div>
-                                        <strong>Heure souhaitée:</strong><br>
-                                        <span class="text-muted">@request.PreferredTime.Value.ToString(@"hh\:mm")</span>
+                                    <div style="margin-bottom: 14px;">
+                                        <strong style="color: var(--dark-text); font-size: 14px;">Heure souhaitée:</strong><br>
+                                        <span style="color: var(--light-text);">@request.PreferredTime.Value.ToString(@"hh\:mm")</span>
                                     </div>
                                 }
+                                <div class="assigned-doctor" data-role="assigned-doctor" @(string.IsNullOrWhiteSpace(request.AssignedDoctor) ? "style=\"display:none;\"" : string.Empty)>
+                                    <span class="glyphicon glyphicon-user-md"></span>
+                                    <span class="assigned-doctor-text">@(!string.IsNullOrWhiteSpace(request.AssignedDoctor) ? $"Assigné à {request.AssignedDoctor}" : "Non assigné")</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -353,10 +563,10 @@
         }
         else
         {
-            <div class="text-center" style="padding: 60px; background: white; border-radius: 12px; border: 1px solid var(--border);">
-                <span class="glyphicon glyphicon-inbox" style="font-size: 64px; color: #ccc;"></span>
-                <h3 style="margin: 24px 0 8px; color: var(--muted);">Aucune demande en attente</h3>
-                <p class="text-muted">Toutes les demandes de rendez-vous ont été traitées.</p>
+            <div class="empty-state">
+                <span class="glyphicon glyphicon-inbox"></span>
+                <h3>Aucune demande en attente</h3>
+                <p>Toutes les demandes de rendez-vous ont été traitées.</p>
             </div>
         }
     </div>
@@ -365,27 +575,27 @@
 <!-- Approve Modal -->
 <div class="modal fade" id="approveModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Approuver la demande</h4>
+        <div class="modal-content" style="border-radius: 18px; border: none;">
+            <div class="modal-header" style="background: var(--gradient-primary); color: white; border-radius: 18px 18px 0 0;">
+                <button type="button" class="close" data-dismiss="modal" style="color: white; opacity: 0.9;">&times;</button>
+                <h4 class="modal-title"><span class="glyphicon glyphicon-ok-circle"></span> Approuver la demande</h4>
             </div>
             <div class="modal-body">
                 <p>Approuver la demande de rendez-vous pour <strong id="approvePatientName"></strong>?</p>
                 
                 <div class="form-group">
                     <label>Date du rendez-vous:</label>
-                    <input type="date" id="appointmentDate" class="form-control" min="@DateTime.Now.ToString("yyyy-MM-dd")">
+                    <input type="date" id="appointmentDate" name="appointmentDate" class="form-control" min="@DateTime.Now.ToString("yyyy-MM-dd")" value="@DateTime.Now.ToString("yyyy-MM-dd")">
                 </div>
                 
                 <div class="form-group">
                     <label>Heure du rendez-vous:</label>
-                    <input type="time" id="appointmentTime" class="form-control">
+                    <input type="time" id="appointmentTime" name="appointmentTime" class="form-control" step="300" value="@DateTime.Now.ToString("HH:mm")">
                 </div>
                 
                 <div class="form-group">
                     <label>Médecin assigné:</label>
-                    <select id="assignedDoctor" class="form-control">
+                    <select id="assignedDoctor" name="assignedDoctor" class="form-control">
                         <option value="">-- Sélectionner un médecin --</option>
                     </select>
                     <small class="text-muted" id="doctorSelectHint" style="display:block; margin-top:4px;">Liste chargée depuis la base de données</small>
@@ -396,8 +606,8 @@
                     <textarea id="approveComments" class="form-control" rows="2" placeholder="Commentaires pour le patient..."></textarea>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
+            <div class="modal-footer" style="border-top: 1px solid var(--border-color);">
+                <button type="button" class="btn" style="background: #ddd; color: #666;" data-dismiss="modal">Annuler</button>
                 <button type="button" class="btn btn-approve" onclick="confirmApprove()">
                     <span class="glyphicon glyphicon-ok"></span> Confirmer l'approbation
                 </button>
@@ -409,10 +619,10 @@
 <!-- Decline Modal -->
 <div class="modal fade" id="declineModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Refuser la demande</h4>
+        <div class="modal-content" style="border-radius: 18px; border: none;">
+            <div class="modal-header" style="background: linear-gradient(135deg, var(--danger) 0%, #c0392b 100%); color: white; border-radius: 18px 18px 0 0;">
+                <button type="button" class="close" data-dismiss="modal" style="color: white; opacity: 0.9;">&times;</button>
+                <h4 class="modal-title"><span class="glyphicon glyphicon-remove-circle"></span> Refuser la demande</h4>
             </div>
             <div class="modal-body">
                 <p>Refuser la demande de rendez-vous pour <strong id="declinePatientName"></strong>?</p>
@@ -433,8 +643,8 @@
                     <textarea id="declineComments" class="form-control" rows="3" placeholder="Explication détaillée..."></textarea>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
+            <div class="modal-footer" style="border-top: 1px solid var(--border-color);">
+                <button type="button" class="btn" style="background: #ddd; color: #666;" data-dismiss="modal">Annuler</button>
                 <button type="button" class="btn btn-decline" onclick="confirmDecline()">
                     <span class="glyphicon glyphicon-remove"></span> Confirmer le refus
                 </button>
@@ -516,34 +726,27 @@
                     show = priority === 'faible';
                     break;
                 case 'today':
-                    // You can implement date filtering logic here
                     show = true;
                     break;
             }
             
             if (show) {
-                $(this).fadeIn();
+                $(this).show();
             } else {
-                $(this).fadeOut();
+                $(this).hide();
             }
         });
     }
     
     function viewDetails(requestId) {
-        // Implement view details functionality
-        window.location.href = '@Url.Action("ViewRequest", "Secretary")' + '?id=' + requestId;
+        window.location.href = '@Url.Action("ViewRequest", "Secretary")' + '/' + requestId;
     }
     
     function approveRequest(requestId, patientName) {
         currentRequestId = requestId;
         $('#approvePatientName').text(patientName);
         $('#approveModal').modal('show');
-
-        if (doctorsCache.length === 0) {
-            loadDoctors();
-        } else {
-            renderDoctorOptions(doctorsCache);
-        }
+        loadDoctors();
     }
     
     function declineRequest(requestId, patientName) {
@@ -553,13 +756,20 @@
     }
     
     function confirmApprove() {
-        var appointmentDate = $('#appointmentDate').val();
-        var appointmentTime = $('#appointmentTime').val();
-        var doctorId = $('#assignedDoctor').val();
+        var appointmentDate = ($('#appointmentDate').val() || '').trim();
+        var appointmentTime = ($('#appointmentTime').val() || '').trim();
+        var doctorIdStr = ($('#assignedDoctor').val() || '').trim();
+        var doctorLabel = ($('#assignedDoctor option:selected').text() || '').trim();
         var comments = $('#approveComments').val();
         
-        if (!appointmentDate || !appointmentTime || !doctorId) {
+        if (!appointmentDate || !appointmentTime || !doctorIdStr) {
             alert('Veuillez renseigner la date, l\'heure et le médecin assigné.');
+            return;
+        }
+        
+        var doctorId = parseInt(doctorIdStr, 10);
+        if (isNaN(doctorId) || doctorId <= 0) {
+            alert('Veuillez sélectionner un médecin valide.');
             return;
         }
         
@@ -573,32 +783,31 @@
             if (result.success) {
                 $('#approveModal').modal('hide');
                 var $card = $('.request-item[data-request="' + currentRequestId + '"]');
-                setStatusPill($card, 'Approuvé');
+                setStatusPill($card, 'Confirmé');
+                updateAssignedDoctor($card, doctorLabel);
                 disableActions($card);
                 showFeedback('success', 'Demande approuvée avec succès.');
             } else {
                 showFeedback('error', result.message || 'Erreur lors de l\'approbation');
             }
+        }).fail(function(xhr, status, error) {
+            showFeedback('error', 'Erreur réseau: ' + error);
         });
     }
     
     function confirmDecline() {
         var reason = $('#declineReason').val();
         var comments = $('#declineComments').val();
+        var finalReason = reason + (comments ? ': ' + comments : '');
         
         if (!reason) {
-            alert('Veuillez sélectionner une raison pour le refus.');
+            alert('Veuillez sélectionner une raison.');
             return;
-        }
-        
-        var fullReason = reason;
-        if (comments) {
-            fullReason += ': ' + comments;
         }
         
         $.post('@Url.Action("DeclineRequest", "Secretary")', {
             requestId: currentRequestId,
-            reason: fullReason
+            reason: finalReason
         }, function(result) {
             if (result.success) {
                 $('#declineModal').modal('hide');
@@ -613,38 +822,43 @@
     }
     
     function setStatusPill($card, status) {
-        var css = 'status-pending';
-        if (status.toLowerCase() === 'approuvé' || status.toLowerCase() === 'confirmé') {
-            css = 'status-approved';
-        } else if (status.toLowerCase() === 'refusé') {
-            css = 'status-declined';
+        var $pill = $card.find('.status-pill-text');
+        $pill.text(status);
+        
+        var $statusPill = $pill.parent();
+        $statusPill.removeClass('status-pending status-approved status-declined');
+        
+        if (status === 'Approuvé' || status === 'Confirmé') {
+            $statusPill.addClass('status-approved');
+        } else if (status === 'Refusé') {
+            $statusPill.addClass('status-declined');
         }
-
-        var pill = $card.find('.status-pill');
-        pill.removeClass('status-pending status-approved status-declined').addClass(css).text(status);
+    }
+    
+    function disableActions($card) {
+        $card.find('.request-actions button').prop('disabled', true).css('opacity', '0.5');
     }
 
-    function disableActions($card) {
-        $card.find('.request-actions button').prop('disabled', true).addClass('disabled');
+    function updateAssignedDoctor($card, doctorLabel) {
+        var $section = $card.find('[data-role="assigned-doctor"]');
+        if (!doctorLabel) {
+            $section.hide();
+            return;
+        }
+
+        $section.show();
+        $section.find('.assigned-doctor-text').text('Assigné à ' + doctorLabel);
     }
 
     function showFeedback(type, message) {
         var alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
         $('#actionFeedback')
-            .removeClass('alert-success alert-danger')
+            .removeClass('alert-success alert-danger alert-info')
             .addClass(alertClass)
-            .text(message)
+            .html('<span class="glyphicon glyphicon-' + (type === 'success' ? 'ok' : 'exclamation-sign') + '-circle"></span> ' + message)
             .fadeIn();
 
         setTimeout(function () { $('#actionFeedback').fadeOut(); }, 4000);
     }
-    
-    $(document).ready(function() {
-        loadDoctors();
-        // Auto-refresh every 2 minutes to check for new requests
-        setInterval(function() {
-            // You can implement AJAX refresh here
-        }, 120000);
-    });
 </script>
 }

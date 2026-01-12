@@ -1,0 +1,652 @@
+@{
+    ViewBag.Title = "Contact d'urgence";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    /* Professional Purple Medical Theme */
+    :root {
+        --primary-purple: #7132CA;
+        --light-purple: #C47BE4;
+        --dark-purple: #301CA0;
+        --pink-accent: #F29AAE;
+        --white: #FFFFFF;
+        --light-bg: #F7F8FC;
+        --dark-text: #2C2C54;
+        --light-text: #8B8BA7;
+        --card-shadow: 0 4px 20px rgba(113, 50, 202, 0.12);
+        --hover-shadow: 0 8px 35px rgba(113, 50, 202, 0.2);
+        --gradient-primary: linear-gradient(135deg, #7132CA 0%, #C47BE4 100%);
+        --gradient-dark: linear-gradient(135deg, #301CA0 0%, #7132CA 100%);
+    }
+
+    .emergency-container {
+        max-width: 1100px;
+        margin: 30px auto;
+    }
+
+    /* Header with Purple Gradient */
+    .emergency-header {
+        background: var(--gradient-primary);
+        color: white;
+        padding: 40px;
+        border-radius: 20px;
+        margin-bottom: 35px;
+        box-shadow: var(--card-shadow);
+        position: relative;
+        overflow: hidden;
+        text-align: center;
+    }
+
+    .emergency-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 50%;
+    }
+
+    .emergency-header .icon {
+        font-size: 64px;
+        margin-bottom: 20px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .emergency-header h2 {
+        margin: 0 0 10px 0;
+        font-size: 30px;
+        font-weight: 700;
+        position: relative;
+        z-index: 1;
+    }
+
+    .emergency-header p {
+        margin: 0;
+        opacity: 0.95;
+        font-size: 15px;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Personal Contact Banner */
+    .personal-contact-banner {
+        background: linear-gradient(135deg, #F29AAE 0%, #C47BE4 100%);
+        color: white;
+        padding: 25px 35px;
+        border-radius: 16px;
+        margin-bottom: 35px;
+        box-shadow: var(--card-shadow);
+        border: 3px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .personal-contact-banner .icon {
+        font-size: 48px;
+        margin-bottom: 15px;
+    }
+
+    .personal-contact-banner h3 {
+        margin: 0 0 15px 0;
+        font-size: 22px;
+        font-weight: 700;
+    }
+
+    .personal-contact-info {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 20px;
+        margin-top: 15px;
+    }
+
+    .contact-detail {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 15px;
+        border-radius: 10px;
+        backdrop-filter: blur(10px);
+    }
+
+    .contact-detail strong {
+        display: block;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 5px;
+        opacity: 0.9;
+    }
+
+    .contact-detail .value {
+        font-size: 18px;
+        font-weight: 600;
+    }
+
+    .contact-detail .value a {
+        color: white;
+        text-decoration: none;
+    }
+
+    .contact-detail .value a:hover {
+        text-decoration: underline;
+    }
+
+    .edit-contact-btn {
+        background: rgba(255, 255, 255, 0.25);
+        color: white;
+        border: 2px solid rgba(255, 255, 255, 0.4);
+        padding: 10px 20px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 13px;
+        margin-top: 15px;
+        transition: all 0.3s ease;
+        display: inline-block;
+    }
+
+    .edit-contact-btn:hover {
+        background: rgba(255, 255, 255, 0.35);
+        color: white;
+        border-color: white;
+    }
+
+    .no-contact-message {
+        text-align: center;
+        padding: 30px;
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 12px;
+        backdrop-filter: blur(10px);
+    }
+
+    .no-contact-message .glyphicon {
+        font-size: 48px;
+        margin-bottom: 15px;
+        opacity: 0.7;
+    }
+
+    /* Contact Cards */
+    .contact-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 25px;
+        margin-bottom: 35px;
+    }
+
+    .contact-card {
+        background: white;
+        border-radius: 18px;
+        padding: 32px;
+        box-shadow: var(--card-shadow);
+        border: 1px solid rgba(113, 50, 202, 0.08);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .contact-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--gradient-primary);
+    }
+
+    .contact-card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--hover-shadow);
+    }
+
+    .contact-card.emergency {
+        border-color: #ff6b6b;
+    }
+
+    .contact-card.emergency::before {
+        background: linear-gradient(135deg, #ff6b6b 0%, #ff8787 100%);
+    }
+
+    .contact-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        color: white;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+    }
+
+    .contact-icon.purple { background: var(--gradient-primary); }
+    .contact-icon.red { background: linear-gradient(135deg, #ff6b6b 0%, #ff8787 100%); }
+    .contact-icon.pink { background: linear-gradient(135deg, #F29AAE 0%, #C47BE4 100%); }
+
+    .contact-title {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--dark-text);
+        margin-bottom: 15px;
+    }
+
+    .contact-info {
+        margin-bottom: 12px;
+    }
+
+    .contact-info strong {
+        display: block;
+        font-size: 12px;
+        text-transform: uppercase;
+        color: var(--light-text);
+        margin-bottom: 5px;
+        letter-spacing: 0.5px;
+    }
+
+    .contact-value {
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--primary-purple);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .contact-value a {
+        color: var(--primary-purple);
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .contact-value a:hover {
+        color: var(--dark-purple);
+        text-decoration: underline;
+    }
+
+    .call-button {
+        background: var(--gradient-primary);
+        color: white;
+        border: none;
+        padding: 14px 28px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 14px;
+        width: 100%;
+        margin-top: 20px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(113, 50, 202, 0.25);
+    }
+
+    .call-button:hover {
+        background: var(--gradient-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(113, 50, 202, 0.35);
+    }
+
+    .call-button.emergency {
+        background: linear-gradient(135deg, #ff6b6b 0%, #ff8787 100%);
+    }
+
+    .call-button.emergency:hover {
+        background: linear-gradient(135deg, #ff5252 0%, #ff6b6b 100%);
+    }
+
+    /* Info Section */
+    .info-section {
+        background: white;
+        border-radius: 18px;
+        padding: 32px;
+        box-shadow: var(--card-shadow);
+        margin-bottom: 35px;
+        border: 1px solid rgba(113, 50, 202, 0.08);
+    }
+
+    .info-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--dark-text);
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .info-title .glyphicon {
+        color: var(--primary-purple);
+    }
+
+    .info-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .info-list li {
+        padding: 15px 0;
+        border-bottom: 1px solid rgba(113, 50, 202, 0.08);
+        display: flex;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .info-list li:last-child {
+        border-bottom: none;
+    }
+
+    .info-list .glyphicon {
+        color: var(--primary-purple);
+        margin-top: 3px;
+        font-size: 16px;
+    }
+
+    .info-list .text {
+        flex: 1;
+        color: var(--dark-text);
+        line-height: 1.7;
+    }
+
+    @@media (max-width: 768px) {
+        .contact-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .personal-contact-info {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="emergency-container">
+    
+    <!-- Emergency Header -->
+    <div class="emergency-header">
+        <div class="icon">
+            <span class="glyphicon glyphicon-phone-alt"></span>
+        </div>
+        <h2>Contacts d'urgence</h2>
+        <p>En cas d'urgence médicale, contactez immédiatement les numéros ci-dessous</p>
+    </div>
+
+    <!-- Personal Emergency Contact Banner -->
+    @{
+        var guardianName = ViewBag.GuardianName as string;
+        var guardianPhone = ViewBag.GuardianPhone as string;
+        var guardianRelation = ViewBag.GuardianRelation as string;
+        var hasGuardian = !string.IsNullOrEmpty(guardianName) && !string.IsNullOrEmpty(guardianPhone);
+    }
+
+    <div class="personal-contact-banner">
+        <div class="icon">
+            <span class="glyphicon glyphicon-heart"></span>
+        </div>
+        <h3>Votre Contact d'Urgence Personnel</h3>
+        
+        @if (hasGuardian)
+        {
+            <div class="personal-contact-info">
+                <div class="contact-detail">
+                    <strong>Nom du contact</strong>
+                    <div class="value">@guardianName</div>
+                </div>
+                <div class="contact-detail">
+                    <strong>Téléphone</strong>
+                    <div class="value">
+                        <a href="tel:@guardianPhone">@guardianPhone</a>
+                    </div>
+                </div>
+                <div class="contact-detail">
+                    <strong>Relation</strong>
+                    <div class="value">@(guardianRelation ?? "Non spécifié")</div>
+                </div>
+            </div>
+            <a href="@Url.Action("UpdateProfile", "Patient")" class="edit-contact-btn">
+                <span class="glyphicon glyphicon-pencil"></span>
+                Modifier le contact
+            </a>
+        }
+        else
+        {
+            <div class="no-contact-message">
+                <div class="glyphicon glyphicon-user"></div>
+                <p style="margin: 10px 0;">Vous n'avez pas encore configuré de contact d'urgence personnel</p>
+                <a href="@Url.Action("UpdateProfile", "Patient")" class="edit-contact-btn">
+                    <span class="glyphicon glyphicon-plus"></span>
+                    Ajouter un contact d'urgence
+                </a>
+            </div>
+        }
+    </div>
+
+    <!-- Contact Cards -->
+    <div class="contact-grid">
+        
+        <!-- Emergency Services -->
+        <div class="contact-card emergency">
+            <div class="contact-icon red">
+                <span class="glyphicon glyphicon-flash"></span>
+            </div>
+            <div class="contact-title">Services d'urgence</div>
+            <div class="contact-info">
+                <strong>SAMU</strong>
+                <div class="contact-value">
+                    <span class="glyphicon glyphicon-phone"></span>
+                    <a href="tel:15">15</a>
+                </div>
+            </div>
+            <div class="contact-info">
+                <strong>Urgence Européenne</strong>
+                <div class="contact-value">
+                    <span class="glyphicon glyphicon-phone"></span>
+                    <a href="tel:112">112</a>
+                </div>
+            </div>
+            <button class="call-button emergency" onclick="window.location.href='tel:15'">
+                <span class="glyphicon glyphicon-earphone"></span>
+                Appeler le 15
+            </button>
+        </div>
+
+        <!-- Police/Pompiers -->
+        <div class="contact-card emergency">
+            <div class="contact-icon red">
+                <span class="glyphicon glyphicon-fire"></span>
+            </div>
+            <div class="contact-title">Police & Pompiers</div>
+            <div class="contact-info">
+                <strong>Police Secours</strong>
+                <div class="contact-value">
+                    <span class="glyphicon glyphicon-phone"></span>
+                    <a href="tel:17">17</a>
+                </div>
+            </div>
+            <div class="contact-info">
+                <strong>Pompiers</strong>
+                <div class="contact-value">
+                    <span class="glyphicon glyphicon-phone"></span>
+                    <a href="tel:18">18</a>
+                </div>
+            </div>
+            <button class="call-button emergency" onclick="window.location.href='tel:18'">
+                <span class="glyphicon glyphicon-earphone"></span>
+                Appeler les pompiers
+            </button>
+        </div>
+
+        <!-- Clinic Contact -->
+        <div class="contact-card">
+            <div class="contact-icon purple">
+                <span class="glyphicon glyphicon-home"></span>
+            </div>
+            <div class="contact-title">Cabinet MEDX</div>
+            <div class="contact-info">
+                <strong>Téléphone</strong>
+                <div class="contact-value">
+                    <span class="glyphicon glyphicon-phone"></span>
+                    <a href="tel:+33123456789">+33 1 23 45 67 89</a>
+                </div>
+            </div>
+            <div class="contact-info">
+                <strong>Email</strong>
+                <div class="contact-value">
+                    <span class="glyphicon glyphicon-envelope"></span>
+                    <a href="mailto:contact@medx.fr">contact@medx.fr</a>
+                </div>
+            </div>
+            <button class="call-button" onclick="window.location.href='tel:+33123456789'">
+                <span class="glyphicon glyphicon-earphone"></span>
+                Appeler le cabinet
+            </button>
+        </div>
+
+        <!-- Pharmacy -->
+        <div class="contact-card">
+            <div class="contact-icon pink">
+                <span class="glyphicon glyphicon-plus-sign"></span>
+            </div>
+            <div class="contact-title">Pharmacie de garde</div>
+            <div class="contact-info">
+                <strong>Info Pharmacie</strong>
+                <div class="contact-value">
+                    <span class="glyphicon glyphicon-phone"></span>
+                    <a href="tel:3237">32 37</a>
+                </div>
+            </div>
+            <div class="contact-info">
+                <strong>Disponibilité</strong>
+                <div class="contact-value" style="font-size: 14px; color: var(--light-text);">
+                    24h/24, 7j/7
+                </div>
+            </div>
+            <button class="call-button" onclick="window.location.href='tel:3237'">
+                <span class="glyphicon glyphicon-earphone"></span>
+                Appeler la pharmacie
+            </button>
+        </div>
+
+        <!-- SOS Médecins -->
+        <div class="contact-card">
+            <div class="contact-icon purple">
+                <span class="glyphicon glyphicon-user-md"></span>
+            </div>
+            <div class="contact-title">SOS Médecins</div>
+            <div class="contact-info">
+                <strong>Visite à domicile</strong>
+                <div class="contact-value">
+                    <span class="glyphicon glyphicon-phone"></span>
+                    <a href="tel:3624">36 24</a>
+                </div>
+            </div>
+            <div class="contact-info">
+                <strong>Service</strong>
+                <div class="contact-value" style="font-size: 14px; color: var(--light-text);">
+                    7j/7, 24h/24
+                </div>
+            </div>
+            <button class="call-button" onclick="window.location.href='tel:3624'">
+                <span class="glyphicon glyphicon-earphone"></span>
+                Appeler SOS Médecins
+            </button>
+        </div>
+
+        <!-- Centre Anti-Poison -->
+        <div class="contact-card">
+            <div class="contact-icon pink">
+                <span class="glyphicon glyphicon-warning-sign"></span>
+            </div>
+            <div class="contact-title">Centre Anti-Poison</div>
+            <div class="contact-info">
+                <strong>Intoxication / Empoisonnement</strong>
+                <div class="contact-value">
+                    <span class="glyphicon glyphicon-phone"></span>
+                    <a href="tel:+33140054848">01 40 05 48 48</a>
+                </div>
+            </div>
+            <div class="contact-info">
+                <strong>Service</strong>
+                <div class="contact-value" style="font-size: 14px; color: var(--light-text);">
+                    24h/24, 7j/7
+                </div>
+            </div>
+            <button class="call-button" onclick="window.location.href='tel:+33140054848'">
+                <span class="glyphicon glyphicon-earphone"></span>
+                Appeler le centre
+            </button>
+        </div>
+
+    </div>
+
+    <!-- Important Information -->
+    <div class="info-section">
+        <div class="info-title">
+            <span class="glyphicon glyphicon-info-sign"></span>
+            Informations importantes
+        </div>
+        <ul class="info-list">
+            <li>
+                <span class="glyphicon glyphicon-alert"></span>
+                <div class="text">
+                    <strong>En cas d'urgence vitale</strong>, composez immédiatement le <strong>15 (SAMU)</strong> ou le <strong>112</strong> (numéro d'urgence européen).
+                </div>
+            </li>
+            <li>
+                <span class="glyphicon glyphicon-fire"></span>
+                <div class="text">
+                    <strong>Pompiers (18)</strong> - Incendies, accidents de la route, secours aux personnes<br>
+                    <strong>Police (17)</strong> - Urgences de sécurité, agression, vol
+                </div>
+            </li>
+            <li>
+                <span class="glyphicon glyphicon-user-md"></span>
+                <div class="text">
+                    <strong>SOS Médecins (36 24)</strong> - Pour une visite médicale à domicile en urgence, disponible 24h/24
+                </div>
+            </li>
+            <li>
+                <span class="glyphicon glyphicon-warning-sign"></span>
+                <div class="text">
+                    <strong>Centre Anti-Poison (01 40 05 48 48)</strong> - En cas d'intoxication ou d'empoisonnement
+                </div>
+            </li>
+            <li>
+                <span class="glyphicon glyphicon-plus-sign"></span>
+                <div class="text">
+                    <strong>Pharmacie de garde (32 37)</strong> - Pour trouver la pharmacie ouverte la plus proche
+                </div>
+            </li>
+            <li>
+                <span class="glyphicon glyphicon-time"></span>
+                <div class="text">
+                    <strong>Horaires du cabinet MEDX:</strong> Du lundi au vendredi de 8h00 à 19h00, Samedi de 9h00 à 13h00
+                </div>
+            </li>
+            <li>
+                <span class="glyphicon glyphicon-map-marker"></span>
+                <div class="text">
+                    <strong>Adresse:</strong> 123 Avenue de la Santé, 75001 Paris, France
+                </div>
+            </li>
+            <li>
+                <span class="glyphicon glyphicon-heart"></span>
+                <div class="text">
+                    <strong>En cas de doute</strong>, n'hésitez pas à contacter nos services ou les urgences. Votre santé est notre priorité.
+                </div>
+            </li>
+            <li>
+                <span class="glyphicon glyphicon-phone-alt"></span>
+                <div class="text">
+                    <strong>Numéros gratuits:</strong> Tous les numéros d'urgence (15, 17, 18, 112) sont gratuits et accessibles depuis tout téléphone fixe ou mobile.
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Back Button -->
+    <div class="text-center" style="margin-top: 35px;">
+        <a href="@Url.Action("Index", "Patient")" class="btn btn-default btn-lg" style="border-radius: 12px; padding: 13px 32px; border: 2px solid rgba(113, 50, 202, 0.15); background: white; color: #7132CA; font-weight: 600;">
+            <span class="glyphicon glyphicon-arrow-left"></span>
+            Retour au tableau de bord
+        </a>
+    </div>
+
+</div>

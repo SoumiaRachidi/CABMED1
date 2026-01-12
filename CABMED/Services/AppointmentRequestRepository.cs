@@ -2,206 +2,193 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Web.Hosting;
-using System.Web.Script.Serialization;
+using System.Web;
 using CABMED.ViewModels;
+using Newtonsoft.Json;
 
 namespace CABMED.Services
 {
-    /// <summary>
-    /// Simple repository that keeps track of appointment requests so that
-    /// patient and secretary dashboards stay in sync.
-    /// </summary>
     public static class AppointmentRequestRepository
     {
-        private static readonly object SyncRoot = new object();
-        private static readonly List<AppointmentRequestViewModel> Requests = new List<AppointmentRequestViewModel>();
-        private static int _sequence = 1;
-        private static bool _initialized;
+        private static readonly object _lock = new object();
+        private static readonly string _filePath = GetStoragePath();
+        private static int _nextId = 1;
 
-        public static AppointmentRequestViewModel Add(AppointmentRequestViewModel request)
+        private static string GetStoragePath()
         {
-            if (request == null)
+            var appDataPath = HttpContext.Current?.Server.MapPath("~/App_Data");
+            if (string.IsNullOrEmpty(appDataPath))
             {
-                throw new ArgumentNullException(nameof(request));
+                appDataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data");
             }
 
-            lock (SyncRoot)
+            if (!Directory.Exists(appDataPath))
             {
-                EnsureLoaded();
-
-                if (request.RequestId == 0)
-                {
-                    request.RequestId = _sequence++;
-                }
-
-                Requests.Add(request);
-                SaveChanges();
-                return request;
+                Directory.CreateDirectory(appDataPath);
             }
+
+            return Path.Combine(appDataPath, "appointmentRequests.json");
         }
 
         public static List<AppointmentRequestViewModel> GetAll()
         {
-            lock (SyncRoot)
+            lock (_lock)
             {
-                EnsureLoaded();
-                return new List<AppointmentRequestViewModel>(Requests);
+                try
+                {
+                    if (!File.Exists(_filePath))
+                    {
+                        return new List<AppointmentRequestViewModel>();
+                    }
+
+                    var json = File.ReadAllText(_filePath);
+                    if (string.IsNullOrWhiteSpace(json))
+                    {
+                        return new List<AppointmentRequestViewModel>();
+                    }
+
+                    var requests = JsonConvert.DeserializeObject<List<AppointmentRequestViewModel>>(json);
+                    return requests ?? new List<AppointmentRequestViewModel>();
+                }
+                catch (Exception)
+                {
+                    return new List<AppointmentRequestViewModel>();
+                }
+            }
+        }
+
+        public static AppointmentRequestViewModel GetById(int id)
+        {
+            lock (_lock)
+            {
+                var requests = GetAll();
+                return requests.FirstOrDefault(r => r.RequestId == id);
             }
         }
 
         public static List<AppointmentRequestViewModel> GetByPatient(int patientId)
         {
-            lock (SyncRoot)
+            lock (_lock)
             {
-                EnsureLoaded();
-                return Requests
-                    .Where(r => r.PatientId == patientId)
-                    .OrderByDescending(r => r.DateDemande)
-                    .ToList();
+                var requests = GetAll();
+                return requests.Where(r => r.PatientId == patientId).ToList();
             }
         }
 
-        public static AppointmentRequestViewModel GetById(int requestId)
+        public static void Add(AppointmentRequestViewModel request)
         {
-            lock (SyncRoot)
+            lock (_lock)
             {
-                EnsureLoaded();
-                return Requests.FirstOrDefault(r => r.RequestId == requestId);
-            }
-        }
-
-        public static int CountByStatus(string status)
-        {
-            lock (SyncRoot)
-            {
-                EnsureLoaded();
-                return Requests.Count(r => string.Equals(r.Status, status, StringComparison.InvariantCultureIgnoreCase));
-            }
-        }
-
-        public static int Count(Func<AppointmentRequestViewModel, bool> predicate)
-        {
-            lock (SyncRoot)
-            {
-                EnsureLoaded();
-                return Requests.Count(predicate);
-            }
-        }
-
-        public static List<AppointmentRequestViewModel> GetRecent(int take)
-        {
-            lock (SyncRoot)
-            {
-                EnsureLoaded();
-                return Requests
-                    .OrderByDescending(r => r.DateDemande)
-                    .Take(take)
-                    .ToList();
-            }
-        }
-
-        public static bool ApproveRequest(int requestId, DateTime appointmentDate, TimeSpan appointmentTime, int assignedDoctorId, string assignedDoctor, string comments, string processedBy, int? rendezVousId = null)
-        {
-            lock (SyncRoot)
-            {
-                EnsureLoaded();
-                var request = Requests.FirstOrDefault(r => r.RequestId == requestId);
-                if (request == null)
+                var requests = GetAll();
+                
+                if (request.RequestId == 0)
                 {
-                    return false;
+                    request.RequestId = GenerateNextId(requests);
                 }
 
-                request.Status = "Approuvé";
-                request.AssignedDoctorId = assignedDoctorId;
-                request.AssignedDoctor = assignedDoctor;
-                request.SecretaryComments = comments;
-                request.ConfirmedDate = appointmentDate.Date;
-                request.ConfirmedStartTime = appointmentTime;
-                request.ConfirmedEndTime = appointmentTime.Add(TimeSpan.FromMinutes(30));
-                request.ProcessedDate = DateTime.Now;
-                request.ProcessedBy = processedBy;
-                request.RendezVousId = rendezVousId ?? request.RendezVousId;
-                SaveChanges();
-                return true;
+                requests.Add(request);
+                SaveAll(requests);
+            }
+        }
+
+        public static void ApproveRequest(int requestId, DateTime appointmentDate, TimeSpan appointmentTime, 
+            int doctorId, string doctorName, string comments, string processedBy, int rendezVousId)
+        {
+            lock (_lock)
+            {
+                var requests = GetAll();
+                var request = requests.FirstOrDefault(r => r.RequestId == requestId);
+
+                if (request != null)
+                {
+                    request.Status = "Confirmé";
+                    request.ConfirmedDate = appointmentDate;
+                    request.ConfirmedStartTime = appointmentTime;
+                    request.ConfirmedEndTime = appointmentTime.Add(TimeSpan.FromMinutes(30));
+                    request.AssignedDoctorId = doctorId;
+                    request.AssignedDoctor = doctorName;
+                    request.SecretaryComments = comments;
+                    request.ProcessedDate = DateTime.Now;
+                    request.ProcessedBy = processedBy;
+                    request.RendezVousId = rendezVousId;
+
+                    SaveAll(requests);
+                }
             }
         }
 
         public static bool DeclineRequest(int requestId, string reason, string processedBy)
         {
-            lock (SyncRoot)
+            lock (_lock)
             {
-                EnsureLoaded();
-                var request = Requests.FirstOrDefault(r => r.RequestId == requestId);
-                if (request == null)
+                var requests = GetAll();
+                var request = requests.FirstOrDefault(r => r.RequestId == requestId);
+
+                if (request != null)
                 {
-                    return false;
+                    request.Status = "Refusé";
+                    request.SecretaryComments = reason;
+                    request.ProcessedDate = DateTime.Now;
+                    request.ProcessedBy = processedBy;
+
+                    SaveAll(requests);
+                    return true;
                 }
 
-                request.Status = "Refusé";
-                request.SecretaryComments = reason;
-                request.AssignedDoctor = null;
-                request.AssignedDoctorId = null;
-                request.ConfirmedDate = null;
-                request.ConfirmedStartTime = null;
-                request.ConfirmedEndTime = null;
-                request.ProcessedDate = DateTime.Now;
-                request.ProcessedBy = processedBy;
-                SaveChanges();
-                return true;
+                return false;
             }
         }
 
-        private static void EnsureLoaded()
+        public static int CountByStatus(string status)
         {
-            if (_initialized)
+            lock (_lock)
             {
-                return;
+                var requests = GetAll();
+                return requests.Count(r => string.Equals(r.Status, status, StringComparison.InvariantCultureIgnoreCase));
             }
+        }
 
-            var serializer = new JavaScriptSerializer();
-            var path = GetStoragePath();
-
-            if (File.Exists(path))
+        public static int Count(Func<AppointmentRequestViewModel, bool> predicate)
+        {
+            lock (_lock)
             {
-                var json = File.ReadAllText(path);
-                if (!string.IsNullOrWhiteSpace(json))
+                var requests = GetAll();
+                return requests.Count(predicate);
+            }
+        }
+
+        public static void Reset()
+        {
+            lock (_lock)
+            {
+                if (File.Exists(_filePath))
                 {
-                    var items = serializer.Deserialize<List<AppointmentRequestViewModel>>(json);
-                    if (items != null)
-                    {
-                        Requests.Clear();
-                        Requests.AddRange(items);
-                        _sequence = Requests.Count == 0 ? 1 : Requests.Max(r => r.RequestId) + 1;
-                    }
+                    File.Delete(_filePath);
                 }
+                _nextId = 1;
             }
-
-            _initialized = true;
         }
 
-        private static void SaveChanges()
+        private static void SaveAll(List<AppointmentRequestViewModel> requests)
         {
-            var serializer = new JavaScriptSerializer();
-            var json = serializer.Serialize(Requests);
-            var path = GetStoragePath();
-            var directory = Path.GetDirectoryName(path);
-            if (!Directory.Exists(directory))
+            try
             {
-                Directory.CreateDirectory(directory);
+                var json = JsonConvert.SerializeObject(requests, Formatting.Indented);
+                File.WriteAllText(_filePath, json);
             }
-            File.WriteAllText(path, json);
+            catch (Exception)
+            {
+                // Log error if logging is available
+            }
         }
 
-        private static string GetStoragePath()
+        private static int GenerateNextId(List<AppointmentRequestViewModel> requests)
         {
-            var path = HostingEnvironment.MapPath("~/App_Data/appointmentRequests.json");
-            if (string.IsNullOrEmpty(path))
+            if (requests.Any())
             {
-                throw new InvalidOperationException("Impossible de déterminer le chemin de stockage pour les demandes de rendez-vous.");
+                _nextId = requests.Max(r => r.RequestId) + 1;
             }
-
-            return path;
+            return _nextId++;
         }
     }
 }

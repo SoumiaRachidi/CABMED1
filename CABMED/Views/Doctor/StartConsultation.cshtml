@@ -1,0 +1,117 @@
+@model CABMED.ViewModels.ConsultationViewModel
+@{
+    ViewBag.Title = "Démarrer une consultation";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container" style="max-width: 900px; margin-top: 30px;">
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                <span class="glyphicon glyphicon-plus-sign"></span>
+                Nouvelle consultation médicale
+            </h3>
+        </div>
+        <div class="panel-body">
+            
+            <!-- Patient Information Card -->
+            <div class="panel panel-info" style="margin-bottom: 20px;">
+                <div class="panel-heading">
+                    <strong>Informations patient</strong>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Nom complet:</strong> @Model.PatientPrenom @Model.PatientNom</p>
+                            <p><strong>Téléphone:</strong> @Model.PatientTelephone</p>
+                        </div>
+                        <div class="col-md-6">
+                            @if (Model.PatientDateNaissance.HasValue)
+                            {
+                                <p><strong>Date de naissance:</strong> @Model.PatientDateNaissance.Value.ToString("dd/MM/yyyy")</p>
+                            }
+                            <p><strong>Motif du RDV:</strong> @Model.Motif</p>
+                        </div>
+                    </div>
+                    @if (!string.IsNullOrEmpty(Model.PatientAntecedents))
+                    {
+                        <div class="alert alert-warning" style="margin-top: 10px; margin-bottom: 0;">
+                            <strong>Antécédents médicaux:</strong>
+                            <p style="margin-bottom: 0;">@Model.PatientAntecedents</p>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            @using (Html.BeginForm("StartConsultation", "Doctor", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(m => m.RendezVousId)
+                @Html.HiddenFor(m => m.MedecinId)
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.DateConsultation, new { @class = "col-sm-3 control-label" })
+                    <div class="col-sm-9">
+                        @Html.TextBoxFor(m => m.DateConsultation, "{0:yyyy-MM-ddTHH:mm}", new { @class = "form-control", type = "datetime-local" })
+                        @Html.ValidationMessageFor(m => m.DateConsultation, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Symptoms, new { @class = "col-sm-3 control-label" })
+                    <div class="col-sm-9">
+                        @Html.TextAreaFor(m => m.Symptoms, 4, 50, new { @class = "form-control", placeholder = "Décrivez les symptômes présentés par le patient..." })
+                        @Html.ValidationMessageFor(m => m.Symptoms, "", new { @class = "text-danger" })
+                        <small class="help-block">
+                            <span class="glyphicon glyphicon-info-sign"></span>
+                            Ce champ sera utilisé pour le dossier médical du patient
+                        </small>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Diagnostic, new { @class = "col-sm-3 control-label" })
+                    <div class="col-sm-9">
+                        @Html.TextAreaFor(m => m.Diagnostic, 5, 50, new { @class = "form-control", placeholder = "Entrez votre diagnostic médical..." })
+                        @Html.ValidationMessageFor(m => m.Diagnostic, "", new { @class = "text-danger" })
+                        <small class="help-block">
+                            <span class="glyphicon glyphicon-info-sign"></span>
+                            Diagnostic principal de la consultation
+                        </small>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Notes, new { @class = "col-sm-3 control-label" })
+                    <div class="col-sm-9">
+                        @Html.TextAreaFor(m => m.Notes, 6, 50, new { @class = "form-control", placeholder = "Notes complémentaires, observations, recommandations..." })
+                        @Html.ValidationMessageFor(m => m.Notes, "", new { @class = "text-danger" })
+                        <small class="help-block">Notes médicales confidentielles (optionnel)</small>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-sm-offset-3 col-sm-9">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <span class="glyphicon glyphicon-ok"></span>
+                            Enregistrer la consultation
+                        </button>
+                        <a href="@Url.Action("Index", "Doctor")" class="btn btn-default btn-lg">
+                            <span class="glyphicon glyphicon-remove"></span>
+                            Annuler
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="alert alert-info">
+        <span class="glyphicon glyphicon-info-sign"></span>
+        <strong>Info:</strong> Après l'enregistrement, vous serez redirigé vers la page de prescription pour ajouter des ordonnances si nécessaire.
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

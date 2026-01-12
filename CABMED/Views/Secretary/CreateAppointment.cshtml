@@ -1,0 +1,368 @@
+@{
+    ViewBag.Title = "Nouveau Rendez-vous Direct";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    /* Professional appointment management styling - matching AppointmentRequests */
+    :root {
+        --primary:#2b7de9;        
+        --accent:#2ecc71;         
+        --warning:#e67e22;        
+        --danger:#e74c3c;         
+        --muted:#6c757d;
+        --bg:#ffffff;
+        --card:#f8f9fa;
+        --border:#e9ecef;
+    }
+
+    .create-appointment-container { 
+        background: var(--bg); 
+        margin-top: 24px;
+    }
+
+    .form-card {
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: white;
+        margin-bottom: 20px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .form-card:hover {
+        box-shadow: 0 4px 15px rgba(0,0,0,.1);
+    }
+
+    .form-card-header {
+        padding: 20px;
+        border-bottom: 1px solid var(--border);
+        background: var(--card);
+    }
+
+    .form-card-header h4 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 600;
+        color: #333;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .form-card-header .glyphicon {
+        color: var(--primary);
+        font-size: 18px;
+    }
+
+    .form-card-body {
+        padding: 20px;
+    }
+
+    .form-group label {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 8px;
+        font-size: 14px;
+    }
+
+    .form-control {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 10px 12px;
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(43, 125, 233, 0.1);
+        outline: none;
+    }
+
+    .btn {
+        border-radius: 8px;
+        padding: 10px 20px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 14px;
+    }
+
+    .btn-create {
+        background: var(--accent);
+        color: white;
+    }
+
+    .btn-create:hover {
+        background: #27ae60;
+        color: white;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+    }
+
+    .btn-secondary {
+        background: var(--muted);
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background: #5a6268;
+        color: white;
+    }
+
+    .alert {
+        border-radius: 8px;
+        border: none;
+        padding: 15px 20px;
+        margin-bottom: 20px;
+    }
+
+    .alert-success {
+        background: #d4edda;
+        color: #155724;
+        border-left: 4px solid var(--accent);
+    }
+
+    .alert-danger {
+        background: #f8d7da;
+        color: #721c24;
+        border-left: 4px solid var(--danger);
+    }
+
+    .page-header-section {
+        margin-bottom: 24px;
+    }
+
+    .page-header-section h2 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .page-header-section p {
+        margin: 4px 0 0;
+        color: var(--muted);
+        font-size: 14px;
+    }
+
+    .action-buttons {
+        margin-top: 24px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+    }
+
+    .required-indicator {
+        color: var(--danger);
+        margin-left: 3px;
+    }
+
+    @@media (max-width: 768px) {
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="container create-appointment-container">
+    <div class="row">
+        <div class="col-md-12">
+            <!-- Page Header -->
+            <div class="d-flex" style="align-items:center; justify-content:space-between; margin-bottom: 24px;">
+                <div class="page-header-section">
+                    <h2>Nouveau Rendez-vous Direct</h2>
+                    <p>Créer un rendez-vous directement pour un patient</p>
+                </div>
+                <div>
+                    <a href="@Url.Action("Index", "Secretary")" class="btn btn-secondary">
+                        <span class="glyphicon glyphicon-arrow-left"></span>
+                        Retour au tableau de bord
+                    </a>
+                </div>
+            </div>
+
+            <!-- Success/Error Messages -->
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success">
+                    <span class="glyphicon glyphicon-ok-circle"></span>
+                    @TempData["SuccessMessage"]
+                </div>
+            }
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger">
+                    <span class="glyphicon glyphicon-exclamation-sign"></span>
+                    @TempData["ErrorMessage"]
+                </div>
+            }
+
+            <!-- Form -->
+            @using (Html.BeginForm("CreateAppointment", "Secretary", FormMethod.Post, new { @class = "appointment-form" }))
+            {
+                @Html.AntiForgeryToken()
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <!-- Patient Selection Card -->
+                        <div class="form-card">
+                            <div class="form-card-header">
+                                <h4>
+                                    <span class="glyphicon glyphicon-user"></span>
+                                    Sélectionner le patient
+                                </h4>
+                            </div>
+                            <div class="form-card-body">
+                                <div class="form-group">
+                                    <label for="patientId">
+                                        Patient
+                                        <span class="required-indicator">*</span>
+                                    </label>
+                                    <select name="patientId" id="patientId" class="form-control" required>
+                                        <option value="">-- Choisir un patient --</option>
+                                        @if (ViewBag.Patients != null)
+                                        {
+                                            foreach (var patient in ViewBag.Patients as IEnumerable<CABMED.Models.Users>)
+                                            {
+                                                <option value="@patient.UserId">@patient.Prenom @patient.Nom (@patient.Email)</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Doctor Selection Card -->
+                        <div class="form-card">
+                            <div class="form-card-header">
+                                <h4>
+                                    <span class="glyphicon glyphicon-plus-sign"></span>
+                                    Sélectionner le médecin
+                                </h4>
+                            </div>
+                            <div class="form-card-body">
+                                <div class="form-group">
+                                    <label for="doctorId">
+                                        Médecin
+                                        <span class="required-indicator">*</span>
+                                    </label>
+                                    <select name="doctorId" id="doctorId" class="form-control" required>
+                                        <option value="">-- Choisir un médecin --</option>
+                                        @if (ViewBag.Doctors != null)
+                                        {
+                                            foreach (var doctor in ViewBag.Doctors as IEnumerable<CABMED.Models.Users>)
+                                            {
+                                                var specialty = !string.IsNullOrEmpty(doctor.Specialite) ? " - " + doctor.Specialite : "";
+                                                <option value="@doctor.UserId">Dr. @doctor.Prenom @doctor.Nom@specialty</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Appointment Details Card -->
+                        <div class="form-card">
+                            <div class="form-card-header">
+                                <h4>
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                    Détails du rendez-vous
+                                </h4>
+                            </div>
+                            <div class="form-card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="appointmentDate">
+                                                Date
+                                                <span class="required-indicator">*</span>
+                                            </label>
+                                            <input type="date" 
+                                                   name="appointmentDate" 
+                                                   id="appointmentDate" 
+                                                   class="form-control" 
+                                                   required
+                                                   min="@DateTime.Now.ToString("yyyy-MM-dd")">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="appointmentTime">
+                                                Heure
+                                                <span class="required-indicator">*</span>
+                                            </label>
+                                            <input type="time" 
+                                                   name="appointmentTime" 
+                                                   id="appointmentTime" 
+                                                   class="form-control" 
+                                                   required>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="motif">Motif de la consultation</label>
+                                    <textarea name="motif" 
+                                              id="motif" 
+                                              class="form-control" 
+                                              rows="4" 
+                                              placeholder="Décrivez le motif de la consultation..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="form-card">
+                            <div class="form-card-body">
+                                <div class="action-buttons">
+                                    <a href="@Url.Action("Index", "Secretary")" class="btn btn-secondary">
+                                        <span class="glyphicon glyphicon-remove"></span>
+                                        Annuler
+                                    </a>
+                                    <button type="submit" class="btn btn-create">
+                                        <span class="glyphicon glyphicon-floppy-disk"></span>
+                                        Créer le rendez-vous
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script>
+        $(document).ready(function() {
+            // Set default time to next hour
+            var now = new Date();
+            now.setHours(now.getHours() + 1);
+            now.setMinutes(0);
+            var hours = ('0' + now.getHours()).slice(-2);
+            var minutes = ('0' + now.getMinutes()).slice(-2);
+            $('#appointmentTime').val(hours + ':' + minutes);
+
+            // Highlight selected dropdowns
+            $('#patientId, #doctorId').on('change', function() {
+                if ($(this).val()) {
+                    $(this).css('border-color', 'var(--accent)');
+                } else {
+                    $(this).css('border-color', 'var(--border)');
+                }
+            });
+        });
+    </script>
+}

@@ -6,6 +6,9 @@ using System.Web.Mvc;
 using System.Web.Security;
 using CABMED.Models;
 using CABMED.ViewModels;
+using System.Globalization;
+using System.Text;
+using CABMED.Services;
 
 namespace CABMED.Controllers
 {
@@ -54,11 +57,20 @@ namespace CABMED.Controllers
                     return View(model);
                 }
 
+                var roleNormalized = NormalizeRole(user.Role);
+
                 Session["UserID"] = user.UserId;
-                Session["Role"] = user.Role;
+                Session["UserId"] = user.UserId;
+                Session["Role"] = roleNormalized;
                 Session["UserName"] = (user.Prenom + " " + user.Nom).Trim();
 
-                string role = (user.Role ?? string.Empty).ToLower();
+                // Store additional user details for patient info
+                Session["UserFirstName"] = user.Prenom ?? string.Empty;
+                Session["UserLastName"] = user.Nom ?? string.Empty;
+                Session["UserEmail"] = user.Email ?? string.Empty;
+                Session["UserPhone"] = user.Telephone ?? string.Empty;
+
+                string role = roleNormalized;
 
                 switch (role)
                 {
@@ -110,8 +122,8 @@ namespace CABMED.Controllers
                         return View(model);
                     }
 
-                    var role = (model.Role ?? "patient").Trim().ToLower();
-                    if (role != "admin" && role != "patient")
+                    var role = NormalizeRole(model.Role ?? "patient");
+                    if (role != "admin" && role != "patient" && role != "secretaire" && role != "medecin")
                     {
                         role = "patient";
                     }
@@ -137,11 +149,22 @@ namespace CABMED.Controllers
 
                     // Auto-login right after register
                     Session["UserID"] = newUser.UserId;
-                    Session["Role"] = newUser.Role;
+                    Session["UserId"] = newUser.UserId;
+                    Session["Role"] = role;
                     Session["UserName"] = (newUser.Prenom + " " + newUser.Nom).Trim();
+
+                    // Store additional user details for patient info
+                    Session["UserFirstName"] = newUser.Prenom ?? string.Empty;
+                    Session["UserLastName"] = newUser.Nom ?? string.Empty;
+                    Session["UserEmail"] = newUser.Email ?? string.Empty;
+                    Session["UserPhone"] = newUser.Telephone ?? string.Empty;
 
                     if (role == "admin")
                         return RedirectToAction("Index", "Admin");
+                    else if (role == "secretaire")
+                        return RedirectToAction("Index", "Secretary");
+                    else if (role == "medecin")
+                        return RedirectToAction("Index", "Doctor");
                     else
                         return RedirectToAction("Index", "Patient");
                 }
@@ -154,39 +177,7 @@ namespace CABMED.Controllers
             }
         }
 
-        // GET: Auth/CreateAdmin (TEMPORARY - Remove after creating admin)
-        public ActionResult CreateAdmin()
-        {
-            try
-            {
-                var existingAdmin = db.Users.FirstOrDefault(u => u.Email.ToLower() == "admin@cabmed.com");
-                if (existingAdmin != null)
-                {
-                    db.Users.Remove(existingAdmin);
-                    db.SaveChanges();
-                }
 
-                var admin = new Users
-                {
-                    Nom = "Admin",
-                    Prenom = "System",
-                    Email = "admin@cabmed.com",
-                    PasswordHash = HashPassword("admin123"),
-                    Role = "admin",
-                    IsActive = true,
-                    CreatedAt = DateTime.Now
-                };
-
-                db.Users.Add(admin);
-                db.SaveChanges();
-
-                return Content("Admin user created successfully!<br/><br/>Email: admin@cabmed.com<br/>Password: admin123<br/>Password Hash: " + admin.PasswordHash + "<br/><br/><a href='/Auth/Login'>Go to Login</a>");
-            }
-            catch (Exception ex)
-            {
-                return Content("Error creating admin: " + ex.Message);
-            }
-        }
 
         // GET: Auth/CheckUser (Debug helper)
         public ActionResult CheckUser(string email)
@@ -199,6 +190,53 @@ namespace CABMED.Controllers
             }
 
             return Content($"User Found:<br/>ID: {user.UserId}<br/>Name: {user.Prenom} {user.Nom}<br/>Email: {user.Email}<br/>Role: {user.Role}<br/>IsActive: {user.IsActive}<br/>PasswordHash: {user.PasswordHash}<br/><br/>Test Hash for 'admin123': {HashPassword("admin123")}");
+        }
+
+        // GET: Auth/DebugRepository (Debug helper)
+        public ActionResult DebugRepository()
+        {
+            try
+            {
+                var requests = CABMED.Services.AppointmentRequestRepository.GetAll();
+                var info = $"Repository Status:<br/>" +
+                          $"Total Requests: {requests.Count}<br/>" +
+                          $"Storage Path: ~/App_Data/appointmentRequests.json<br/><br/>";
+                
+                if (requests.Count > 0)
+                {
+                    info += "Recent Requests:<br/>";
+                    foreach (var req in requests.Take(5))
+                    {
+                        info += $"- ID: {req.RequestId}, Patient: {req.PatientNom} {req.PatientPrenom}, Status: {req.Status}<br/>";
+                    }
+                }
+                else
+                {
+                    info += "No requests found.<br/>";
+                }
+                
+                info += $"<br/><a href='/Auth/ResetRepository'>Reset Repository</a>";
+                
+                return Content(info);
+            }
+            catch (Exception ex)
+            {
+                return Content($"Error accessing repository: {ex.Message}<br/><br/><a href='/Auth/ResetRepository'>Reset Repository</a>");
+            }
+        }
+
+        // GET: Auth/ResetRepository (Debug helper)
+        public ActionResult ResetRepository()
+        {
+            try
+            {
+                CABMED.Services.AppointmentRequestRepository.Reset();
+                return Content("Repository reset successfully!<br/><br/><a href='/Auth/DebugRepository'>Check Repository Status</a>");
+            }
+            catch (Exception ex)
+            {
+                return Content($"Error resetting repository: {ex.Message}");
+            }
         }
 
         // GET: Auth/Logout
@@ -230,6 +268,28 @@ namespace CABMED.Controllers
             }
 
             return false;
+        }
+
+        private static string NormalizeRole(string role)
+        {
+            var r = (role ?? string.Empty).Trim().ToLowerInvariant();
+            if (string.IsNullOrEmpty(r)) return r;
+            // remove diacritics
+            var normalized = r.Normalize(NormalizationForm.FormD);
+            var sb = new StringBuilder();
+            foreach (var ch in normalized)
+            {
+                var uc = CharUnicodeInfo.GetUnicodeCategory(ch);
+                if (uc != UnicodeCategory.NonSpacingMark)
+                {
+                    sb.Append(ch);
+                }
+            }
+            r = sb.ToString().Normalize(NormalizationForm.FormC);
+            // map common variants
+            if (r == "secretaire" || r == "secrétaire") r = "secretaire";
+            if (r == "medecin" || r == "médecin") r = "medecin";
+            return r;
         }
 
         protected override void Dispose(bool disposing)

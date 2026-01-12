@@ -1,0 +1,571 @@
+@model List<CABMED.Models.Consultations>
+@{
+    ViewBag.Title = "Mes Ordonnances";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    /* Professional Purple Medical Theme */
+    :root {
+        --primary-purple: #7132CA;
+        --light-purple: #C47BE4;
+        --dark-purple: #301CA0;
+        --pink-accent: #F29AAE;
+        --white: #FFFFFF;
+        --light-bg: #F7F8FC;
+        --dark-text: #2C2C54;
+        --light-text: #8B8BA7;
+        --border: #E8E9F3;
+        --card-shadow: 0 4px 20px rgba(113, 50, 202, 0.12);
+        --hover-shadow: 0 8px 35px rgba(113, 50, 202, 0.2);
+        --gradient-primary: linear-gradient(135deg, #7132CA 0%, #C47BE4 100%);
+    }
+
+    .prescriptions-container {
+        max-width: 1200px;
+        margin: 30px auto;
+    }
+
+    /* Header with Purple Gradient */
+    .page-header-custom {
+        background: var(--gradient-primary);
+        color: white;
+        padding: 40px;
+        border-radius: 20px;
+        margin-bottom: 35px;
+        box-shadow: var(--card-shadow);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .page-header-custom::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 50%;
+    }
+
+    .page-header-custom h2 {
+        margin: 0;
+        font-size: 30px;
+        font-weight: 700;
+        position: relative;
+        z-index: 1;
+    }
+
+    .page-header-custom p {
+        margin: 8px 0 0 0;
+        opacity: 0.95;
+        font-size: 15px;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Search Filter Bar */
+    .search-filter-bar {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 25px;
+        margin-bottom: 28px;
+        box-shadow: var(--card-shadow);
+    }
+
+    .search-input {
+        border-radius: 10px;
+        border: 2px solid var(--border);
+        padding: 12px 16px;
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
+
+    .search-input:focus {
+        border-color: var(--primary-purple);
+        box-shadow: 0 0 0 4px rgba(113, 50, 202, 0.1);
+        outline: none;
+    }
+
+    /* Prescription Table */
+    .prescription-table {
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: var(--card-shadow);
+        border: 1px solid var(--border);
+    }
+
+    .prescription-table table {
+        margin-bottom: 0;
+    }
+
+    .prescription-table thead {
+        background: var(--gradient-primary);
+        color: white;
+    }
+
+    .prescription-table thead th {
+        border: none;
+        padding: 18px 16px;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 12px;
+        letter-spacing: 0.8px;
+    }
+
+    .prescription-table tbody tr {
+        border-bottom: 1px solid var(--border);
+        transition: all 0.3s ease;
+    }
+
+    .prescription-table tbody tr:hover {
+        background-color: rgba(113, 50, 202, 0.03);
+        transform: translateX(3px);
+    }
+
+    .prescription-table tbody td {
+        padding: 20px 16px;
+        vertical-align: middle;
+    }
+
+    /* Date Badge */
+    .date-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, #F7F8FC 0%, #E8E9F3 100%);
+        padding: 10px 14px;
+        border-radius: 10px;
+        font-weight: 600;
+        color: var(--dark-text);
+        font-size: 14px;
+        border: 2px solid var(--border);
+    }
+
+    .date-badge .day {
+        font-size: 20px;
+        color: var(--primary-purple);
+        display: block;
+        line-height: 1;
+        font-weight: 700;
+    }
+
+    .date-badge .month {
+        font-size: 11px;
+        text-transform: uppercase;
+        color: var(--light-text);
+        margin-top: 3px;
+    }
+
+    /* Doctor Info */
+    .doctor-info {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .doctor-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: var(--gradient-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 16px;
+        box-shadow: 0 2px 10px rgba(113, 50, 202, 0.2);
+    }
+
+    .doctor-details {
+        flex: 1;
+    }
+
+    .doctor-name {
+        font-weight: 600;
+        color: var(--dark-text);
+        font-size: 14px;
+        margin-bottom: 3px;
+    }
+
+    .doctor-specialty {
+        font-size: 12px;
+        color: var(--light-text);
+    }
+
+    /* Diagnosis */
+    .diagnosis-text {
+        color: var(--dark-text);
+        font-size: 14px;
+        line-height: 1.6;
+        max-width: 320px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .medications-count {
+        background: var(--gradient-primary);
+        color: white;
+        padding: 5px 12px;
+        border-radius: 14px;
+        font-size: 11px;
+        font-weight: 600;
+        display: inline-block;
+        margin-left: 10px;
+        box-shadow: 0 2px 8px rgba(113, 50, 202, 0.2);
+    }
+
+    /* Download Button */
+    .btn-download {
+        background: var(--gradient-primary);
+        color: white;
+        border: none;
+        padding: 11px 22px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 13px;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 12px rgba(113, 50, 202, 0.25);
+    }
+
+    .btn-download:hover {
+        background: linear-gradient(135deg, #301CA0 0%, #7132CA 100%);
+        color: white;
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(113, 50, 202, 0.35);
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+        background: white;
+        border-radius: 16px;
+        box-shadow: var(--card-shadow);
+    }
+
+    .empty-state-icon {
+        font-size: 80px;
+        color: rgba(113, 50, 202, 0.12);
+        margin-bottom: 24px;
+    }
+
+    .empty-state h3 {
+        color: var(--dark-text);
+        font-weight: 600;
+        margin-bottom: 12px;
+    }
+
+    .empty-state p {
+        color: var(--light-text);
+        margin-bottom: 28px;
+    }
+
+    .empty-state .btn-primary {
+        background: var(--gradient-primary);
+        border: none;
+        padding: 14px 28px;
+        border-radius: 12px;
+        font-weight: 600;
+    }
+
+    /* No Results */
+    #noResultsMessage .empty-state-icon {
+        color: rgba(113, 50, 202, 0.15);
+    }
+
+    /* Reset Button */
+    .btn-reset {
+        border: 2px solid var(--border);
+        background: white;
+        color: var(--primary-purple);
+        border-radius: 10px;
+        padding: 11px 20px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-reset:hover {
+        border-color: var(--primary-purple);
+        background: rgba(113, 50, 202, 0.05);
+        color: var(--primary-purple);
+    }
+
+    @@media (max-width: 768px) {
+        .prescription-table {
+            overflow-x: auto;
+        }
+        
+        .diagnosis-text {
+            max-width: 150px;
+        }
+    }
+</style>
+
+<div class="prescriptions-container">
+    
+    <!-- Header - Purple Gradient -->
+    <div class="page-header-custom">
+        <h2>
+            <span class="glyphicon glyphicon-list-alt"></span>
+            Mes Ordonnances Médicales
+        </h2>
+        <p>Consultez, téléchargez et imprimez vos prescriptions</p>
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <span class="glyphicon glyphicon-exclamation-sign"></span>
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <!-- Search & Filter Bar -->
+    <div class="search-filter-bar">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <span class="input-group-addon" style="background: var(--gradient-primary); color: white; border: none; border-radius: 10px 0 0 10px;">
+                        <span class="glyphicon glyphicon-search"></span>
+                    </span>
+                    <input type="text" 
+                           id="searchInput" 
+                           class="form-control search-input" 
+                           placeholder="Rechercher par médecin, diagnostic ou date..."
+                           style="border-left: none; border-radius: 0 10px 10px 0;">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <input type="date" 
+                       id="dateFilter" 
+                       class="form-control search-input" 
+                       placeholder="Filtrer par date">
+            </div>
+            <div class="col-md-3">
+                <button type="button" 
+                        class="btn btn-reset btn-block" 
+                        onclick="clearFilters()">
+                    <span class="glyphicon glyphicon-refresh"></span>
+                    Réinitialiser
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Prescriptions Table -->
+    @if (Model != null && Model.Any())
+    {
+        var consultationsWithPrescriptions = Model.Where(c => c.Prescriptions != null && c.Prescriptions.Any()).ToList();
+        
+        if (consultationsWithPrescriptions.Any())
+        {
+            <div class="prescription-table">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th style="width: 130px;">Date</th>
+                            <th style="width: 260px;">Médecin</th>
+                            <th>Diagnostic</th>
+                            <th style="width: 190px; text-align: center;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="prescriptionsTableBody">
+                        @foreach (var consultation in consultationsWithPrescriptions)
+                        {
+                            var doctor = consultation.Users;
+                            var prescriptionCount = consultation.Prescriptions.Count;
+                            var consultationDate = consultation.DateConsultation ?? DateTime.Now;
+                            var doctorInitials = "";
+                            
+                            if (doctor != null)
+                            {
+                                var firstInitial = !string.IsNullOrEmpty(doctor.Prenom) ? doctor.Prenom[0].ToString() : "";
+                                var lastInitial = !string.IsNullOrEmpty(doctor.Nom) ? doctor.Nom[0].ToString() : "";
+                                doctorInitials = (firstInitial + lastInitial).ToUpper();
+                            }
+                            
+                            <tr class="prescription-row" 
+                                data-date="@consultationDate.ToString("yyyy-MM-dd")"
+                                data-doctor="@(doctor != null ? (doctor.Prenom + " " + doctor.Nom).ToLower() : "")"
+                                data-diagnosis="@(consultation.Diagnostic?.ToLower() ?? "")">
+                                
+                                <!-- Date Column -->
+                                <td>
+                                    <div class="date-badge">
+                                        <span class="day">@consultationDate.ToString("dd")</span>
+                                        <span class="month">@consultationDate.ToString("MMM yyyy", new System.Globalization.CultureInfo("fr-FR"))</span>
+                                    </div>
+                                </td>
+                                
+                                <!-- Doctor Column -->
+                                <td>
+                                    <div class="doctor-info">
+                                        <div class="doctor-avatar">@doctorInitials</div>
+                                        <div class="doctor-details">
+                                            @if (doctor != null)
+                                            {
+                                                <div class="doctor-name">Dr. @doctor.Prenom @doctor.Nom</div>
+                                                if (!string.IsNullOrEmpty(doctor.Specialite))
+                                                {
+                                                    <div class="doctor-specialty">@doctor.Specialite</div>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <div class="doctor-name text-muted">Médecin non disponible</div>
+                                            }
+                                        </div>
+                                    </div>
+                                </td>
+                                
+                                <!-- Diagnosis Column -->
+                                <td>
+                                    @if (!string.IsNullOrEmpty(consultation.Diagnostic))
+                                    {
+                                        <div class="diagnosis-text" title="@consultation.Diagnostic">
+                                            @consultation.Diagnostic
+                                        </div>
+                                        <span class="medications-count">@prescriptionCount médicament@(prescriptionCount > 1 ? "s" : "")</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Diagnostic non renseigné</span>
+                                        <span class="medications-count">@prescriptionCount médicament@(prescriptionCount > 1 ? "s" : "")</span>
+                                    }
+                                </td>
+                                
+                                <!-- Action Column -->
+                                <td style="text-align: center;">
+                                    <a href="@Url.Action("ViewPrescription", "Patient", new { id = consultation.ConsultationId })" 
+                                       class="btn-download">
+                                        <span class="glyphicon glyphicon-download-alt"></span>
+                                        Télécharger
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- No Results Message (Hidden by default) -->
+            <div id="noResultsMessage" class="empty-state" style="display: none; margin-top: 20px;">
+                <div class="empty-state-icon">
+                    <span class="glyphicon glyphicon-search"></span>
+                </div>
+                <h3>Aucun résultat trouvé</h3>
+                <p>Essayez de modifier vos critères de recherche</p>
+            </div>
+        }
+        else
+        {
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <span class="glyphicon glyphicon-inbox"></span>
+                </div>
+                <h3>Aucune ordonnance disponible</h3>
+                <p>Vous n'avez pas encore d'ordonnances médicales.</p>
+                <p class="text-muted">Les ordonnances seront disponibles après vos consultations médicales.</p>
+                <div style="margin-top: 30px;">
+                    <a href="@Url.Action("BookAppointment", "Patient")" class="btn btn-primary btn-lg">
+                        <span class="glyphicon glyphicon-plus"></span>
+                        Prendre un rendez-vous
+                    </a>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <span class="glyphicon glyphicon-inbox"></span>
+            </div>
+            <h3>Aucune ordonnance disponible</h3>
+            <p>Vous n'avez pas encore d'ordonnances médicales.</p>
+            <p class="text-muted">Les ordonnances seront disponibles après vos consultations médicales.</p>
+            <div style="margin-top: 30px;">
+                <a href="@Url.Action("BookAppointment", "Patient")" class="btn btn-primary btn-lg">
+                    <span class="glyphicon glyphicon-plus"></span>
+                    Prendre un rendez-vous
+                </a>
+            </div>
+        </div>
+    }
+
+    <!-- Back Button -->
+    <div class="text-center" style="margin-top: 35px;">
+        <a href="@Url.Action("Index", "Patient")" class="btn btn-default btn-lg" style="border-radius: 12px; padding: 13px 32px; border: 2px solid var(--border); background: white; color: var(--primary-purple); font-weight: 600;">
+            <span class="glyphicon glyphicon-arrow-left"></span>
+            Retour au tableau de bord
+        </a>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    $(document).ready(function() {
+        // Search functionality
+        $('#searchInput').on('keyup', function() {
+            filterPrescriptions();
+        });
+
+        // Date filter functionality
+        $('#dateFilter').on('change', function() {
+            filterPrescriptions();
+        });
+    });
+
+    function filterPrescriptions() {
+        var searchText = $('#searchInput').val().toLowerCase();
+        var dateFilter = $('#dateFilter').val();
+        var visibleCount = 0;
+
+        $('.prescription-row').each(function() {
+            var row = $(this);
+            var doctor = row.data('doctor');
+            var diagnosis = row.data('diagnosis');
+            var rowDate = row.data('date');
+            
+            var matchesSearch = searchText === '' || 
+                               doctor.indexOf(searchText) > -1 || 
+                               diagnosis.indexOf(searchText) > -1 ||
+                               rowDate.indexOf(searchText) > -1;
+            
+            var matchesDate = dateFilter === '' || rowDate === dateFilter;
+            
+            if (matchesSearch && matchesDate) {
+                row.show();
+                visibleCount++;
+            } else {
+                row.hide();
+            }
+        });
+
+        // Show/hide no results message
+        if (visibleCount === 0) {
+            $('#noResultsMessage').show();
+            $('.prescription-table').hide();
+        } else {
+            $('#noResultsMessage').hide();
+            $('.prescription-table').show();
+        }
+    }
+
+    function clearFilters() {
+        $('#searchInput').val('');
+        $('#dateFilter').val('');
+        $('.prescription-row').show();
+        $('#noResultsMessage').hide();
+        $('.prescription-table').show();
+    }
+</script>
+}

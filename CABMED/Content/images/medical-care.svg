@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 350" width="400" height="350">
+  <!-- Medical proximity care illustration -->
+  <defs>
+    <linearGradient id="heartGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF6B4A;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FFB4A0;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background elements -->
+  <circle cx="200" cy="175" r="140" fill="#E8F0FF" opacity="0.3"/>
+  
+  <!-- Doctor figure -->
+  <circle cx="180" cy="150" r="30" fill="#2D3E6E"/>
+  <rect x="160" y="180" width="40" height="60" fill="#2D3E6E" rx="5"/>
+  <rect x="155" y="190" width="50" height="50" fill="white" rx="3"/>
+  <line x1="170" y1="200" x2="190" y2="200" stroke="#FF6B4A" stroke-width="2"/>
+  <line x1="170" y1="210" x2="190" y2="210" stroke="#FF6B4A" stroke-width="2"/>
+  <line x1="170" y1="220" x2="190" y2="220" stroke="#FF6B4A" stroke-width="2"/>
+  
+  <!-- Patient figure -->
+  <circle cx="240" cy="160" r="25" fill="#C4C4C4"/>
+  <rect x="222" y="185" width="36" height="55" fill="#C4C4C4" rx="5"/>
+  
+  <!-- Large heart -->
+  <path d="M 200 280 C 200 280 160 240 160 210 C 160 185 175 175 190 175 C 200 175 205 180 200 190 C 195 180 200 175 210 175 C 225 175 240 185 240 210 C 240 240 200 280 200 280 Z" 
+        fill="url(#heartGrad)" opacity="0.8"/>
+  
+  <!-- Medical cross -->
+  <rect x="195" y="90" width="10" height="25" fill="#FF6B4A"/>
+  <rect x="185" y="100" width="30" height="10" fill="#FF6B4A"/>
+</svg>

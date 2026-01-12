@@ -1,0 +1,509 @@
+@model List<CABMED.Models.Consultations>
+@{
+    ViewBag.Title = "Mon Historique Médical";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    /* Professional Purple Medical Theme */
+    :root {
+        --primary-purple: #7132CA;
+        --light-purple: #C47BE4;
+        --dark-purple: #301CA0;
+        --pink-accent: #F29AAE;
+        --white: #FFFFFF;
+        --light-bg: #F7F8FC;
+        --dark-text: #2C2C54;
+        --light-text: #8B8BA7;
+        --card-shadow: 0 4px 20px rgba(113, 50, 202, 0.12);
+        --hover-shadow: 0 8px 35px rgba(113, 50, 202, 0.2);
+        --gradient-primary: linear-gradient(135deg, #7132CA 0%, #C47BE4 100%);
+    }
+
+    .history-container {
+        max-width: 1200px;
+        margin: 30px auto;
+    }
+
+    /* Header with Purple Gradient */
+    .history-header {
+        background: var(--gradient-primary);
+        color: white;
+        padding: 40px;
+        border-radius: 20px;
+        margin-bottom: 35px;
+        box-shadow: var(--card-shadow);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .history-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 50%;
+    }
+
+    .history-header .icon {
+        font-size: 64px;
+        margin-bottom: 20px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .history-header h2 {
+        margin: 0 0 10px 0;
+        font-size: 30px;
+        font-weight: 700;
+        position: relative;
+        z-index: 1;
+    }
+
+    .history-header p {
+        margin: 0;
+        opacity: 0.95;
+        font-size: 15px;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Timeline */
+    .timeline {
+        position: relative;
+        padding: 20px 0;
+    }
+
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 30px;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: linear-gradient(180deg, var(--primary-purple) 0%, var(--light-purple) 100%);
+    }
+
+    .timeline-item {
+        position: relative;
+        padding-left: 80px;
+        margin-bottom: 40px;
+    }
+
+    .timeline-marker {
+        position: absolute;
+        left: 16px;
+        top: 0;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: var(--gradient-primary);
+        border: 4px solid white;
+        box-shadow: 0 2px 10px rgba(113, 50, 202, 0.3);
+        z-index: 1;
+    }
+
+    .timeline-date {
+        position: absolute;
+        left: 60px;
+        top: 5px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--primary-purple);
+    }
+
+    .consultation-card {
+        background: white;
+        border-radius: 16px;
+        padding: 25px;
+        box-shadow: var(--card-shadow);
+        border: 1px solid rgba(113, 50, 202, 0.08);
+        transition: all 0.3s ease;
+        margin-top: 35px;
+    }
+
+    .consultation-card:hover {
+        transform: translateX(10px);
+        box-shadow: var(--hover-shadow);
+        border-color: var(--primary-purple);
+    }
+
+    .consultation-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid rgba(113, 50, 202, 0.1);
+    }
+
+    .doctor-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .doctor-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        background: var(--gradient-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 18px;
+        box-shadow: 0 2px 10px rgba(113, 50, 202, 0.2);
+    }
+
+    .doctor-details h4 {
+        margin: 0 0 5px 0;
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--dark-text);
+    }
+
+    .doctor-details p {
+        margin: 0;
+        font-size: 13px;
+        color: var(--light-text);
+    }
+
+    .consultation-date-badge {
+        background: linear-gradient(135deg, var(--light-purple) 0%, var(--pink-accent) 100%);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .consultation-body {
+        margin-bottom: 20px;
+    }
+
+    .info-section {
+        margin-bottom: 15px;
+    }
+
+    .info-label {
+        font-size: 12px;
+        text-transform: uppercase;
+        color: var(--light-text);
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        margin-bottom: 5px;
+    }
+
+    .info-value {
+        color: var(--dark-text);
+        font-size: 15px;
+        line-height: 1.6;
+    }
+
+    .prescriptions-list {
+        background: linear-gradient(135deg, rgba(113, 50, 202, 0.03) 0%, rgba(196, 123, 228, 0.03) 100%);
+        border-left: 3px solid var(--primary-purple);
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 15px;
+    }
+
+    .prescription-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(113, 50, 202, 0.1);
+    }
+
+    .prescription-item:last-child {
+        border-bottom: none;
+    }
+
+    .prescription-number {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: var(--primary-purple);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+
+    .prescription-details {
+        flex: 1;
+    }
+
+    .prescription-name {
+        font-weight: 600;
+        color: var(--dark-text);
+        margin-bottom: 3px;
+    }
+
+    .prescription-dosage {
+        font-size: 13px;
+        color: var(--light-text);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+        background: white;
+        border-radius: 16px;
+        box-shadow: var(--card-shadow);
+    }
+
+    .empty-state-icon {
+        font-size: 80px;
+        color: rgba(113, 50, 202, 0.12);
+        margin-bottom: 24px;
+    }
+
+    .empty-state h3 {
+        color: var(--dark-text);
+        font-weight: 600;
+        margin-bottom: 12px;
+    }
+
+    .empty-state p {
+        color: var(--light-text);
+        margin-bottom: 28px;
+    }
+
+    .view-prescription-btn {
+        background: var(--gradient-primary);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 13px;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(113, 50, 202, 0.25);
+    }
+
+    .view-prescription-btn:hover {
+        background: linear-gradient(135deg, #301CA0 0%, #7132CA 100%);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(113, 50, 202, 0.35);
+        text-decoration: none;
+    }
+
+    .stats-bar {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 35px;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: var(--card-shadow);
+        border: 1px solid rgba(113, 50, 202, 0.08);
+        text-align: center;
+    }
+
+    .stat-value {
+        font-size: 32px;
+        font-weight: 700;
+        color: var(--primary-purple);
+        margin-bottom: 5px;
+    }
+
+    .stat-label {
+        font-size: 13px;
+        color: var(--light-text);
+        font-weight: 600;
+    }
+</style>
+
+<div class="history-container">
+    
+    <!-- History Header -->
+    <div class="history-header text-center">
+        <div class="icon">
+            <span class="glyphicon glyphicon-heart-empty"></span>
+        </div>
+        <h2>Mon Historique Médical</h2>
+        <p>Consultez toutes vos consultations et prescriptions passées</p>
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <span class="glyphicon glyphicon-exclamation-sign"></span>
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    @if (Model != null && Model.Any())
+    {
+        <!-- Statistics -->
+        <div class="stats-bar">
+            <div class="stat-card">
+                <div class="stat-value">@Model.Count</div>
+                <div class="stat-label">Consultations Total</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">@Model.Sum(c => c.Prescriptions.Count)</div>
+                <div class="stat-label">Ordonnances Reçues</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">@Model.Count(c => c.DateConsultation.HasValue && c.DateConsultation.Value.Year == DateTime.Now.Year)</div>
+                <div class="stat-label">Cette Année</div>
+            </div>
+        </div>
+
+        <!-- Timeline -->
+        <div class="timeline">
+            @foreach (var consultation in Model)
+            {
+                var doctor = consultation.Users;
+                var consultDate = consultation.DateConsultation ?? consultation.RendezVous.DateHeureDebut;
+                var doctorInitials = "";
+                
+                if (doctor != null)
+                {
+                    var firstInitial = !string.IsNullOrEmpty(doctor.Prenom) ? doctor.Prenom[0].ToString() : "";
+                    var lastInitial = !string.IsNullOrEmpty(doctor.Nom) ? doctor.Nom[0].ToString() : "";
+                    doctorInitials = (firstInitial + lastInitial).ToUpper();
+                }
+
+                <div class="timeline-item">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-date">
+                        @consultDate.ToString("dd MMM yyyy", new System.Globalization.CultureInfo("fr-FR"))
+                    </div>
+
+                    <div class="consultation-card">
+                        <!-- Consultation Header -->
+                        <div class="consultation-header">
+                            <div class="doctor-info">
+                                <div class="doctor-avatar">@doctorInitials</div>
+                                <div class="doctor-details">
+                                    @if (doctor != null)
+                                    {
+                                        <h4>Dr. @doctor.Prenom @doctor.Nom</h4>
+                                        if (!string.IsNullOrEmpty(doctor.Specialite))
+                                        {
+                                            <p>@doctor.Specialite</p>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <h4>Médecin</h4>
+                                    }
+                                </div>
+                            </div>
+                            <div class="consultation-date-badge">
+                                @consultDate.ToString("HH:mm")
+                            </div>
+                        </div>
+
+                        <!-- Consultation Body -->
+                        <div class="consultation-body">
+                            @if (!string.IsNullOrEmpty(consultation.Diagnostic))
+                            {
+                                <div class="info-section">
+                                    <div class="info-label">Diagnostic</div>
+                                    <div class="info-value">@consultation.Diagnostic</div>
+                                </div>
+                            }
+
+                            @if (!string.IsNullOrEmpty(consultation.Notes))
+                            {
+                                <div class="info-section">
+                                    <div class="info-label">Notes</div>
+                                    <div class="info-value">@consultation.Notes</div>
+                                </div>
+                            }
+
+                            <!-- Prescriptions -->
+                            @if (consultation.Prescriptions != null && consultation.Prescriptions.Any())
+                            {
+                                <div class="info-section">
+                                    <div class="info-label">
+                                        <span class="glyphicon glyphicon-list-alt"></span>
+                                        Ordonnances (@consultation.Prescriptions.Count médicament@(consultation.Prescriptions.Count > 1 ? "s" : ""))
+                                    </div>
+                                    <div class="prescriptions-list">
+                                        @{
+                                            int counter = 1;
+                                        }
+                                        @foreach (var prescription in consultation.Prescriptions)
+                                        {
+                                            var parts = prescription.Posologie?.Split('|') ?? new string[0];
+                                            var dosage = parts.Length > 0 ? parts[0].Trim() : prescription.Posologie;
+                                            
+                                            <div class="prescription-item">
+                                                <div class="prescription-number">@counter</div>
+                                                <div class="prescription-details">
+                                                    <div class="prescription-name">@prescription.Medicament</div>
+                                                    <div class="prescription-dosage">@dosage</div>
+                                                </div>
+                                            </div>
+                                            counter++;
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- View Prescription Button -->
+                        @if (consultation.Prescriptions != null && consultation.Prescriptions.Any())
+                        {
+                            <div style="text-align: right; margin-top: 15px;">
+                                <a href="@Url.Action("ViewPrescription", "Patient", new { id = consultation.ConsultationId })" 
+                                   class="view-prescription-btn">
+                                    <span class="glyphicon glyphicon-file"></span>
+                                    Voir l'ordonnance complète
+                                </a>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <span class="glyphicon glyphicon-folder-open"></span>
+            </div>
+            <h3>Aucun historique médical</h3>
+            <p>Vous n'avez pas encore de consultations enregistrées.</p>
+            <p class="text-muted">Votre historique médical apparaîtra ici après vos consultations.</p>
+            <div style="margin-top: 30px;">
+                <a href="@Url.Action("BookAppointment", "Patient")" class="btn btn-primary btn-lg" style="background: var(--gradient-primary); border: none; border-radius: 12px; padding: 14px 28px;">
+                    <span class="glyphicon glyphicon-plus"></span>
+                    Prendre un rendez-vous
+                </a>
+            </div>
+        </div>
+    }
+
+    <!-- Back Button -->
+    <div class="text-center" style="margin-top: 35px;">
+        <a href="@Url.Action("Index", "Patient")" class="btn btn-default btn-lg" style="border-radius: 12px; padding: 13px 32px; border: 2px solid rgba(113, 50, 202, 0.15); background: white; color: #7132CA; font-weight: 600;">
+            <span class="glyphicon glyphicon-arrow-left"></span>
+            Retour au tableau de bord
+        </a>
+    </div>
+
+</div>

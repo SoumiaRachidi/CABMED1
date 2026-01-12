@@ -1,0 +1,397 @@
+@model CABMED.ViewModels.UpdateProfileViewModel
+@{
+    ViewBag.Title = "Mon Profil";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    /* Professional Purple Medical Theme */
+    :root {
+        --primary-purple: #7132CA;
+        --light-purple: #C47BE4;
+        --dark-purple: #301CA0;
+        --pink-accent: #F29AAE;
+        --white: #FFFFFF;
+        --light-bg: #F7F8FC;
+        --dark-text: #2C2C54;
+        --light-text: #8B8BA7;
+        --card-shadow: 0 4px 20px rgba(113, 50, 202, 0.12);
+        --hover-shadow: 0 8px 35px rgba(113, 50, 202, 0.2);
+        --gradient-primary: linear-gradient(135deg, #7132CA 0%, #C47BE4 100%);
+    }
+
+    .profile-container {
+        max-width: 900px;
+        margin: 30px auto;
+    }
+
+    /* Header with Purple Gradient */
+    .profile-header {
+        background: var(--gradient-primary);
+        color: white;
+        padding: 40px;
+        border-radius: 20px;
+        margin-bottom: 35px;
+        box-shadow: var(--card-shadow);
+        position: relative;
+        overflow: hidden;
+        text-align: center;
+    }
+
+    .profile-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 50%;
+    }
+
+    .profile-header .icon {
+        font-size: 64px;
+        margin-bottom: 20px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .profile-header h2 {
+        margin: 0 0 10px 0;
+        font-size: 30px;
+        font-weight: 700;
+        position: relative;
+        z-index: 1;
+    }
+
+    .profile-header p {
+        margin: 0;
+        opacity: 0.95;
+        font-size: 15px;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Form Card */
+    .form-card {
+        background: white;
+        border-radius: 18px;
+        padding: 35px;
+        box-shadow: var(--card-shadow);
+        margin-bottom: 25px;
+        border: 1px solid rgba(113, 50, 202, 0.08);
+    }
+
+    .form-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--gradient-primary);
+        border-radius: 18px 18px 0 0;
+    }
+
+    .section-header {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--dark-text);
+        margin-bottom: 25px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid rgba(113, 50, 202, 0.15);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .section-header .glyphicon {
+        color: var(--primary-purple);
+    }
+
+    .form-group label {
+        font-weight: 600;
+        color: var(--dark-text);
+        margin-bottom: 8px;
+    }
+
+    .form-control {
+        border: 2px solid rgba(113, 50, 202, 0.15);
+        border-radius: 10px;
+        padding: 12px 16px;
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: var(--primary-purple);
+        box-shadow: 0 0 0 4px rgba(113, 50, 202, 0.1);
+        outline: none;
+    }
+
+    .text-danger {
+        color: #ff6b6b;
+        font-size: 12px;
+        margin-top: 5px;
+    }
+
+    .btn-save {
+        background: var(--gradient-primary);
+        color: white;
+        border: none;
+        padding: 14px 32px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(113, 50, 202, 0.25);
+    }
+
+    .btn-save:hover {
+        background: linear-gradient(135deg, #301CA0 0%, #7132CA 100%);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(113, 50, 202, 0.35);
+    }
+
+    .btn-cancel {
+        background: white;
+        color: var(--primary-purple);
+        border: 2px solid rgba(113, 50, 202, 0.2);
+        padding: 14px 32px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 16px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-cancel:hover {
+        border-color: var(--primary-purple);
+        background: rgba(113, 50, 202, 0.05);
+        color: var(--primary-purple);
+    }
+
+    .alert-success {
+        background: linear-gradient(135deg, #5FCF80 0%, #43A047 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 16px 20px;
+    }
+
+    .alert-danger {
+        background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 16px 20px;
+    }
+
+    .info-box {
+        background: linear-gradient(135deg, rgba(113, 50, 202, 0.05) 0%, rgba(196, 123, 228, 0.05) 100%);
+        border-left: 4px solid var(--primary-purple);
+        padding: 18px 20px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+    }
+
+    .info-box .glyphicon {
+        color: var(--primary-purple);
+        margin-right: 10px;
+    }
+</style>
+
+<div class="profile-container">
+    
+    <!-- Profile Header -->
+    <div class="profile-header">
+        <div class="icon">
+            <span class="glyphicon glyphicon-user"></span>
+        </div>
+        <h2>Mon Profil</h2>
+        <p>Gérez vos informations personnelles et vos contacts d'urgence</p>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert" style="color: white; opacity: 0.8;">&times;</button>
+            <span class="glyphicon glyphicon-ok-circle"></span>
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert" style="color: white; opacity: 0.8;">&times;</button>
+            <span class="glyphicon glyphicon-exclamation-sign"></span>
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    @using (Html.BeginForm("UpdateProfile", "Patient", FormMethod.Post, new { @class = "profile-form" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(m => m.UserId)
+
+        <!-- Personal Information -->
+        <div class="form-card" style="position: relative;">
+            <div class="section-header">
+                <span class="glyphicon glyphicon-user"></span>
+                Informations personnelles
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Nom)
+                        @Html.TextBoxFor(m => m.Nom, new { @class = "form-control", placeholder = "Votre nom de famille" })
+                        @Html.ValidationMessageFor(m => m.Nom, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Prenom)
+                        @Html.TextBoxFor(m => m.Prenom, new { @class = "form-control", placeholder = "Votre prénom" })
+                        @Html.ValidationMessageFor(m => m.Prenom, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Email)
+                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control", type = "email", placeholder = "votre.email@exemple.com" })
+                        @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Telephone)
+                        @Html.TextBoxFor(m => m.Telephone, new { @class = "form-control", type = "tel", placeholder = "+33 1 23 45 67 89" })
+                        @Html.ValidationMessageFor(m => m.Telephone, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.DateNaissance)
+                        @Html.TextBoxFor(m => m.DateNaissance, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+                        @Html.ValidationMessageFor(m => m.DateNaissance, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Address Information -->
+        <div class="form-card" style="position: relative;">
+            <div class="section-header">
+                <span class="glyphicon glyphicon-map-marker"></span>
+                Adresse
+            </div>
+
+            <div class="info-box">
+                <span class="glyphicon glyphicon-info-sign"></span>
+                <strong>Pourquoi cette information?</strong> Votre adresse nous permet de vous localiser en cas d'urgence et d'organiser des visites à domicile si nécessaire.
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.Adresse)
+                @Html.TextBoxFor(m => m.Adresse, new { @class = "form-control", placeholder = "Numéro et nom de rue" })
+                @Html.ValidationMessageFor(m => m.Adresse, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Ville)
+                        @Html.TextBoxFor(m => m.Ville, new { @class = "form-control", placeholder = "Ville" })
+                        @Html.ValidationMessageFor(m => m.Ville, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.CodePostal)
+                        @Html.TextBoxFor(m => m.CodePostal, new { @class = "form-control", placeholder = "75001" })
+                        @Html.ValidationMessageFor(m => m.CodePostal, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Emergency Contact / Guardian -->
+        <div class="form-card" style="position: relative;">
+            <div class="section-header">
+                <span class="glyphicon glyphicon-phone-alt"></span>
+                Contact d'urgence / Tuteur
+            </div>
+
+            <div class="info-box">
+                <span class="glyphicon glyphicon-heart"></span>
+                <strong>Contact d'urgence:</strong> Cette personne sera contactée en cas d'urgence médicale. Il peut s'agir d'un parent, conjoint, ami proche ou tuteur légal.
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.GuardianName)
+                @Html.TextBoxFor(m => m.GuardianName, new { @class = "form-control", placeholder = "Nom complet du contact d'urgence" })
+                @Html.ValidationMessageFor(m => m.GuardianName, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.GuardianPhone)
+                        @Html.TextBoxFor(m => m.GuardianPhone, new { @class = "form-control", type = "tel", placeholder = "+33 6 12 34 56 78" })
+                        @Html.ValidationMessageFor(m => m.GuardianPhone, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.GuardianRelation)
+                        @Html.TextBoxFor(m => m.GuardianRelation, new { @class = "form-control", placeholder = "Ex: Parent, Conjoint, Ami" })
+                        @Html.ValidationMessageFor(m => m.GuardianRelation, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Medical History -->
+        <div class="form-card" style="position: relative;">
+            <div class="section-header">
+                <span class="glyphicon glyphicon-heart-empty"></span>
+                Antécédents médicaux
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.AntecedentsMedicaux)
+                @Html.TextAreaFor(m => m.AntecedentsMedicaux, 6, 50, new { @class = "form-control", placeholder = "Allergies, maladies chroniques, interventions chirurgicales, traitements en cours..." })
+                @Html.ValidationMessageFor(m => m.AntecedentsMedicaux, "", new { @class = "text-danger" })
+                <small class="help-block" style="color: var(--light-text);">
+                    <span class="glyphicon glyphicon-info-sign"></span>
+                    Ces informations aident les médecins à mieux vous soigner
+                </small>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="text-center" style="margin-top: 35px;">
+            <button type="submit" class="btn btn-save">
+                <span class="glyphicon glyphicon-floppy-disk"></span>
+                Enregistrer les modifications
+            </button>
+            <a href="@Url.Action("Index", "Patient")" class="btn btn-cancel">
+                <span class="glyphicon glyphicon-remove"></span>
+                Annuler
+            </a>
+        </div>
+    }
+
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

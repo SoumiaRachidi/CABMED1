@@ -139,6 +139,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\AppointmentStatus.cs" />
     <Compile Include="Models\Consultations.cs">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
@@ -176,6 +177,8 @@
     <Compile Include="Services\AppointmentRequestRepository.cs" />
     <Compile Include="ViewModels\AppointmentRequestViewModel.cs" />
     <Compile Include="ViewModels\AppointmentViewModel.cs" />
+    <Compile Include="ViewModels\ConsultationViewModel.cs" />
+    <Compile Include="ViewModels\CreatePrescriptionViewModel.cs" />
     <Compile Include="ViewModels\CreateStaffViewModel.cs" />
     <Compile Include="ViewModels\DoctorPatientHistoryViewModel.cs" />
     <Compile Include="ViewModels\EditStaffViewModel.cs" />
@@ -183,6 +186,7 @@
     <Compile Include="ViewModels\PrescriptionDetailsViewModel.cs" />
     <Compile Include="ViewModels\PrescriptionViewModel.cs" />
     <Compile Include="ViewModels\RegisterViewModel.cs" />
+    <Compile Include="ViewModels\UpdateProfileViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-grid.css" />
@@ -201,6 +205,13 @@
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\bootstrap.rtl.css" />
     <Content Include="Content\bootstrap.rtl.min.css" />
+    <Content Include="Content\images\health-monitoring.svg" />
+    <Content Include="Content\images\medical-care.svg" />
+    <Content Include="Content\images\medical-records.svg" />
+    <Content Include="Content\images\schedule.svg" />
+    <Content Include="Content\images\team.svg" />
+    <Content Include="Content\images\user-login.svg" />
+    <Content Include="Content\images\user-register.svg" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
@@ -227,6 +238,7 @@
     <Content Include="Models\Model1.edmx.diagram">
       <DependentUpon>Model1.edmx</DependentUpon>
     </Content>
+    <Content Include="Content\images\README.md" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />
@@ -271,6 +283,16 @@
     <Content Include="Views\Patient\AppointmentStatus.cshtml" />
     <Content Include="Views\Secretary\AppointmentRequests.cshtml" />
     <Content Include="Views\Patient\MyAppointments.cshtml" />
+    <Content Include="Views\Doctor\StartConsultation.cshtml" />
+    <Content Include="Views\Doctor\AddPrescription.cshtml" />
+    <Content Include="Views\Doctor\ViewPrescription.cshtml" />
+    <Content Include="Views\Patient\MyPrescriptions.cshtml" />
+    <Content Include="Views\Patient\EmergencyContact.cshtml" />
+    <Content Include="Views\Patient\UpdateProfile.cshtml" />
+    <Content Include="Views\Patient\MedicalHistory.cshtml" />
+    <Content Include="Views\Secretary\ManageAppointments.cshtml" />
+    <Content Include="Views\Admin\PatientDetails.cshtml" />
+    <Content Include="Views\Secretary\CreateAppointment.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

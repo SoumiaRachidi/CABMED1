@@ -40,278 +40,765 @@
 }
 
 <style>
-    /* Professional medical minimalist theme - consistent with Admin dashboard */
+    /* Professional Purple Medical Theme - Cohesive Color Palette */
     :root {
-        --primary:#2b7de9;        /* light blue */
-        --accent:#2ecc71;         /* medical green */
-        --warning:#e67e22;        /* orange */
-        --danger:#e74c3c;         /* red */
-        --muted:#6c757d;
-        --bg:#ffffff;
-        --card:#f8f9fa;
-        --border:#e9ecef;
+        --primary-purple: #7132CA;        /* Main color - Deep Purple */
+        --light-purple: #C47BE4;          /* Light accent */
+        --dark-purple: #301CA0;           /* Dark accent */
+        --pink-accent: #F29AAE;           /* Soft pink */
+        --white: #FFFFFF;
+        --light-bg: #F7F8FC;
+        --dark-text: #2C2C54;
+        --light-text: #8B8BA7;
+        --card-shadow: 0 4px 20px rgba(113, 50, 202, 0.12);
+        --hover-shadow: 0 8px 35px rgba(113, 50, 202, 0.2);
+        --gradient-primary: linear-gradient(135deg, #7132CA 0%, #C47BE4 100%);
+        --gradient-dark: linear-gradient(135deg, #301CA0 0%, #7132CA 100%);
+        --gradient-light: linear-gradient(135deg, #F29AAE 0%, #C47BE4 100%);
     }
-    .patient-dashboard { background: var(--bg); }
-    .metric-card { border:1px solid var(--border); border-radius:12px; background: var(--card); padding:22px; box-shadow:0 2px 8px rgba(0,0,0,.03); }
-    .metric-card .value { font-size:40px; font-weight:700; margin:6px 0; }
-    .metric-card .label { color: var(--muted); }
-    .metric-icon { width:44px; height:44px; display:flex; align-items:center; justify-content:center; border-radius:10px; color:#fff; }
-    .metric-icon.primary { background: var(--primary); }
-    .metric-icon.accent { background: var(--accent); }
-    .metric-icon.warning { background: var(--warning); }
-    .metric-icon.danger { background: var(--danger); }
 
-    .quick-actions .btn { border-radius:10px; padding:14px 18px; font-weight:600; margin-right:8px; margin-bottom:8px; }
-    .panel-clean { border:1px solid var(--border); border-radius:12px; background: var(--card); }
-    .panel-clean .panel-heading { padding:16px 18px; border-bottom:1px solid var(--border); background:#fff; border-radius:12px 12px 0 0; }
-    .panel-clean .panel-body { padding:18px; }
+    body {
+        background: var(--light-bg);
+        font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+        color: var(--dark-text);
+    }
 
-    .form-control { border-radius:10px; }
-    .appointment-card { border-left:4px solid var(--primary); background:#fff; padding:16px; margin:8px 0; border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,.1); }
-    .appointment-card.urgent { border-left-color: var(--warning); }
-    
-    .health-info { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color:#fff; border-radius:12px; padding:20px; }
-    .health-info h4 { margin-top:0; }
+    .patient-dashboard {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 30px 20px;
+    }
+
+    /* Welcome Header - Purple Gradient */
+    .welcome-header {
+        background: var(--gradient-primary);
+        border-radius: 20px;
+        padding: 45px;
+        color: white;
+        margin-bottom: 35px;
+        box-shadow: var(--card-shadow);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .welcome-header::before {
+        content: '';
+        position: absolute;
+        top: -60%;
+        right: -8%;
+        width: 350px;
+        height: 350px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 50%;
+    }
+
+    .welcome-header::after {
+        content: '';
+        position: absolute;
+        bottom: -40%;
+        left: -5%;
+        width: 280px;
+        height: 280px;
+        background: rgba(196, 123, 228, 0.15);
+        border-radius: 50%;
+    }
+
+    .welcome-header h1 {
+        margin: 0 0 12px 0;
+        font-size: 34px;
+        font-weight: 700;
+        position: relative;
+        z-index: 1;
+    }
+
+    .welcome-header p {
+        margin: 0;
+        font-size: 16px;
+        opacity: 0.95;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Quick Action Buttons */
+    .quick-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 25px;
+        flex-wrap: wrap;
+        position: relative;
+        z-index: 1;
+    }
+
+    .quick-actions .btn {
+        border-radius: 12px;
+        padding: 12px 24px;
+        font-weight: 600;
+        border: none;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .quick-actions .btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 25px rgba(0, 0, 0, 0.18);
+    }
+
+    .quick-actions .btn-primary {
+        background: var(--white);
+        color: var(--primary-purple);
+    }
+
+    .quick-actions .btn-info {
+        background: rgba(255, 255, 255, 0.25);
+        color: white;
+        border: 2px solid rgba(255, 255, 255, 0.4);
+    }
+
+    .quick-actions .btn-success {
+        background: rgba(255, 255, 255, 0.25);
+        color: white;
+        border: 2px solid rgba(255, 255, 255, 0.4);
+    }
+
+    .quick-actions .btn-default {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 2px solid rgba(255, 255, 255, 0.35);
+    }
+
+    /* Stats Cards */
+    .stats-section {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 25px;
+        margin-bottom: 35px;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 18px;
+        padding: 28px;
+        box-shadow: var(--card-shadow);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid rgba(113, 50, 202, 0.08);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--gradient-primary);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--hover-shadow);
+        border-color: var(--primary-purple);
+    }
+
+    .stat-card-header {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        margin-bottom: 18px;
+    }
+
+    .stat-icon {
+        width: 62px;
+        height: 62px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 26px;
+        color: white;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+    }
+
+    .stat-icon.purple { background: var(--gradient-primary); }
+    .stat-icon.pink { background: var(--gradient-light); }
+    .stat-icon.dark { background: var(--gradient-dark); }
+
+    .stat-info {
+        flex: 1;
+    }
+
+    .stat-value {
+        font-size: 38px;
+        font-weight: 700;
+        color: var(--primary-purple);
+        line-height: 1;
+        margin-bottom: 6px;
+    }
+
+    .stat-label {
+        font-size: 14px;
+        color: var(--light-text);
+        font-weight: 500;
+    }
+
+    .stat-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--primary-purple);
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        margin-top: 12px;
+        transition: all 0.3s ease;
+    }
+
+    .stat-link:hover {
+        gap: 10px;
+        color: var(--dark-purple);
+    }
+
+    /* Content Grid */
+    .content-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 28px;
+        margin-bottom: 35px;
+    }
+
+    /* Action Tiles */
+    .action-tiles {
+        background: white;
+        border-radius: 18px;
+        padding: 32px;
+        box-shadow: var(--card-shadow);
+        border: 1px solid rgba(113, 50, 202, 0.08);
+    }
+
+    .section-title {
+        font-size: 19px;
+        font-weight: 700;
+        color: var(--dark-text);
+        margin-bottom: 22px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .section-title .glyphicon {
+        color: var(--primary-purple);
+        font-size: 20px;
+    }
+
+    .tiles-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .action-tile {
+        background: linear-gradient(135deg, #F7F8FC 0%, #F0F1F7 100%);
+        border-radius: 14px;
+        padding: 24px;
+        text-align: center;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        text-decoration: none;
+        display: block;
+        border: 2px solid transparent;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .action-tile::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: var(--gradient-primary);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .action-tile:hover::before {
+        opacity: 0.08;
+    }
+
+    .action-tile:hover {
+        transform: translateY(-5px);
+        border-color: var(--primary-purple);
+        box-shadow: 0 8px 25px rgba(113, 50, 202, 0.2);
+    }
+
+    .action-tile .glyphicon {
+        font-size: 32px;
+        display: block;
+        margin-bottom: 12px;
+        position: relative;
+        z-index: 1;
+        transition: all 0.3s ease;
+    }
+
+    .action-tile:hover .glyphicon {
+        transform: scale(1.1);
+    }
+
+    .action-tile.primary .glyphicon { color: var(--primary-purple); }
+    .action-tile.danger .glyphicon { color: var(--pink-accent); }
+    .action-tile.info .glyphicon { color: var(--light-purple); }
+    .action-tile.warning .glyphicon { color: #301CA0; }
+
+    .action-tile span:last-child {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--dark-text);
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Health Info Card */
+    .health-info-card {
+        background: var(--gradient-primary);
+        border-radius: 18px;
+        padding: 32px;
+        color: white;
+        box-shadow: var(--card-shadow);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .health-info-card::before {
+        content: '';
+        position: absolute;
+        top: -50px;
+        right: -50px;
+        width: 220px;
+        height: 220px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+    }
+
+    .health-info-card::after {
+        content: '';
+        position: absolute;
+        bottom: -60px;
+        left: -40px;
+        width: 180px;
+        height: 180px;
+        background: rgba(196, 123, 228, 0.2);
+        border-radius: 50%;
+    }
+
+    .health-info-card h3 {
+        margin: 0 0 16px 0;
+        font-size: 21px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .health-info-card p {
+        margin-bottom: 22px;
+        opacity: 0.95;
+        line-height: 1.7;
+        position: relative;
+        z-index: 1;
+    }
+
+    .health-details {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .health-detail {
+        background: rgba(255, 255, 255, 0.18);
+        border-radius: 12px;
+        padding: 18px;
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .health-detail:hover {
+        background: rgba(255, 255, 255, 0.25);
+        transform: translateY(-2px);
+    }
+
+    .health-detail strong {
+        display: block;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        margin-bottom: 6px;
+        opacity: 0.9;
+    }
+
+    .health-detail-value {
+        font-size: 16px;
+        font-weight: 600;
+    }
+
+    /* Activity Section */
+    .activity-section {
+        background: white;
+        border-radius: 18px;
+        padding: 32px;
+        box-shadow: var(--card-shadow);
+        margin-top: 28px;
+        border: 1px solid rgba(113, 50, 202, 0.08);
+    }
+
+    .activity-item {
+        background: linear-gradient(135deg, #F7F8FC 0%, #F0F1F7 100%);
+        border-left: 4px solid var(--primary-purple);
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 14px;
+        transition: all 0.3s ease;
+    }
+
+    .activity-item:hover {
+        transform: translateX(8px);
+        box-shadow: 0 4px 18px rgba(113, 50, 202, 0.15);
+        border-left-color: var(--light-purple);
+    }
+
+    .activity-item h5 {
+        margin: 0 0 6px 0;
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--dark-text);
+    }
+
+    .activity-item p {
+        margin: 0 0 10px 0;
+        color: var(--light-text);
+        font-size: 14px;
+    }
+
+    .activity-date {
+        font-size: 12px;
+        color: var(--light-text);
+        font-weight: 500;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 65px 20px;
+    }
+
+    .empty-state .glyphicon {
+        font-size: 68px;
+        color: rgba(113, 50, 202, 0.15);
+        margin-bottom: 22px;
+    }
+
+    .empty-state h4 {
+        color: var(--light-text);
+        font-weight: 600;
+        margin-bottom: 12px;
+    }
+
+    .empty-state p {
+        color: #B8B8CC;
+        margin-bottom: 28px;
+    }
+
+    .empty-state .btn-primary {
+        background: var(--gradient-primary);
+        border: none;
+        color: white;
+        padding: 14px 28px;
+        border-radius: 12px;
+        font-weight: 600;
+    }
+
+    /* Health Tips */
+    .health-tips {
+        background: white;
+        border-radius: 18px;
+        padding: 32px;
+        box-shadow: var(--card-shadow);
+        margin-top: 28px;
+        border: 1px solid rgba(113, 50, 202, 0.08);
+    }
+
+    .tips-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 22px;
+    }
+
+    .tip-card {
+        text-align: center;
+        padding: 28px 18px;
+        background: linear-gradient(135deg, #F7F8FC 0%, #F0F1F7 100%);
+        border-radius: 14px;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+
+    .tip-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 8px 25px rgba(113, 50, 202, 0.15);
+        border-color: var(--primary-purple);
+    }
+
+    .tip-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 16px;
+        font-size: 26px;
+        color: white;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+    }
+
+    .tip-icon.purple { background: var(--gradient-primary); }
+    .tip-icon.pink { background: var(--gradient-light); }
+    .tip-icon.dark { background: var(--gradient-dark); }
+
+    .tip-card h5 {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--dark-text);
+        margin-bottom: 12px;
+    }
+
+    .tip-card p {
+        font-size: 13px;
+        color: var(--light-text);
+        line-height: 1.7;
+        margin: 0;
+    }
+
+    @@media (max-width: 992px) {
+        .content-grid {
+            grid-template-columns: 1fr;
+        }
+    }
 
     @@media (max-width: 768px) {
-        .metric-card { margin-bottom:16px; }
-        .quick-actions .btn { display:block; width:100%; margin-right:0; }
+        .stats-section {
+            grid-template-columns: 1fr;
+        }
+        
+        .tiles-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .health-details {
+            grid-template-columns: 1fr;
+        }
+
+        .welcome-header {
+            padding: 35px 25px;
+        }
+
+        .quick-actions {
+            flex-direction: column;
+        }
+
+        .quick-actions .btn {
+            width: 100%;
+        }
     }
 </style>
 
-<div class="container patient-dashboard" style="margin-top: 24px;">
-    <div class="row">
-        <div class="col-md-12">
-            <div class="d-flex" style="align-items:center; justify-content:space-between;">
-                <div>
-                    <h2 style="margin:0;">Espace Patient</h2>
-                    <p class="text-muted" style="margin:4px 0 16px;">Bienvenue, @ViewBag.UserName</p>
-                </div>
-                <div class="quick-actions">
-                    <a href="@Url.Action("BookAppointment", "Patient")" class="btn btn-primary">
-                        <span class="glyphicon glyphicon-calendar"></span> Prendre rendez-vous
-                    </a>
-                    <a href="@Url.Action("MyAppointments", "Patient")" class="btn btn-info">
-                        <span class="glyphicon glyphicon-list-alt"></span> Mes rendez-vous
-                    </a>
-                    <a href="@Url.Action("MedicalHistory", "Patient")" class="btn btn-success">
-                        <span class="glyphicon glyphicon-file-text"></span> Mon dossier médical
-                    </a>
-                    <a href="@Url.Action("Logout", "Auth")" class="btn btn-default">
-                        <span class="glyphicon glyphicon-log-out"></span> Déconnexion
-                    </a>
-                </div>
-            </div>
+<div class="patient-dashboard">
+    
+    <!-- Welcome Header - Purple Gradient -->
+    <div class="welcome-header">
+        <h1>Bienvenue, @ViewBag.UserName</h1>
+        <p>Gérez vos rendez-vous médicaux et suivez votre parcours de santé</p>
+        
+        <div class="quick-actions">
+            <a href="@Url.Action("BookAppointment", "Patient")" class="btn btn-primary">
+                <span class="glyphicon glyphicon-calendar"></span> Prendre rendez-vous
+            </a>
+            <a href="@Url.Action("MyAppointments", "Patient")" class="btn btn-info">
+                <span class="glyphicon glyphicon-list-alt"></span> Mes rendez-vous
+            </a>
+            <a href="@Url.Action("MyPrescriptions", "Patient")" class="btn btn-success">
+                <span class="glyphicon glyphicon-file"></span> Mes ordonnances
+            </a>
+            <a href="@Url.Action("Logout", "Auth")" class="btn btn-default">
+                <span class="glyphicon glyphicon-log-out"></span> Déconnexion
+            </a>
         </div>
     </div>
 
-    <!-- Health Status Overview -->
-    <div class="row" style="margin-top: 8px;">
-        <div class="col-md-4">
-            <div class="metric-card">
-                <div class="d-flex" style="gap:12px; align-items:center;">
-                    <div class="metric-icon primary">
-                        <span class="glyphicon glyphicon-calendar"></span>
-                    </div>
-                    <div>
-                        <div class="value" style="color: var(--primary);">@(ViewBag.UpcomingAppointments ?? 0)</div>
-                        <div class="label">Prochains rendez-vous</div>
-                    </div>
+    <!-- Stats Cards - Purple Theme -->
+    <div class="stats-section">
+        <div class="stat-card">
+            <div class="stat-card-header">
+                <div class="stat-icon purple">
+                    <span class="glyphicon glyphicon-calendar"></span>
                 </div>
-                <div class="text-right" style="margin-top:10px;">
-                    <a href="@Url.Action("MyAppointments", "Patient")" class="btn btn-link">Voir détails</a>
+                <div class="stat-info">
+                    <div class="stat-value">@(ViewBag.UpcomingAppointments ?? 0)</div>
+                    <div class="stat-label">Prochains rendez-vous</div>
                 </div>
             </div>
+            <a href="@Url.Action("MyAppointments", "Patient")" class="stat-link">
+                Voir détails <span class="glyphicon glyphicon-chevron-right"></span>
+            </a>
         </div>
-        <div class="col-md-4">
-            <div class="metric-card">
-                <div class="d-flex" style="gap:12px; align-items:center;">
-                    <div class="metric-icon accent">
-                        <span class="glyphicon glyphicon-ok-sign"></span>
-                    </div>
-                    <div>
-                        <div class="value" style="color: var(--accent);">@(ViewBag.CompletedAppointments ?? 0)</div>
-                        <div class="label">Consultations terminées</div>
-                    </div>
+
+        <div class="stat-card">
+            <div class="stat-card-header">
+                <div class="stat-icon pink">
+                    <span class="glyphicon glyphicon-ok-sign"></span>
                 </div>
-                <div class="text-right" style="margin-top:10px;">
-                    <a href="@Url.Action("MedicalHistory", "Patient")" class="btn btn-link">Voir détails</a>
+                <div class="stat-info">
+                    <div class="stat-value">@(ViewBag.CompletedAppointments ?? 0)</div>
+                    <div class="stat-label">Consultations terminées</div>
                 </div>
             </div>
+            <a href="@Url.Action("MedicalHistory", "Patient")" class="stat-link">
+                Voir historique <span class="glyphicon glyphicon-chevron-right"></span>
+            </a>
         </div>
-        <div class="col-md-4">
-            <div class="metric-card">
-                <div class="d-flex" style="gap:12px; align-items:center;">
-                    <div class="metric-icon warning">
-                        <span class="glyphicon glyphicon-exclamation-sign"></span>
-                    </div>
-                    <div>
-                        <div class="value" style="color: var(--warning);">@(ViewBag.PendingResults ?? 0)</div>
-                        <div class="label">Résultats en attente</div>
-                    </div>
+
+        <div class="stat-card">
+            <div class="stat-card-header">
+                <div class="stat-icon dark">
+                    <span class="glyphicon glyphicon-exclamation-sign"></span>
                 </div>
-                <div class="text-right" style="margin-top:10px;">
-                    <a href="@Url.Action("TestResults", "Patient")" class="btn btn-link">Voir détails</a>
+                <div class="stat-info">
+                    <div class="stat-value">@(ViewBag.PendingResults ?? 0)</div>
+                    <div class="stat-label">Résultats en attente</div>
                 </div>
             </div>
+            <a href="@Url.Action("TestResults", "Patient")" class="stat-link">
+                Consulter <span class="glyphicon glyphicon-chevron-right"></span>
+            </a>
         </div>
     </div>
 
-    <!-- Quick Actions Section -->
-    <div class="row" style="margin-top:24px;">
-        <div class="col-md-6">
-            <div class="panel-clean">
-                <div class="panel-heading">
-                    <strong><span class="glyphicon glyphicon-flash"></span> Actions rapides</strong>
-                </div>
-                <div class="panel-body">
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <a href="@Url.Action("BookAppointment", "Patient")" class="btn btn-primary btn-block">
-                                <span class="glyphicon glyphicon-plus"></span><br>
-                                Nouveau rendez-vous
-                            </a>
-                        </div>
-                        <div class="col-sm-6">
-                            <a href="@Url.Action("EmergencyContact", "Patient")" class="btn btn-danger btn-block">
-                                <span class="glyphicon glyphicon-phone"></span><br>
-                                Contact d'urgence
-                            </a>
-                        </div>
-                    </div>
-                    <div class="row" style="margin-top:12px;">
-                        <div class="col-sm-6">
-                            <a href="@Url.Action("MyPrescriptions", "Patient")" class="btn btn-info btn-block">
-                                <span class="glyphicon glyphicon-list"></span><br>
-                                Mes ordonnances
-                            </a>
-                        </div>
-                        <div class="col-sm-6">
-                            <a href="@Url.Action("UpdateProfile", "Patient")" class="btn btn-warning btn-block">
-                                <span class="glyphicon glyphicon-user"></span><br>
-                                Mon profil
-                            </a>
-                        </div>
-                    </div>
-                </div>
+    <!-- Main Content Grid -->
+    <div class="content-grid">
+        <!-- Quick Actions -->
+        <div class="action-tiles">
+            <div class="section-title">
+                <span class="glyphicon glyphicon-flash"></span>
+                Actions rapides
+            </div>
+            <div class="tiles-grid">
+                <a href="@Url.Action("BookAppointment", "Patient")" class="action-tile primary">
+                    <span class="glyphicon glyphicon-plus"></span>
+                    <span>Nouveau rendez-vous</span>
+                </a>
+                <a href="@Url.Action("EmergencyContact", "Patient")" class="action-tile danger">
+                    <span class="glyphicon glyphicon-phone"></span>
+                    <span>Contact d'urgence</span>
+                </a>
+                <a href="@Url.Action("MyPrescriptions", "Patient")" class="action-tile info">
+                    <span class="glyphicon glyphicon-list"></span>
+                    <span>Mes ordonnances</span>
+                </a>
+                <a href="@Url.Action("UpdateProfile", "Patient")" class="action-tile warning">
+                    <span class="glyphicon glyphicon-user"></span>
+                    <span>Mon profil</span>
+                </a>
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="health-info">
-                <h4><span class="glyphicon glyphicon-heart"></span> Informations de santé</h4>
-                <p>Restez informé(e) de vos prochains rendez-vous et suivez votre parcours de soins.</p>
-                <div class="row">
-                    <div class="col-xs-6">
-                        <strong>Prochain RDV:</strong><br>
-                        <small>@(ViewBag.NextAppointmentDate ?? "Aucun prévu")</small>
-                    </div>
-                    <div class="col-xs-6">
-                        <strong>Médecin traitant:</strong><br>
-                        <small>@(ViewBag.PrimaryDoctor ?? "Non défini")</small>
-                    </div>
+
+        <!-- Health Info Card - Purple Gradient -->
+        <div class="health-info-card">
+            <h3>
+                <span class="glyphicon glyphicon-heart"></span>
+                Informations de santé
+            </h3>
+            <p>Restez informé(e) de vos prochains rendez-vous et suivez votre parcours de soins.</p>
+            <div class="health-details">
+                <div class="health-detail">
+                    <strong>Prochain RDV</strong>
+                    <div class="health-detail-value">@(ViewBag.NextAppointmentDate ?? "Aucun prévu")</div>
+                </div>
+                <div class="health-detail">
+                    <strong>Médecin traitant</strong>
+                    <div class="health-detail-value">@(ViewBag.PrimaryDoctor ?? "Non défini")</div>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Recent Activity -->
-    <div class="row" style="margin-top:24px;">
-        <div class="col-md-12">
-            <div class="panel-clean">
-                <div class="panel-heading">
-                    <strong><span class="glyphicon glyphicon-time"></span> Activité récente</strong>
-                </div>
-                <div class="panel-body">
-                    @if (ViewBag.RecentActivity != null && ((IEnumerable<dynamic>)ViewBag.RecentActivity).Any())
-                    {
-                        foreach (var activity in (IEnumerable<dynamic>)ViewBag.RecentActivity)
-                        {
-                            var activityType = GetActivityProperty(activity, "Type", "ActivityType", "Title") ?? "Activité";
-                            var activityDescription = GetActivityProperty(activity, "Description", "Details", "Message") ?? "Description non disponible";
-                            var activityDate = GetActivityProperty(activity, "Date", "CreatedDate", "DateHeure") ?? string.Empty;
-                            <div class="appointment-card">
-                                <div class="d-flex" style="justify-content:space-between; align-items:center;">
-                                    <div>
-                                        <h5 style="margin:0;">@activityType</h5>
-                                        <p class="text-muted" style="margin:4px 0;">@activityDescription</p>
-                                    </div>
-                                    <div class="text-right">
-                                        <small class="text-muted">@activityDate</small>
-                                    </div>
-                                </div>
-                            </div>
-                        }
-                    }
-                    else
-                    {
-                        <div class="text-center text-muted" style="padding:40px;">
-                            <span class="glyphicon glyphicon-inbox" style="font-size:48px; opacity:0.3;"></span>
-                            <p style="margin-top:16px;">Aucune activité récente</p>
-                            <a href="@Url.Action("BookAppointment", "Patient")" class="btn btn-primary">Prendre votre premier rendez-vous</a>
-                        </div>
-                    }
-                </div>
-            </div>
+    <div class="activity-section">
+        <div class="section-title">
+            <span class="glyphicon glyphicon-time"></span>
+            Activité récente
         </div>
+        @if (ViewBag.RecentActivity != null && ((IEnumerable<dynamic>)ViewBag.RecentActivity).Any())
+        {
+            foreach (var activity in (IEnumerable<dynamic>)ViewBag.RecentActivity)
+            {
+                var activityType = GetActivityProperty(activity, "Type", "ActivityType", "Title") ?? "Activité";
+                var activityDescription = GetActivityProperty(activity, "Description", "Details", "Message") ?? "Description non disponible";
+                var activityDate = GetActivityProperty(activity, "Date", "CreatedDate", "DateHeure") ?? string.Empty;
+                
+                <div class="activity-item">
+                    <h5>@activityType</h5>
+                    <p>@activityDescription</p>
+                    <span class="activity-date">
+                        <span class="glyphicon glyphicon-time"></span> @activityDate
+                    </span>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="empty-state">
+                <span class="glyphicon glyphicon-inbox"></span>
+                <h4>Aucune activité récente</h4>
+                <p>Votre historique d'activité apparaîtra ici</p>
+                <a href="@Url.Action("BookAppointment", "Patient")" class="btn btn-primary">
+                    <span class="glyphicon glyphicon-plus"></span> Prendre votre premier rendez-vous
+                </a>
+            </div>
+        }
     </div>
 
-    <!-- Health Tips Section -->
-    <div class="row" style="margin-top:24px;">
-        <div class="col-md-12">
-            <div class="panel-clean">
-                <div class="panel-heading">
-                    <strong><span class="glyphicon glyphicon-info-sign"></span> Conseils santé</strong>
+    <!-- Health Tips - Purple Theme -->
+    <div class="health-tips">
+        <div class="section-title">
+            <span class="glyphicon glyphicon-info-sign"></span>
+            Conseils santé
+        </div>
+        <div class="tips-grid">
+            <div class="tip-card">
+                <div class="tip-icon purple">
+                    <span class="glyphicon glyphicon-heart"></span>
                 </div>
-                <div class="panel-body">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div style="text-align:center; padding:20px;">
-                                <div class="metric-icon accent" style="margin:0 auto 12px;">
-                                    <span class="glyphicon glyphicon-heart"></span>
-                                </div>
-                                <h5>Suivi régulier</h5>
-                                <p class="text-muted">Respectez vos rendez-vous de contrôle pour un suivi optimal de votre santé.</p>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div style="text-align:center; padding:20px;">
-                                <div class="metric-icon primary" style="margin:0 auto 12px;">
-                                    <span class="glyphicon glyphicon-phone"></span>
-                                </div>
-                                <h5>Contact d'urgence</h5>
-                                <p class="text-muted">En cas d'urgence médicale, contactez immédiatement les services d'urgence.</p>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div style="text-align:center; padding:20px;">
-                                <div class="metric-icon warning" style="margin:0 auto 12px;">
-                                    <span class="glyphicon glyphicon-list-alt"></span>
-                                </div>
-                                <h5>Ordonnances</h5>
-                                <p class="text-muted">Suivez vos prescriptions et n'hésitez pas à poser des questions à votre médecin.</p>
-                            </div>
-                        </div>
-                    </div>
+                <h5>Suivi régulier</h5>
+                <p>Respectez vos rendez-vous de contrôle pour un suivi optimal de votre santé.</p>
+            </div>
+            <div class="tip-card">
+                <div class="tip-icon pink">
+                    <span class="glyphicon glyphicon-phone"></span>
                 </div>
+                <h5>Contact d'urgence</h5>
+                <p>En cas d'urgence médicale, contactez immédiatement les services d'urgence.</p>
+            </div>
+            <div class="tip-card">
+                <div class="tip-icon dark">
+                    <span class="glyphicon glyphicon-list-alt"></span>
+                </div>
+                <h5>Ordonnances</h5>
+                <p>Suivez vos prescriptions et n'hésitez pas à poser des questions à votre médecin.</p>
             </div>
         </div>
     </div>
 </div>
-
-@section Scripts {
-<script>
-    // Simple interactivity for better user experience
-    $(document).ready(function() {
-        // Highlight upcoming appointments
-        $('.appointment-card').hover(
-            function() { $(this).addClass('shadow-lg'); },
-            function() { $(this).removeClass('shadow-lg'); }
-        );
-        
-        // Auto-refresh metrics every 5 minutes (optional)
-        // setInterval(function() {
-        //     location.reload();
-        // }, 300000);
-    });
-</script>
-}

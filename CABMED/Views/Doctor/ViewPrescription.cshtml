@@ -1,0 +1,384 @@
+@model CABMED.ViewModels.PrescriptionDetailsViewModel
+@{
+    ViewBag.Title = "Ordonnance M�dicale";
+    Layout = null; // No layout for printing
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ordonnance M�dicale - @Model.PrescriptionId</title>
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        @@media print {
+            .no-print { display: none; }
+            body { padding: 0; margin: 0; }
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .prescription-document {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #7132CA 0%, #C47BE4 100%);
+            color: white;
+            padding: 30px;
+            position: relative;
+        }
+
+        .header .logo {
+            font-size: 24px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header .clinic-name {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        .rx-symbol {
+            position: absolute;
+            right: 30px;
+            top: 30px;
+            font-size: 48px;
+            font-weight: bold;
+            font-style: italic;
+            opacity: 0.3;
+        }
+
+        .prescription-meta {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .prescription-meta .row {
+            margin: 0;
+        }
+
+        .prescription-meta strong {
+            color: #495057;
+            font-size: 12px;
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 3px;
+        }
+
+        .prescription-meta .value {
+            color: #212529;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .patient-section {
+            padding: 25px 30px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #495057;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #7132CA;
+            display: inline-block;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .info-item strong {
+            color: #6c757d;
+            font-size: 13px;
+            display: block;
+            margin-bottom: 3px;
+        }
+
+        .info-item .value {
+            color: #212529;
+            font-size: 15px;
+        }
+
+        .medications-section {
+            padding: 25px 30px;
+        }
+
+        .medication-card {
+            background: #f8f9fa;
+            border-left: 4px solid #7132CA;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+        }
+
+        .medication-card:nth-child(even) {
+            border-left-color: #C47BE4;
+        }
+
+        .medication-card:nth-child(3n) {
+            border-left-color: #F29AAE;
+        }
+
+        .medication-number {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background: #7132CA;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .medication-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #212529;
+            display: inline-block;
+        }
+
+        .medication-details {
+            margin-top: 12px;
+            padding-left: 40px;
+        }
+
+        .medication-details .detail-row {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .medication-details .detail-label {
+            font-weight: 600;
+            color: #495057;
+            min-width: 100px;
+        }
+
+        .medication-details .detail-value {
+            color: #212529;
+        }
+
+        .instructions-section {
+            padding: 25px 30px;
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+        }
+
+        .instructions-section .section-title {
+            border-bottom-color: #ffc107;
+        }
+
+        .doctor-signature {
+            padding: 25px 30px;
+            text-align: right;
+        }
+
+        .doctor-info {
+            display: inline-block;
+            text-align: left;
+            border-top: 2px solid #212529;
+            padding-top: 10px;
+            min-width: 250px;
+        }
+
+        .doctor-name {
+            font-size: 16px;
+            font-weight: bold;
+            color: #212529;
+        }
+
+        .doctor-specialite {
+            font-size: 13px;
+            color: #6c757d;
+            margin-top: 3px;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            text-align: center;
+            font-size: 11px;
+            color: #6c757d;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .action-buttons {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            margin-top: 20px;
+            border-radius: 8px;
+        }
+
+        .btn {
+            margin: 0 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="prescription-document">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                <span class="glyphicon glyphicon-plus-sign"></span>
+                MEDX
+            </div>
+            <div class="clinic-name">Clinique M�dical Professionnel</div>
+            <div class="rx-symbol">Rx</div>
+        </div>
+
+        <!-- Prescription Metadata -->
+        <div class="prescription-meta">
+            <div class="row">
+                <div class="col-xs-6">
+                    <strong>Prescription N�:</strong>
+                    <div class="value">RX-@Model.PrescriptionId.ToString("D4")</div>
+                </div>
+                <div class="col-xs-6 text-right">
+                    <strong>Date:</strong>
+                    <div class="value">@Model.DatePrescription.ToString("dd MMMM yyyy", new System.Globalization.CultureInfo("fr-FR"))</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Patient Information -->
+        <div class="patient-section">
+            <div class="section-title">Informations Patient</div>
+            <div class="info-grid">
+                <div class="info-item">
+                    <strong>Nom:</strong>
+                    <div class="value">@Model.PatientName</div>
+                </div>
+                <div class="info-item">
+                    <strong>Patient ID:</strong>
+                    <div class="value">PT-@Model.PatientId.ToString("D4")</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Medications Prescribed -->
+        <div class="medications-section">
+            <div class="section-title">M�dicaments Prescrits</div>
+            
+            @if (Model.Medications != null && Model.Medications.Any())
+            {
+                int counter = 1;
+                foreach (var med in Model.Medications)
+                {
+                    var parts = med.Posologie?.Split('|') ?? new string[0];
+                    var dosage = parts.Length > 0 ? parts[0].Trim() : med.Posologie;
+                    var frequency = parts.FirstOrDefault(p => p.Contains("Fr�quence:"))?.Replace("Fr�quence:", "").Trim();
+                    var duration = parts.FirstOrDefault(p => p.Contains("Dur�e:"))?.Replace("Dur�e:", "").Trim();
+                    var instructions = parts.FirstOrDefault(p => p.Contains("Instructions:"))?.Replace("Instructions:", "").Trim();
+
+                    <div class="medication-card">
+                        <div>
+                            <span class="medication-number">@counter</span>
+                            <span class="medication-name">@med.Medicament</span>
+                        </div>
+                        <div class="medication-details">
+                            <div class="detail-row">
+                                <span class="detail-label">Dosage:</span>
+                                <span class="detail-value">@dosage</span>
+                            </div>
+                            @if (!string.IsNullOrEmpty(frequency))
+                            {
+                                <div class="detail-row">
+                                    <span class="detail-label">Fr�quence:</span>
+                                    <span class="detail-value">@frequency</span>
+                                </div>
+                            }
+                            @if (!string.IsNullOrEmpty(duration))
+                            {
+                                <div class="detail-row">
+                                    <span class="detail-label">Dur�e:</span>
+                                    <span class="detail-value">@duration</span>
+                                </div>
+                            }
+                            @if (!string.IsNullOrEmpty(instructions))
+                            {
+                                <div class="detail-row">
+                                    <span class="detail-label">Instructions:</span>
+                                    <span class="detail-value">@instructions</span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    counter++;
+                }
+            }
+            else
+            {
+                <!-- Single medication fallback -->
+                <div class="medication-card">
+                    <div>
+                        <span class="medication-number">1</span>
+                        <span class="medication-name">@Model.Medicament</span>
+                    </div>
+                    <div class="medication-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Posologie:</span>
+                            <span class="detail-value">@Model.Posologie</span>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Doctor Signature -->
+        <div class="doctor-signature">
+            <div class="doctor-info">
+                <div class="doctor-name">@Model.DoctorName</div>
+                @if (!string.IsNullOrEmpty(Model.DoctorSpecialite))
+                {
+                    <div class="doctor-specialite">@Model.DoctorSpecialite</div>
+                }
+                <div class="doctor-specialite">Date: @Model.DatePrescription.ToString("dd/MM/yyyy")</div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            Cette prescription est valide 30 jours � partir de la date d'�mission<br>
+            Pour toute question ou pr�occupation, veuillez contacter notre cabinet
+        </div>
+    </div>
+
+    <!-- Action Buttons (Hidden when printing) -->
+    <div class="action-buttons no-print">
+        <button onclick="window.print()" class="btn btn-primary btn-lg">
+            <span class="glyphicon glyphicon-print"></span>
+            Imprimer
+        </button>
+        <a href="@Url.Action("Index", "Doctor")" class="btn btn-default btn-lg">
+            <span class="glyphicon glyphicon-arrow-left"></span>
+            Retour au tableau de bord
+        </a>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,161 @@
+@model CABMED.ViewModels.CreatePrescriptionViewModel
+@{
+    ViewBag.Title = "Créer une ordonnance";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var existingPrescriptions = ViewBag.ExistingPrescriptions as List<CABMED.Models.Prescriptions>;
+}
+
+<div class="container" style="max-width: 900px; margin-top: 30px;">
+    
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <span class="glyphicon glyphicon-ok-circle"></span>
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <div class="panel panel-success">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                <span class="glyphicon glyphicon-list-alt"></span>
+                Créer une ordonnance (Prescription)
+            </h3>
+        </div>
+        <div class="panel-body">
+            
+            <!-- Consultation Info -->
+            <div class="well well-sm">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Patient:</strong> @Model.PatientName</p>
+                        <p><strong>Médecin:</strong> @Model.DoctorName</p>
+                    </div>
+                    <div class="col-md-6">
+                        @if (!string.IsNullOrEmpty(Model.DoctorSpecialite))
+                        {
+                            <p><strong>Spécialité:</strong> @Model.DoctorSpecialite</p>
+                        }
+                        <p><strong>Date:</strong> @Model.DatePrescription.ToString("dd/MM/yyyy")</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Existing Prescriptions -->
+            @if (existingPrescriptions != null && existingPrescriptions.Count > 0)
+            {
+                <div class="panel panel-default" style="margin-bottom: 20px;">
+                    <div class="panel-heading">
+                        <strong>Médicaments déjà prescrits (@existingPrescriptions.Count)</strong>
+                    </div>
+                    <div class="panel-body">
+                        <table class="table table-striped table-condensed">
+                            <thead>
+                                <tr>
+                                    <th>Médicament</th>
+                                    <th>Posologie</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var prescription in existingPrescriptions)
+                                {
+                                    <tr>
+                                        <td><strong>@prescription.Medicament</strong></td>
+                                        <td>@prescription.Posologie</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+
+            <!-- Prescription Form -->
+            @using (Html.BeginForm("AddPrescription", "Doctor", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(m => m.ConsultationId)
+
+                <h4 style="margin-top: 20px; margin-bottom: 15px; border-bottom: 2px solid #5cb85c; padding-bottom: 5px;">
+                    <span class="glyphicon glyphicon-plus"></span> Ajouter un médicament
+                </h4>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Medicament, new { @class = "col-sm-3 control-label" })
+                    <div class="col-sm-9">
+                        @Html.TextBoxFor(m => m.Medicament, new { @class = "form-control", placeholder = "Ex: Paracétamol 500mg, Amoxicilline 1g..." })
+                        @Html.ValidationMessageFor(m => m.Medicament, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Posologie, new { @class = "col-sm-3 control-label" })
+                    <div class="col-sm-9">
+                        @Html.TextBoxFor(m => m.Posologie, new { @class = "form-control", placeholder = "Ex: 1 comprimé, 2 gélules, 10ml..." })
+                        @Html.ValidationMessageFor(m => m.Posologie, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Frequence, new { @class = "col-sm-3 control-label" })
+                    <div class="col-sm-9">
+                        @Html.TextBoxFor(m => m.Frequence, new { @class = "form-control", placeholder = "Ex: 3 fois par jour, toutes les 8 heures, matin et soir..." })
+                        @Html.ValidationMessageFor(m => m.Frequence, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Duree, new { @class = "col-sm-3 control-label" })
+                    <div class="col-sm-9">
+                        @Html.TextBoxFor(m => m.Duree, new { @class = "form-control", placeholder = "Ex: 7 jours, 2 semaines, 1 mois..." })
+                        @Html.ValidationMessageFor(m => m.Duree, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Instructions, new { @class = "col-sm-3 control-label" })
+                    <div class="col-sm-9">
+                        @Html.TextAreaFor(m => m.Instructions, 3, 50, new { @class = "form-control", placeholder = "Ex: À prendre pendant les repas, ne pas conduire après la prise..." })
+                        @Html.ValidationMessageFor(m => m.Instructions, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-sm-offset-3 col-sm-9">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <span class="glyphicon glyphicon-plus"></span>
+                            Ajouter ce médicament
+                        </button>
+                    </div>
+                </div>
+            }
+
+            <hr />
+
+            <div class="text-center">
+                <p class="text-muted">
+                    <span class="glyphicon glyphicon-info-sign"></span>
+                    Vous pouvez ajouter plusieurs médicaments à cette ordonnance
+                </p>
+                
+                @if (existingPrescriptions != null && existingPrescriptions.Count > 0)
+                {
+                    <a href="@Url.Action("ViewPrescription", "Doctor", new { id = Model.ConsultationId })" class="btn btn-success btn-lg" style="margin-right: 10px;">
+                        <span class="glyphicon glyphicon-file"></span>
+                        Voir l'ordonnance
+                    </a>
+                }
+                
+                <a href="@Url.Action("Index", "Doctor")" class="btn btn-primary btn-lg">
+                    <span class="glyphicon glyphicon-ok"></span>
+                    Terminer la consultation
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

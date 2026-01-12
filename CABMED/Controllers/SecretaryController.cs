@@ -1,10 +1,11 @@
-using System;
+﻿using System;
+using System.Globalization;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
 using CABMED.Models;
-using CABMED.Services;
 using CABMED.ViewModels;
+using CABMED.Services;
 
 namespace CABMED.Controllers
 {
@@ -28,9 +29,9 @@ namespace CABMED.Controllers
             ViewBag.ApprovedToday = GetApprovedTodayCount();
             ViewBag.TotalRequestsToday = GetTotalRequestsTodayCount();
             ViewBag.NextPendingRequest = allRequests
-                .Where(r => string.Equals(r.Status, "En attente", StringComparison.InvariantCultureIgnoreCase))
-                .OrderByDescending(r => r.DateDemande)
-                .FirstOrDefault();
+              .Where(r => string.Equals(r.Status, "En attente", StringComparison.InvariantCultureIgnoreCase))
+              .OrderByDescending(r => r.DateDemande)
+              .FirstOrDefault();
 
             return View();
         }
@@ -58,51 +59,63 @@ namespace CABMED.Controllers
             }
 
             var doctors = _db.Users
-                .Where(u => u.Role != null && u.Role.ToLower() == "medecin")
-                .OrderBy(u => u.Nom)
-                .ThenBy(u => u.Prenom)
-                .Select(u => new
-                {
-                    id = u.UserId,
-                    name = ((u.Prenom ?? string.Empty) + " " + (u.Nom ?? string.Empty)).Trim(),
-                    specialite = u.Specialite
-                })
-                .ToList();
+              .Where(u => u.Role != null && u.Role.ToLower() == "medecin")
+              .OrderBy(u => u.Nom)
+              .ThenBy(u => u.Prenom)
+              .Select(u => new
+              {
+                  id = u.UserId,
+                  name = ((u.Prenom ?? string.Empty) + " " + (u.Nom ?? string.Empty)).Trim(),
+                  specialite = u.Specialite
+              })
+              .ToList();
 
             return Json(doctors, JsonRequestBehavior.AllowGet);
         }
 
         // POST: Secretary/ApproveRequest
         [HttpPost]
-        public ActionResult ApproveRequest(int requestId, DateTime appointmentDate, TimeSpan appointmentTime, int doctorId, string comments)
+        public ActionResult ApproveRequest(int requestId, string appointmentDate, string appointmentTime, int doctorId, string comments)
         {
             var role = (Session["Role"] as string)?.ToLower();
             if (role != "secretaire")
             {
-                return Json(new { success = false, message = "Acc�s non autoris�" });
+                return Json(new { success = false, message = "Accès non autorisé" });
             }
 
             try
             {
+                // Validate doctorId first
+                if (doctorId <= 0)
+                {
+                    return Json(new { success = false, message = "ID du médecin invalide. Veuillez sélectionner un médecin." });
+                }
+
+                if (!TryParseAppointmentDate(appointmentDate, out var parsedDate) ||
+                  !TryParseAppointmentTime(appointmentTime, out var parsedTime))
+                {
+                    return Json(new { success = false, message = "Date ou heure de rendez-vous invalide" });
+                }
+
                 var request = AppointmentRequestRepository.GetById(requestId);
                 if (request == null)
                 {
-                    return Json(new { success = false, message = "Demande introuvable" });
+                    return Json(new { success = false, message = "Demande introuvable (ID: " + requestId + ")" });
                 }
 
                 var doctor = _db.Users.FirstOrDefault(u => u.UserId == doctorId && u.Role != null && u.Role.ToLower() == "medecin");
                 if (doctor == null)
                 {
-                    return Json(new { success = false, message = "M�decin invalide" });
+                    return Json(new { success = false, message = "Médecin introuvable (ID: " + doctorId + "). Veuillez sélectionner un autre médecin." });
                 }
 
                 var patient = _db.Users.FirstOrDefault(u => u.UserId == request.PatientId);
                 if (patient == null)
                 {
-                    return Json(new { success = false, message = "Patient introuvable" });
+                    return Json(new { success = false, message = "Patient introuvable (ID: " + request.PatientId + ")" });
                 }
 
-                var startDateTime = appointmentDate.Date + appointmentTime;
+                var startDateTime = parsedDate.Date + parsedTime;
                 var endDateTime = startDateTime.AddMinutes(30);
 
                 RendezVous rendezVous = null;
@@ -121,20 +134,37 @@ namespace CABMED.Controllers
                 rendezVous.MedecinId = doctor.UserId;
                 rendezVous.DateHeureDebut = startDateTime;
                 rendezVous.DateHeureFin = endDateTime;
-                rendezVous.Statut = "Confirm�";
-                rendezVous.Motif = request.SymptomsDescription;
+                rendezVous.Statut = "Confirme";
+                rendezVous.Motif = !string.IsNullOrWhiteSpace(request.SymptomsDescription) ? request.SymptomsDescription : "Consultation";
 
                 _db.SaveChanges();
 
-                var processedBy = Session["UserName"] as string ?? "Secr�taire";
+                var processedBy = Session["UserName"] as string ?? "Secrétaire";
                 var doctorName = ((doctor.Prenom ?? string.Empty) + " " + (doctor.Nom ?? string.Empty)).Trim();
-                AppointmentRequestRepository.ApproveRequest(requestId, appointmentDate, appointmentTime, doctor.UserId, doctorName, comments, processedBy, rendezVous.RendezVousId);
+                AppointmentRequestRepository.ApproveRequest(requestId, parsedDate, parsedTime, doctor.UserId, doctorName, comments, processedBy, rendezVous.RendezVousId);
 
-                return Json(new { success = true, message = "Demande approuv�e avec succ�s" });
+                return Json(new { success = true, message = "Demande approuvée avec succès" });
             }
-            catch (Exception)
+            catch (System.Data.Entity.Validation.DbEntityValidationException valEx)
             {
-                return Json(new { success = false, message = "Erreur lors de l'approbation" });
+                var errorMessages = valEx.EntityValidationErrors
+                    .SelectMany(x => x.ValidationErrors)
+                    .Select(x => x.ErrorMessage);
+                var fullError = string.Join("; ", errorMessages);
+                System.Diagnostics.Debug.WriteLine("Validation error in ApproveRequest: " + fullError);
+                return Json(new { success = false, message = "Erreur de validation: " + fullError });
+            }
+            catch (System.Data.Entity.Infrastructure.DbUpdateException dbEx)
+            {
+                var innerMessage = dbEx.InnerException?.InnerException?.Message ?? dbEx.InnerException?.Message ?? dbEx.Message;
+                System.Diagnostics.Debug.WriteLine("Database error in ApproveRequest: " + innerMessage);
+                return Json(new { success = false, message = "Erreur base de données: " + innerMessage });
+            }
+            catch (Exception ex)
+            {
+                var innerMessage = ex.InnerException?.Message ?? ex.Message;
+                System.Diagnostics.Debug.WriteLine("Error in ApproveRequest: " + innerMessage); 
+                return Json(new { success = false, message = "Erreur: " + innerMessage });
             }
         }
 
@@ -145,7 +175,7 @@ namespace CABMED.Controllers
             var role = (Session["Role"] as string)?.ToLower();
             if (role != "secretaire")
             {
-                return Json(new { success = false, message = "Acc�s non autoris�" });
+                return Json(new { success = false, message = "Accès non autorisé" });
             }
 
             try
@@ -161,19 +191,19 @@ namespace CABMED.Controllers
                     var rendezVous = _db.RendezVous.FirstOrDefault(r => r.RendezVousId == request.RendezVousId.Value);
                     if (rendezVous != null)
                     {
-                        rendezVous.Statut = "Refus�";
+                        rendezVous.Statut = "Refuse";
                         _db.SaveChanges();
                     }
                 }
 
-                var processedBy = Session["UserName"] as string ?? "Secr�taire";
+                var processedBy = Session["UserName"] as string ?? "Secrétaire";
                 var success = AppointmentRequestRepository.DeclineRequest(requestId, reason, processedBy);
                 if (!success)
                 {
                     return Json(new { success = false, message = "Demande introuvable" });
                 }
 
-                return Json(new { success = true, message = "Demande refus�e" });
+                return Json(new { success = true, message = "Demande refusée" });
             }
             catch (Exception)
             {
@@ -199,6 +229,207 @@ namespace CABMED.Controllers
             return View(request);
         }
 
+        // GET: Secretary/ManageAppointments
+        public ActionResult ManageAppointments()
+        {
+            var role = (Session["Role"] as string)?.ToLower();
+            if (role != "secretaire")
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            ViewBag.UserName = Session["UserName"] as string;
+
+            // Get all appointments from database
+            var appointments = _db.RendezVous
+                .Include("Users")    // Patient
+                .Include("Users1")   // Doctor
+                .OrderByDescending(r => r.DateHeureDebut)
+                .ToList();
+
+            return View(appointments);
+        }
+
+        // GET: Secretary/TodayAppointments
+        public ActionResult TodayAppointments()
+        {
+            var role = (Session["Role"] as string)?.ToLower();
+            if (role != "secretaire")
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            ViewBag.UserName = Session["UserName"] as string;
+
+            var today = DateTime.Today;
+            var tomorrow = today.AddDays(1);
+
+            var appointments = _db.RendezVous
+                .Include("Users")    // Patient
+                .Include("Users1")   // Doctor
+                .Where(r => r.DateHeureDebut >= today && r.DateHeureDebut < tomorrow)
+                .OrderBy(r => r.DateHeureDebut)
+                .ToList();
+
+            return View(appointments);
+        }
+
+        // GET: Secretary/CreateAppointment
+        public ActionResult CreateAppointment()
+        {
+            var role = (Session["Role"] as string)?.ToLower();
+            if (role != "secretaire")
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            ViewBag.UserName = Session["UserName"] as string;
+
+            // Get all patients
+            ViewBag.Patients = _db.Users
+                .Where(u => u.Role != null && u.Role.ToLower() == "patient" && u.IsActive == true)
+                .OrderBy(u => u.Nom)
+                .ThenBy(u => u.Prenom)
+                .ToList();
+
+            // Get all doctors
+            ViewBag.Doctors = _db.Users
+                .Where(u => u.Role != null && u.Role.ToLower() == "medecin" && u.IsActive == true)
+                .OrderBy(u => u.Nom)
+                .ThenBy(u => u.Prenom)
+                .ToList();
+
+            return View();
+        }
+
+        // POST: Secretary/CreateAppointment
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult CreateAppointment(int patientId, int doctorId, DateTime appointmentDate, string appointmentTime, string motif)
+        {
+            var role = (Session["Role"] as string)?.ToLower();
+            if (role != "secretaire")
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            try
+            {
+                // Validate inputs
+                if (patientId <= 0)
+                {
+                    TempData["ErrorMessage"] = "Veuillez sélectionner un patient";
+                    return RedirectToAction("CreateAppointment");
+                }
+
+                if (doctorId <= 0)
+                {
+                    TempData["ErrorMessage"] = "Veuillez sélectionner un médecin";
+                    return RedirectToAction("CreateAppointment");
+                }
+
+                // Verify patient exists
+                var patient = _db.Users.FirstOrDefault(u => u.UserId == patientId && u.Role.ToLower() == "patient");
+                if (patient == null)
+                {
+                    TempData["ErrorMessage"] = "Patient introuvable";
+                    return RedirectToAction("CreateAppointment");
+                }
+
+                // Verify doctor exists
+                var doctor = _db.Users.FirstOrDefault(u => u.UserId == doctorId && u.Role.ToLower() == "medecin");
+                if (doctor == null)
+                {
+                    TempData["ErrorMessage"] = "Médecin introuvable";
+                    return RedirectToAction("CreateAppointment");
+                }
+
+                if (!TryParseAppointmentTime(appointmentTime, out var parsedTime))
+                {
+                    TempData["ErrorMessage"] = "Heure invalide. Format attendu: HH:mm";
+                    return RedirectToAction("CreateAppointment");
+                }
+
+                var startDateTime = appointmentDate.Date + parsedTime;
+                var endDateTime = startDateTime.AddMinutes(30);
+
+                // Check for conflicts
+                var hasConflict = _db.RendezVous.Any(r =>
+                    r.MedecinId == doctorId &&
+                    ((r.DateHeureDebut <= startDateTime && r.DateHeureFin > startDateTime) ||
+                     (r.DateHeureDebut < endDateTime && r.DateHeureFin >= endDateTime) ||
+                     (r.DateHeureDebut >= startDateTime && r.DateHeureFin <= endDateTime)));
+
+                if (hasConflict)
+                {
+                    TempData["ErrorMessage"] = "Le médecin a déjà un rendez-vous à cette heure";
+                    return RedirectToAction("CreateAppointment");
+                }
+
+                var rendezVous = new RendezVous
+                {
+                    PatientId = patientId,
+                    MedecinId = doctorId,
+                    DateHeureDebut = startDateTime,
+                    DateHeureFin = endDateTime,
+                    Statut = "Confirme", // Without accent to match database
+                    Motif = string.IsNullOrWhiteSpace(motif) ? "Consultation" : motif.Trim()
+                };
+
+                _db.RendezVous.Add(rendezVous);
+                _db.SaveChanges();
+
+                TempData["SuccessMessage"] = $"Rendez-vous créé avec succès pour {patient.Prenom} {patient.Nom} le {startDateTime:dd/MM/yyyy à HH:mm}";
+                return RedirectToAction("ManageAppointments");
+            }
+            catch (System.Data.Entity.Validation.DbEntityValidationException valEx)
+            {
+                var errorMessages = valEx.EntityValidationErrors
+                    .SelectMany(x => x.ValidationErrors)
+                    .Select(x => x.ErrorMessage);
+                var fullError = string.Join("; ", errorMessages);
+                System.Diagnostics.Debug.WriteLine("Validation error in CreateAppointment: " + fullError);
+                TempData["ErrorMessage"] = "Erreur de validation: " + fullError;
+                return RedirectToAction("CreateAppointment");
+            }
+            catch (System.Data.Entity.Infrastructure.DbUpdateException dbEx)
+            {
+                var innerMessage = dbEx.InnerException?.InnerException?.Message ?? dbEx.InnerException?.Message ?? dbEx.Message;
+                System.Diagnostics.Debug.WriteLine("Database error in CreateAppointment: " + innerMessage);
+                TempData["ErrorMessage"] = "Erreur base de données: " + innerMessage;
+                return RedirectToAction("CreateAppointment");
+            }
+            catch (Exception ex)
+            {
+                var innerMessage = ex.InnerException?.Message ?? ex.Message;
+                System.Diagnostics.Debug.WriteLine("Error in CreateAppointment: " + innerMessage);
+                TempData["ErrorMessage"] = "Erreur: " + innerMessage;
+                return RedirectToAction("CreateAppointment");
+            }
+        }
+
+        // GET: Secretary/Reports
+        public ActionResult Reports()
+        {
+            var role = (Session["Role"] as string)?.ToLower();
+            if (role != "secretaire")
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            ViewBag.UserName = Session["UserName"] as string;
+
+            // Statistics
+            ViewBag.TotalAppointmentsToday = _db.RendezVous.Count(r => System.Data.Entity.DbFunctions.TruncateTime(r.DateHeureDebut) == DateTime.Today);
+            ViewBag.TotalAppointmentsWeek = _db.RendezVous.Count(r => r.DateHeureDebut >= DateTime.Today.AddDays(-7));
+            ViewBag.TotalAppointmentsMonth = _db.RendezVous.Count(r => r.DateHeureDebut >= DateTime.Today.AddDays(-30));
+            ViewBag.PendingRequests = GetPendingRequestsCount();
+            ViewBag.TotalPatients = _db.Users.Count(u => u.Role != null && u.Role.ToLower() == "patient");
+            ViewBag.TotalDoctors = _db.Users.Count(u => u.Role != null && u.Role.ToLower() == "medecin");
+
+            return View();
+        }
+
         private int GetPendingRequestsCount()
         {
             return AppointmentRequestRepository.CountByStatus("En attente");
@@ -207,13 +438,33 @@ namespace CABMED.Controllers
         private int GetApprovedTodayCount()
         {
             return AppointmentRequestRepository.Count(r =>
-                string.Equals(r.Status, "Approuv�", StringComparison.InvariantCultureIgnoreCase) &&
-                r.ProcessedDate?.Date == DateTime.Today);
+              string.Equals(r.Status, "Approuvé", StringComparison.InvariantCultureIgnoreCase) &&
+              r.ProcessedDate?.Date == DateTime.Today);
         }
 
         private int GetTotalRequestsTodayCount()
         {
             return AppointmentRequestRepository.Count(r => r.DateDemande.Date == DateTime.Today);
+        }
+
+        private static bool TryParseAppointmentDate(string value, out DateTime date)
+        {
+            if (DateTime.TryParseExact(value ?? string.Empty, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out date))
+            {
+                return true;
+            }
+
+            return DateTime.TryParse(value, CultureInfo.CurrentCulture, DateTimeStyles.None, out date);
+        }
+
+        private static bool TryParseAppointmentTime(string value, out TimeSpan time)
+        {
+            if (TimeSpan.TryParseExact(value ?? string.Empty, new[] { @"hh\:mm", @"h\:mm", @"hh\:mm\:ss" }, CultureInfo.InvariantCulture, out time))
+            {
+                return true;
+            }
+
+            return TimeSpan.TryParse(value, CultureInfo.CurrentCulture, out time);
         }
 
         protected override void Dispose(bool disposing)

@@ -179,18 +179,63 @@ namespace CABMED.Controllers
         // GET: Admin/PatientsList
         public ActionResult PatientsList()
         {
-            if (!CheckAdminAccess())
+            // Allow both admin and secretary to access patient list
+            var role = (Session["Role"] as string)?.ToLower();
+            if (role != "admin" && role != "secretaire")
             {
                 return RedirectToAction("Login", "Auth");
             }
+
+            ViewBag.UserName = Session["UserName"] as string;
 
             var patients = db.Users
                 .Where(u => u.Role.ToLower() == "patient")
                 .Where(u => u.IsActive == true)
                 .OrderBy(u => u.Nom)
+                .ThenBy(u => u.Prenom)
                 .ToList();
 
             return View(patients);
+        }
+
+        // GET: Admin/PatientDetails/5
+        public ActionResult PatientDetails(int id)
+        {
+            // Allow both admin and secretary to access patient details
+            var role = (Session["Role"] as string)?.ToLower();
+            if (role != "admin" && role != "secretaire")
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            ViewBag.UserName = Session["UserName"] as string;
+
+            var patient = db.Users.FirstOrDefault(u => u.UserId == id && u.Role.ToLower() == "patient");
+            if (patient == null)
+            {
+                TempData["ErrorMessage"] = "Patient introuvable";
+                return RedirectToAction("PatientsList");
+            }
+
+            // Get patient's appointments
+            ViewBag.Appointments = db.RendezVous
+                .Include("Users1") // Doctor
+                .Where(r => r.PatientId == id)
+                .OrderByDescending(r => r.DateHeureDebut)
+                .Take(10)
+                .ToList();
+
+            // Get patient's consultations
+            ViewBag.Consultations = db.Consultations
+                .Include("RendezVous")
+                .Include("Users") // Doctor
+                .Include("Prescriptions")
+                .Where(c => c.RendezVous.PatientId == id)
+                .OrderByDescending(c => c.DateConsultation)
+                .Take(10)
+                .ToList();
+
+            return View(patient);
         }
 
         // GET: Admin/EditStaff/5 (read-only by default)

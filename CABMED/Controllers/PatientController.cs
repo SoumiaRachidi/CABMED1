@@ -48,6 +48,7 @@ namespace CABMED.Controllers
             var model = new AppointmentRequestViewModel();
 
             ViewBag.PatientInfo = BuildPatientInfo();
+            PopulateDropdownLists();
 
             return View(model);
         }
@@ -67,24 +68,35 @@ namespace CABMED.Controllers
             {
                 try
                 {
+                    var patientId = GetPatientId();
+                    if (patientId == 0)
+                    {
+                        ModelState.AddModelError("", "Session utilisateur invalide. Veuillez vous reconnecter.");
+                        ViewBag.PatientInfo = BuildPatientInfo();
+                        PopulateDropdownLists();
+                        return View(model);
+                    }
+
                     PopulatePatientInfo(model);
+                    
+                    if (string.IsNullOrWhiteSpace(model.SymptomsDescription))
+                    {
+                        ModelState.AddModelError("SymptomsDescription", "La description des symptômes est obligatoire.");
+                        ViewBag.PatientInfo = BuildPatientInfo();
+                        PopulateDropdownLists();
+                        return View(model);
+                    }
+
                     model.Status = "En attente";
                     model.DateDemande = DateTime.Now;
 
-                    var rendezVousId = CreatePendingRendezVous(model);
-                    if (rendezVousId == null)
-                    {
-                        ModelState.AddModelError("", "Impossible de créer le rendez-vous car aucun créneau n'est disponible.");
-                    }
-                    else
-                    {
-                        model.RendezVousId = rendezVousId.Value;
-                        AppointmentRequestRepository.Add(model);
+                    // Don't create RendezVous record yet - it will be created when secretary approves
+                    model.RendezVousId = null;
+                    AppointmentRequestRepository.Add(model);
 
-                        TempData["SuccessMessage"] = "Votre demande de rendez-vous a été soumise avec succès. Notre secrétariat vous contactera sous peu.";
-                        TempData["LastRequestId"] = model.RequestId;
-                        return RedirectToAction("AppointmentStatus");
-                    }
+                    TempData["SuccessMessage"] = "Votre demande de rendez-vous a été soumise avec succès. Notre secrétariat vous contactera sous peu.";
+                    TempData["LastRequestId"] = model.RequestId;
+                    return RedirectToAction("AppointmentStatus");
                 }
                 catch (Exception)
                 {
@@ -93,6 +105,7 @@ namespace CABMED.Controllers
             }
 
             ViewBag.PatientInfo = BuildPatientInfo();
+            PopulateDropdownLists();
 
             return View(model);
         }
@@ -138,7 +151,365 @@ namespace CABMED.Controllers
                 return RedirectToAction("Login", "Auth");
             }
 
+            var patientId = GetPatientId();
+            if (patientId == 0)
+            {
+                TempData["ErrorMessage"] = "Session invalide";
+                return RedirectToAction("Index");
+            }
+
+            // Get all consultations for this patient
+            var consultations = _db.Consultations
+                .Include(c => c.RendezVous)
+                .Include(c => c.Users) // Doctor
+                .Include(c => c.Prescriptions)
+                .Include(c => c.ResultatsExamens)
+                .Where(c => c.RendezVous.PatientId == patientId)
+                .OrderByDescending(c => c.DateConsultation)
+                .ToList();
+
+            return View(consultations);
+        }
+
+        // GET: Patient/MyPrescriptions
+        /// <summary>
+        /// Display list of all prescriptions for the logged-in patient
+        /// </summary>
+        public ActionResult MyPrescriptions()
+        {
+            var role = (Session["Role"] as string)?.ToLower();
+            if (role != "patient")
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            var patientId = GetPatientId();
+            if (patientId == 0)
+            {
+                TempData["ErrorMessage"] = "Session invalide";
+                return RedirectToAction("Index");
+            }
+
+            // Get all consultations for this patient with their prescriptions
+            var prescriptions = _db.Consultations
+                .Include(c => c.RendezVous)
+                .Include(c => c.Users) // Doctor
+                .Include(c => c.Prescriptions)
+                .Where(c => c.RendezVous.PatientId == patientId)
+                .OrderByDescending(c => c.DateConsultation)
+                .ToList();
+
+            return View(prescriptions);
+        }
+
+        // GET: Patient/EmergencyContact
+        /// <summary>
+        /// Display emergency contact information
+        /// </summary>
+        public ActionResult EmergencyContact()
+        {
+            var role = (Session["Role"] as string)?.ToLower();
+            if (role != "patient")
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            ViewBag.UserName = Session["UserName"] as string;
+
+            // Get patient's guardian/emergency contact info
+            var patientId = GetPatientId();
+            if (patientId > 0)
+            {
+                var patient = _db.Users.FirstOrDefault(u => u.UserId == patientId);
+                if (patient != null)
+                {
+                    var guardianInfo = ParseGuardianInfo(patient.AntecedentsMedicaux);
+                    ViewBag.GuardianName = guardianInfo.GuardianName;
+                    ViewBag.GuardianPhone = guardianInfo.GuardianPhone;
+                    ViewBag.GuardianRelation = guardianInfo.GuardianRelation;
+                }
+            }
+
             return View();
+        }
+
+        // GET: Patient/UpdateProfile
+        /// <summary>
+        /// Display profile update form
+        /// </summary>
+        public ActionResult UpdateProfile()
+        {
+            var role = (Session["Role"] as string)?.ToLower();
+            if (role != "patient")
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            var patientId = GetPatientId();
+            if (patientId == 0)
+            {
+                TempData["ErrorMessage"] = "Session invalide";
+                return RedirectToAction("Index");
+            }
+
+            var patient = _db.Users.FirstOrDefault(u => u.UserId == patientId);
+            if (patient == null)
+            {
+                TempData["ErrorMessage"] = "Utilisateur introuvable";
+                return RedirectToAction("Index");
+            }
+
+            // Parse antecedents to extract guardian info and address
+            var guardianInfo = ParseGuardianInfo(patient.AntecedentsMedicaux);
+
+            var model = new UpdateProfileViewModel
+            {
+                UserId = patient.UserId,
+                Nom = patient.Nom,
+                Prenom = patient.Prenom,
+                Email = patient.Email,
+                Telephone = patient.Telephone,
+                DateNaissance = patient.DateNaissance,
+                AntecedentsMedicaux = guardianInfo.MedicalHistory,
+                Adresse = guardianInfo.Adresse,
+                Ville = guardianInfo.Ville,
+                CodePostal = guardianInfo.CodePostal,
+                GuardianName = guardianInfo.GuardianName,
+                GuardianPhone = guardianInfo.GuardianPhone,
+                GuardianRelation = guardianInfo.GuardianRelation
+            };
+
+            return View(model);
+        }
+
+        // POST: Patient/UpdateProfile
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult UpdateProfile(UpdateProfileViewModel model)
+        {
+            var role = (Session["Role"] as string)?.ToLower();
+            if (role != "patient")
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            var patientId = GetPatientId();
+            if (patientId == 0 || model.UserId != patientId)
+            {
+                TempData["ErrorMessage"] = "Accès non autorisé";
+                return RedirectToAction("Index");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var patient = _db.Users.FirstOrDefault(u => u.UserId == patientId);
+            if (patient == null)
+            {
+                TempData["ErrorMessage"] = "Utilisateur introuvable";
+                return RedirectToAction("Index");
+            }
+
+            // Update basic info
+            patient.Nom = model.Nom;
+            patient.Prenom = model.Prenom;
+            patient.Email = model.Email;
+            patient.Telephone = model.Telephone;
+            patient.DateNaissance = model.DateNaissance;
+
+            // Encode guardian info and address into AntecedentsMedicaux field
+            patient.AntecedentsMedicaux = EncodePatientInfo(model);
+
+            try
+            {
+                _db.SaveChanges();
+
+                // Update session
+                Session["UserName"] = model.Prenom + " " + model.Nom;
+                Session["UserEmail"] = model.Email;
+                Session["UserPhone"] = model.Telephone;
+
+                TempData["SuccessMessage"] = "Profil mis à jour avec succès";
+                return RedirectToAction("UpdateProfile");
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Erreur lors de la mise à jour: " + ex.Message;
+                return View(model);
+            }
+        }
+
+        // Helper method to parse guardian info from AntecedentsMedicaux
+        private (string MedicalHistory, string Adresse, string Ville, string CodePostal, 
+                 string GuardianName, string GuardianPhone, string GuardianRelation) ParseGuardianInfo(string antecedents)
+        {
+            if (string.IsNullOrEmpty(antecedents))
+            {
+                return (string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+            }
+
+            var medicalHistory = string.Empty;
+            var adresse = string.Empty;
+            var ville = string.Empty;
+            var codePostal = string.Empty;
+            var guardianName = string.Empty;
+            var guardianPhone = string.Empty;
+            var guardianRelation = string.Empty;
+
+            // Simple parsing using delimiters
+            var lines = antecedents.Split(new[] { "|||" }, StringSplitOptions.None);
+            
+            if (lines.Length > 0) medicalHistory = lines[0];
+            if (lines.Length > 1) adresse = lines[1];
+            if (lines.Length > 2) ville = lines[2];
+            if (lines.Length > 3) codePostal = lines[3];
+            if (lines.Length > 4) guardianName = lines[4];
+            if (lines.Length > 5) guardianPhone = lines[5];
+            if (lines.Length > 6) guardianRelation = lines[6];
+
+            return (medicalHistory, adresse, ville, codePostal, guardianName, guardianPhone, guardianRelation);
+        }
+
+        // Helper method to encode patient info
+        private string EncodePatientInfo(UpdateProfileViewModel model)
+        {
+            return string.Join("|||",
+                model.AntecedentsMedicaux ?? string.Empty,
+                model.Adresse ?? string.Empty,
+                model.Ville ?? string.Empty,
+                model.CodePostal ?? string.Empty,
+                model.GuardianName ?? string.Empty,
+                model.GuardianPhone ?? string.Empty,
+                model.GuardianRelation ?? string.Empty
+            );
+        }
+
+        // GET: Patient/TestResults
+        /// <summary>
+        /// Display test results for the patient
+        /// </summary>
+        public ActionResult TestResults()
+        {
+            var role = (Session["Role"] as string)?.ToLower();
+            if (role != "patient")
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            var patientId = GetPatientId();
+            if (patientId == 0)
+            {
+                TempData["ErrorMessage"] = "Session invalide";
+                return RedirectToAction("Index");
+            }
+
+            // Get all test results for this patient
+            var results = _db.ResultatsExamens
+                .Include(r => r.Consultations.RendezVous)
+                .Include(r => r.Consultations.Users)
+                .Where(r => r.Consultations.RendezVous.PatientId == patientId)
+                .OrderByDescending(r => r.DateExamen)
+                .ToList();
+
+            return View(results);
+        }
+
+        // GET: Patient/ViewPrescription/{consultationId}
+        /// <summary>
+        /// Display prescription document for a specific consultation
+        /// </summary>
+        public ActionResult ViewPrescription(int id)
+        {
+            var role = (Session["Role"] as string)?.ToLower();
+            if (role != "patient")
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            var patientId = GetPatientId();
+            if (patientId == 0)
+            {
+                TempData["ErrorMessage"] = "Session invalide";
+                return RedirectToAction("Index");
+            }
+
+            var consultation = _db.Consultations
+                .Include(c => c.RendezVous.Users)
+                .Include(c => c.Users)
+                .Include(c => c.Prescriptions)
+                .FirstOrDefault(c => c.ConsultationId == id && c.RendezVous.PatientId == patientId);
+
+            if (consultation == null)
+            {
+                TempData["ErrorMessage"] = "Ordonnance introuvable";
+                return RedirectToAction("Index");
+            }
+
+            var patient = consultation.RendezVous.Users;
+            var doctor = consultation.Users;
+
+            var vm = new PrescriptionDetailsViewModel
+            {
+                ConsultationId = id,
+                PrescriptionId = id,
+                DatePrescription = consultation.DateConsultation ?? DateTime.Now,
+                PatientName = patient != null ? (patient.Prenom + " " + patient.Nom).Trim() : string.Empty,
+                PatientId = patient?.UserId ?? 0,
+                DoctorName = doctor != null ? (doctor.Prenom + " " + doctor.Nom).Trim() : "Médecin",
+                DoctorSpecialite = doctor?.Specialite,
+                Medications = consultation.Prescriptions.Select(p => new PrescriptionMedicationViewModel
+                {
+                    Medicament = p.Medicament,
+                    Posologie = p.Posologie
+                }).ToList()
+            };
+
+            return View("~/Views/Doctor/ViewPrescription.cshtml", vm);
+        }
+
+        // GET: Patient/DebugSession (Debug helper - remove in production)
+        public ActionResult DebugSession()
+        {
+            var role = (Session["Role"] as string)?.ToLower();
+            if (role != "patient")
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+            
+            var debugInfo = $"Session Debug Info:<br/>" +
+                           $"UserID: {Session["UserID"]}<br/>" +
+                           $"UserId: {Session["UserId"]}<br/>" +
+                           $"UserName: {Session["UserName"]}<br/>" +
+                           $"UserFirstName: {Session["UserFirstName"]}<br/>" +
+                           $"UserLastName: {Session["UserLastName"]}<br/>" +
+                           $"UserEmail: {Session["UserEmail"]}<br/>" +
+                           $"UserPhone: {Session["UserPhone"]}<br/>" +
+                           $"Role: {Session["Role"]}<br/>" +
+                           $"PatientId from GetPatientId(): {GetPatientId()}";
+            
+            return Content(debugInfo);
+        }
+
+        // GET: Patient/ResetData (Debug helper - remove in production)
+        public ActionResult ResetData()
+        {
+            var role = (Session["Role"] as string)?.ToLower();
+            if (role != "patient")
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+            
+            try
+            {
+                AppointmentRequestRepository.Reset();
+                return Content("Repository data cleared successfully. <a href='/Patient'>Go back to Patient Dashboard</a>");
+            }
+            catch (Exception ex)
+            {
+                return Content("Error resetting data: " + ex.Message);
+            }
         }
 
         private object BuildPatientInfo()
@@ -158,6 +529,35 @@ namespace CABMED.Controllers
             model.PatientPrenom = Session["UserFirstName"] as string ?? string.Empty;
             model.PatientTelephone = Session["UserPhone"] as string ?? "Téléphone";
             model.PatientEmail = Session["UserEmail"] as string ?? "Email";
+        }
+
+        private void PopulateDropdownLists()
+        {
+            // Populate specialties dropdown
+            var specialties = new List<SelectListItem>
+            {
+                new SelectListItem { Value = "Médecine générale", Text = "Médecine générale" },
+                new SelectListItem { Value = "Cardiologie", Text = "Cardiologie" },
+                new SelectListItem { Value = "Dermatologie", Text = "Dermatologie" },
+                new SelectListItem { Value = "Pédiatrie", Text = "Pédiatrie" },
+                new SelectListItem { Value = "Gynécologie", Text = "Gynécologie" },
+                new SelectListItem { Value = "Orthopédie", Text = "Orthopédie" },
+                new SelectListItem { Value = "Ophtalmologie", Text = "Ophtalmologie" },
+                new SelectListItem { Value = "ORL", Text = "ORL" },
+                new SelectListItem { Value = "Neurologie", Text = "Neurologie" },
+                new SelectListItem { Value = "Psychiatrie", Text = "Psychiatrie" }
+            };
+
+            // Populate urgency levels dropdown
+            var urgencies = new List<SelectListItem>
+            {
+                new SelectListItem { Value = "Faible", Text = "Faible - Consultation de routine" },
+                new SelectListItem { Value = "Moyen", Text = "Moyen - Dans les prochains jours" },
+                new SelectListItem { Value = "Élevé", Text = "Élevé - Urgent" }
+            };
+
+            ViewBag.Specialties = new SelectList(specialties, "Value", "Text");
+            ViewBag.Urgencies = new SelectList(urgencies, "Value", "Text");
         }
 
         private List<AppointmentViewModel> GetPatientAppointments()
@@ -278,12 +678,23 @@ namespace CABMED.Controllers
 
         private int GetPatientId()
         {
-            return Convert.ToInt32(Session["UserId"] ?? 0);
+            var sessionValue = Session["UserID"] ?? Session["UserId"];
+            if (sessionValue == null)
+            {
+                return 0;
+            }
+            
+            if (int.TryParse(sessionValue.ToString(), out int patientId))
+            {
+                return patientId;
+            }
+            
+            return 0;
         }
 
         private int GetUpcomingAppointmentsCount(IEnumerable<AppointmentViewModel> appointments)
         {
-            return appointments.Count(a => HasStatus(a, "Approuvé", "Confirmé") && a.DateHeureDebut >= DateTime.Now);
+            return appointments.Count(a => HasStatus(a, "Confirmé", "En attente") && a.DateHeureDebut >= DateTime.Now);
         }
 
         private int GetCompletedAppointmentsCount(IEnumerable<AppointmentViewModel> appointments)
@@ -299,7 +710,7 @@ namespace CABMED.Controllers
         private string GetNextAppointmentDate(IEnumerable<AppointmentViewModel> appointments)
         {
             var next = appointments
-                .Where(a => HasStatus(a, "Approuvé", "Confirmé") && a.DateHeureDebut > DateTime.MinValue)
+                .Where(a => HasStatus(a, "Confirmé") && a.DateHeureDebut > DateTime.MinValue)
                 .OrderBy(a => a.DateHeureDebut)
                 .FirstOrDefault();
 
@@ -356,43 +767,6 @@ namespace CABMED.Controllers
             }
 
             return HasStatus(appointment, "Confirmé") && appointment.DateHeureDebut < DateTime.Now;
-        }
-
-        private int? CreatePendingRendezVous(AppointmentRequestViewModel request)
-        {
-            if (request.PatientId == 0)
-            {
-                return null;
-            }
-
-            var start = ResolvePreferredStart(request);
-            var rendezVous = new RendezVous
-            {
-                PatientId = request.PatientId,
-                MedecinId = request.PatientId,
-                DateHeureDebut = start,
-                DateHeureFin = start.AddMinutes(30),
-                Statut = "En attente",
-                Motif = request.SymptomsDescription
-            };
-
-            _db.RendezVous.Add(rendezVous);
-            _db.SaveChanges();
-            return rendezVous.RendezVousId;
-        }
-
-        private static DateTime ResolvePreferredStart(AppointmentRequestViewModel request)
-        {
-            var date = request.PreferredDate ?? DateTime.Today;
-            var time = request.PreferredTime ?? new TimeSpan(9, 0, 0);
-            var start = date.Date + time;
-
-            if (start < DateTime.Now)
-            {
-                start = DateTime.Now.AddHours(1);
-            }
-
-            return start;
         }
 
         protected override void Dispose(bool disposing)
