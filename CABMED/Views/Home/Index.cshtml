@@ -1,6 +1,8 @@
 ﻿@{
     ViewBag.Title = "MEDX - Cabinet Médical Nouvelle Génération";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.FullWidth = true;
+    ViewBag.HideNavbar = false;
 }
 
 <style>
@@ -8,18 +10,25 @@
     :root {
         --primary-blue: #2D3E6E;
         --accent-orange: #FF6B4A;
-        --light-orange: #FFB4A0;
+  --light-orange: #FFB4A0;
         --soft-blue: #E8F0FF;
         --light-gray: #F5F7FA;
-        --dark-text: #2C2C54;
-        --light-text: #6C757D;
+ --dark-text: #2C2C54;
+      --light-text: #6C757D;
+    }
+
+    /* Reset any inherited styles */
+    * {
+        box-sizing: border-box;
     }
 
     body {
         background: white;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         color: var(--dark-text);
         overflow-x: hidden;
+margin: 0;
+        padding: 0;
     }
 
     /* Hero Section */

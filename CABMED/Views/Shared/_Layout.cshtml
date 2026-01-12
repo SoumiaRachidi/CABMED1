@@ -1,37 +1,76 @@
 ﻿<!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title - Mon application ASP.NET</title>
+    <title>@ViewBag.Title - MEDX</title>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
+    <style>
+        /* Reset some default Bootstrap margins */
+        body {
+  margin: 0;
+         padding: 0;
+        }
+        
+        /* Navbar styling */
+    .navbar {
+   margin-bottom: 0;
+        }
+        
+  /* Full width layout for auth pages */
+        .full-width-content {
+      width: 100%;
+            padding: 0;
+      margin: 0;
+        }
+        
+        /* Standard container for regular pages */
+ .standard-content {
+            padding-top: 20px;
+        }
+    </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark">
-        <div class="container">
-            @Html.ActionLink("MEDX", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
-            <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" title="Activer/désactiver la navigation" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse d-sm-inline-flex justify-content-between">
-                <ul class="navbar-nav flex-grow-1">
-                    <li>@Html.ActionLink("Accueil", "Index", "Home", new { area = "" }, new { @class = "nav-link" })</li>
-                    <li>@Html.ActionLink("À propos de", "About", "Home", new { area = "" }, new { @class = "nav-link" })</li>
-                    <li>@Html.ActionLink("Contact", "Contact", "Home", new { area = "" }, new { @class = "nav-link" })</li>
-                </ul>
-            </div>
+    @* Only show navbar if not on auth page *@
+    @if (ViewBag.HideNavbar != true)
+    {
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark">
+            <div class="container">
+       @Html.ActionLink("MEDX", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" title="Activer/désactiver la navigation" aria-controls="navbarSupportedContent"
+    aria-expanded="false" aria-label="Toggle navigation">
+         <span class="navbar-toggler-icon"></span>
+      </button>
+   <div class="collapse navbar-collapse d-sm-inline-flex justify-content-between">
+            <ul class="navbar-nav flex-grow-1">
+     <li>@Html.ActionLink("Accueil", "Index", "Home", new { area = "" }, new { @class = "nav-link" })</li>
+  <li>@Html.ActionLink("À propos de", "About", "Home", new { area = "" }, new { @class = "nav-link" })</li>
+<li>@Html.ActionLink("Contact", "Contact", "Home", new { area = "" }, new { @class = "nav-link" })</li>
+           </ul>
         </div>
-    </nav>
-    <div class="container body-content">
-        @RenderBody()
-        <hr />
-        <footer>
-            <p> MEDX</p>
-        </footer>
     </div>
+        </nav>
+    }
+
+    @* Conditional wrapper based on page type *@
+    @if (ViewBag.FullWidth == true)
+    {
+        <div class="full-width-content">
+          @RenderBody()
+        </div>
+    }
+    else
+    {
+  <div class="container body-content standard-content">
+       @RenderBody()
+     <hr />
+        <footer>
+       <p>© @DateTime.Now.Year MEDX</p>
+  </footer>
+        </div>
+    }
 
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")

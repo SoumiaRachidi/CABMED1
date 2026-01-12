@@ -215,6 +215,7 @@
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="Helpers\PasswordHashHelper.txt" />
     <Content Include="Models\Model1.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Model1.Context.cs</LastGenOutput>
@@ -239,6 +240,14 @@
       <DependentUpon>Model1.edmx</DependentUpon>
     </Content>
     <Content Include="Content\images\README.md" />
+    <Content Include="Docs\AuthFormsDesignUpdate.md" />
+    <Content Include="Docs\Fix-Character-Encoding.md" />
+    <Content Include="Docs\Files-Status-Report.md" />
+    <Content Include="Docs\UTF8-Fix-Checklist.md" />
+    <Content Include="Scripts\Check-FileEncoding.ps1" />
+    <Content Include="Docs\Full-Width-Layout-Guide.md" />
+    <Content Include="Scripts\Fix-UTF8-Encoding.ps1" />
+    <Content Include="Docs\Fix-Encoding-Complete-Guide.md" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />
