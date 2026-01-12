@@ -229,6 +229,64 @@ namespace CABMED.Controllers
             return View(request);
         }
 
+        // GET: Secretary/ViewRequestDetails
+        public ActionResult ViewRequestDetails(int id)
+        {
+            var role = (Session["Role"] as string)?.ToLower();
+            if (role != "secretaire")
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            var request = AppointmentRequestRepository.GetById(id);
+            if (request == null)
+            {
+                return HttpNotFound();
+            }
+
+            // Get patient details
+            var patient = _db.Users.FirstOrDefault(u => u.UserId == request.PatientId);
+            if (patient != null)
+            {
+                ViewBag.PatientFullName = ((patient.Prenom ?? string.Empty) + " " + (patient.Nom ?? string.Empty)).Trim();
+                ViewBag.PatientEmail = patient.Email;
+                ViewBag.PatientPhone = patient.Telephone;
+                ViewBag.PatientDateNaissance = patient.DateNaissance;
+            }
+
+            // Get assigned doctor details if available
+            if (!string.IsNullOrWhiteSpace(request.AssignedDoctor))
+            {
+                ViewBag.AssignedDoctorName = request.AssignedDoctor;
+            }
+
+            // Get appointment details if linked
+            if (request.RendezVousId.HasValue)
+            {
+                var rendezVous = _db.RendezVous
+                    .Include("Users")    // Patient
+                    .Include("Users1")   // Doctor
+                    .FirstOrDefault(r => r.RendezVousId == request.RendezVousId.Value);
+
+                if (rendezVous != null)
+                {
+                    ViewBag.AppointmentDate = rendezVous.DateHeureDebut;
+                    ViewBag.AppointmentEndDate = rendezVous.DateHeureFin;
+                    ViewBag.AppointmentStatus = rendezVous.Statut;
+                    
+                    var doctor = rendezVous.Users1;
+                    if (doctor != null)
+                    {
+                        ViewBag.DoctorFullName = ((doctor.Prenom ?? string.Empty) + " " + (doctor.Nom ?? string.Empty)).Trim();
+                        ViewBag.DoctorSpecialite = doctor.Specialite;
+                    }
+                }
+            }
+
+            ViewBag.UserName = Session["UserName"] as string;
+            return View(request);
+        }
+
         // GET: Secretary/ManageAppointments
         public ActionResult ManageAppointments()
         {
