@@ -549,14 +549,19 @@
                             <span class="glyphicon glyphicon-eye-open"></span>
                             Voir détails
                         </button>
-                        <button class="btn btn-approve" onclick="approveRequest(@request.RequestId, '@encodedName')">
-                            <span class="glyphicon glyphicon-ok"></span>
-                            Approuver
-                        </button>
-                        <button class="btn btn-decline" onclick="declineRequest(@request.RequestId, '@encodedName')">
-                            <span class="glyphicon glyphicon-remove"></span>
-                            Refuser
-                        </button>
+                        @if (!statusLabel.Equals("Approuvé", StringComparison.InvariantCultureIgnoreCase) && 
+                             !statusLabel.Equals("Confirmé", StringComparison.InvariantCultureIgnoreCase) &&
+                             !statusLabel.Equals("Refusé", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            <button class="btn btn-approve" onclick="approveRequest(@request.RequestId, '@encodedName')">
+                                <span class="glyphicon glyphicon-ok"></span>
+                                Approuver
+                            </button>
+                            <button class="btn btn-decline" onclick="declineRequest(@request.RequestId, '@encodedName')">
+                                <span class="glyphicon glyphicon-remove"></span>
+                                Refuser
+                            </button>
+                        }
                     </div>
                 </div>
             }
@@ -739,7 +744,7 @@
     }
     
     function viewDetails(requestId) {
-        window.location.href = '@Url.Action("ViewRequest", "Secretary")' + '/' + requestId;
+        window.location.href = '@Url.Action("ViewRequestDetails", "Secretary")' + '/' + requestId;
     }
     
     function approveRequest(requestId, patientName) {

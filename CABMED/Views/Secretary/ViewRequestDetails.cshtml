@@ -1,0 +1,685 @@
+@model CABMED.ViewModels.AppointmentRequestViewModel
+@{
+    ViewBag.Title = "Détails de la demande de rendez-vous";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    /* Professional Purple Medical Theme */
+    :root {
+        --primary-purple: #7132CA;
+        --light-purple: #C47BE4;
+        --dark-purple: #301CA0;
+        --pink-accent: #F29AAE;
+        --white: #FFFFFF;
+        --light-bg: #F7F8FC;
+        --dark-text: #2C2C54;
+        --light-text: #8B8BA7;
+        --card-shadow: 0 4px 20px rgba(113, 50, 202, 0.12);
+        --hover-shadow: 0 8px 35px rgba(113, 50, 202, 0.2);
+        --gradient-primary: linear-gradient(135deg, #7132CA 0%, #C47BE4 100%);
+        --border-color: rgba(113, 50, 202, 0.12);
+        --success: #5FCF80;
+        --danger: #ff6b6b;
+        --warning: #ffa502;
+        --info: #3498db;
+    }
+
+    body {
+        background: var(--light-bg);
+    }
+
+    .details-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 30px 20px;
+    }
+
+    /* Page Header */
+    .page-header-custom {
+        background: var(--gradient-primary);
+        color: white;
+        padding: 40px;
+        border-radius: 20px;
+        margin-bottom: 30px;
+        box-shadow: var(--card-shadow);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .page-header-custom::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 50%;
+    }
+
+    .page-header-custom h2 {
+        margin: 0;
+        font-size: 32px;
+        font-weight: 700;
+        position: relative;
+        z-index: 1;
+    }
+
+    .page-header-custom p {
+        margin: 8px 0 0 0;
+        opacity: 0.95;
+        font-size: 15px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .btn-back {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 2px solid rgba(255, 255, 255, 0.35);
+        border-radius: 12px;
+        padding: 10px 20px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-block;
+        text-decoration: none;
+    }
+
+    .btn-back:hover {
+        background: rgba(255, 255, 255, 0.3);
+        color: white;
+        border-color: rgba(255, 255, 255, 0.5);
+        transform: translateX(-5px);
+        text-decoration: none;
+    }
+
+    /* Cards */
+    .detail-card {
+        background: white;
+        border-radius: 18px;
+        padding: 30px;
+        margin-bottom: 24px;
+        border: 1px solid var(--border-color);
+        box-shadow: var(--card-shadow);
+        transition: all 0.3s ease;
+    }
+
+    .detail-card:hover {
+        box-shadow: var(--hover-shadow);
+    }
+
+    .card-header-custom {
+        border-bottom: 2px solid var(--border-color);
+        padding-bottom: 16px;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .card-header-custom h3 {
+        margin: 0;
+        color: var(--dark-text);
+        font-size: 22px;
+        font-weight: 700;
+        flex: 1;
+    }
+
+    .card-header-custom .glyphicon {
+        color: var(--primary-purple);
+        font-size: 24px;
+    }
+
+    /* Status Badge */
+    .status-badge {
+        padding: 8px 20px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: white;
+        display: inline-block;
+    }
+
+    .status-pending { background: var(--light-text); }
+    .status-approved { background: var(--success); }
+    .status-declined { background: var(--danger); }
+
+    /* Priority Badge */
+    .priority-badge {
+        padding: 8px 20px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+        color: white;
+        text-transform: uppercase;
+        display: inline-block;
+    }
+
+    .priority-high { background: linear-gradient(135deg, var(--pink-accent) 0%, var(--danger) 100%); }
+    .priority-medium { background: var(--gradient-primary); }
+    .priority-low { background: linear-gradient(135deg, var(--success) 0%, #43A047 100%); }
+
+    /* Info Row */
+    .info-row {
+        display: flex;
+        padding: 16px 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .info-row:last-child {
+        border-bottom: none;
+    }
+
+    .info-label {
+        font-weight: 700;
+        color: var(--dark-text);
+        width: 200px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .info-label .glyphicon {
+        color: var(--primary-purple);
+    }
+
+    .info-value {
+        color: var(--light-text);
+        flex: 1;
+    }
+
+    /* Patient Avatar */
+    .patient-avatar-large {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: var(--gradient-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 32px;
+        box-shadow: 0 4px 20px rgba(113, 50, 202, 0.3);
+        margin-right: 20px;
+    }
+
+    /* Symptoms Box */
+    .symptoms-box {
+        background: linear-gradient(135deg, #F7F8FC 0%, #F0F1F7 100%);
+        border-radius: 12px;
+        padding: 20px;
+        border-left: 4px solid var(--primary-purple);
+        margin: 16px 0;
+    }
+
+    .symptoms-box h4 {
+        color: var(--dark-text);
+        font-size: 16px;
+        font-weight: 700;
+        margin: 0 0 12px 0;
+    }
+
+    .symptoms-box p {
+        color: var(--light-text);
+        margin: 0;
+        line-height: 1.6;
+    }
+
+    /* Timeline Item */
+    .timeline-item {
+        padding: 16px 0;
+        border-left: 3px solid var(--primary-purple);
+        padding-left: 20px;
+        margin-left: 10px;
+        position: relative;
+    }
+
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: -8px;
+        top: 20px;
+        width: 13px;
+        height: 13px;
+        border-radius: 50%;
+        background: var(--primary-purple);
+        box-shadow: 0 0 0 4px white;
+    }
+
+    .timeline-date {
+        color: var(--light-text);
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .timeline-title {
+        color: var(--dark-text);
+        font-weight: 700;
+        margin: 4px 0;
+    }
+
+    .timeline-content {
+        color: var(--light-text);
+        font-size: 14px;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+        display: flex;
+        gap: 12px;
+        margin-top: 24px;
+        flex-wrap: wrap;
+    }
+
+    .btn-custom {
+        border-radius: 12px;
+        padding: 12px 24px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 14px;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-custom:hover {
+        transform: translateY(-2px);
+        text-decoration: none;
+    }
+
+    .btn-primary-custom {
+        background: var(--gradient-primary);
+        color: white;
+        box-shadow: 0 4px 15px rgba(113, 50, 202, 0.3);
+    }
+
+    .btn-primary-custom:hover {
+        background: linear-gradient(135deg, var(--dark-purple) 0%, var(--primary-purple) 100%);
+        box-shadow: 0 6px 20px rgba(113, 50, 202, 0.4);
+        color: white;
+    }
+
+    .btn-secondary-custom {
+        background: white;
+        color: var(--primary-purple);
+        border: 2px solid var(--primary-purple);
+    }
+
+    .btn-secondary-custom:hover {
+        background: var(--primary-purple);
+        color: white;
+    }
+
+    @@media (max-width: 768px) {
+        .info-row {
+            flex-direction: column;
+        }
+
+        .info-label {
+            width: 100%;
+            margin-bottom: 8px;
+        }
+
+        .patient-avatar-large {
+            margin: 0 auto 16px;
+        }
+
+        .page-header-custom {
+            padding: 30px 20px;
+        }
+    }
+</style>
+
+<div class="container details-container">
+    <!-- Page Header -->
+    <div class="page-header-custom">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+            <div>
+                <h2>Détails de la demande</h2>
+                <p>Informations complètes sur la demande de rendez-vous</p>
+            </div>
+            <div>
+                <a href="@Url.Action("AppointmentRequests", "Secretary")" class="btn-back">
+                    <span class="glyphicon glyphicon-arrow-left"></span>
+                    Retour aux demandes
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <!-- Patient Information Card -->
+            <div class="detail-card">
+                <div class="card-header-custom">
+                    <span class="glyphicon glyphicon-user"></span>
+                    <h3>Informations du patient</h3>
+                </div>
+                
+                <div style="display: flex; align-items: center; margin-bottom: 24px;">
+                    <div class="patient-avatar-large">
+                        @{
+                            var firstLetter = !string.IsNullOrWhiteSpace(Model.PatientNom) ? Model.PatientNom[0].ToString().ToUpper() : "P";
+                            var secondLetter = !string.IsNullOrWhiteSpace(Model.PatientPrenom) ? Model.PatientPrenom[0].ToString().ToUpper() : "";
+                        }
+                        @(firstLetter + secondLetter)
+                    </div>
+                    <div>
+                        <h3 style="margin: 0; color: var(--dark-text);">@ViewBag.PatientFullName</h3>
+                        <p style="margin: 4px 0 0 0; color: var(--light-text);">Patient</p>
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">
+                        <span class="glyphicon glyphicon-envelope"></span>
+                        Email
+                    </div>
+                    <div class="info-value">@(ViewBag.PatientEmail ?? "Non renseigné")</div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">
+                        <span class="glyphicon glyphicon-phone"></span>
+                        Téléphone
+                    </div>
+                    <div class="info-value">@(ViewBag.PatientPhone ?? Model.PatientTelephone ?? "Non renseigné")</div>
+                </div>
+
+                @if (ViewBag.PatientDateNaissance != null)
+                {
+                    <div class="info-row">
+                        <div class="info-label">
+                            <span class="glyphicon glyphicon-calendar"></span>
+                            Date de naissance
+                        </div>
+                        <div class="info-value">@(((DateTime?)ViewBag.PatientDateNaissance)?.ToString("dd/MM/yyyy") ?? "Non renseignée")</div>
+                    </div>
+                }
+            </div>
+
+            <!-- Request Details Card -->
+            <div class="detail-card">
+                <div class="card-header-custom">
+                    <span class="glyphicon glyphicon-file"></span>
+                    <h3>Détails de la demande</h3>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">
+                        <span class="glyphicon glyphicon-time"></span>
+                        Date de demande
+                    </div>
+                    <div class="info-value">@Model.DateDemande.ToString("dd/MM/yyyy à HH:mm")</div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">
+                        <span class="glyphicon glyphicon-flag"></span>
+                        Priorité
+                    </div>
+                    <div class="info-value">
+                        @{
+                            var priorityClass = Model.UrgencyLevel == "Élevé" ? "priority-high" :
+                                              Model.UrgencyLevel == "Moyen" ? "priority-medium" : "priority-low";
+                        }
+                        <span class="priority-badge @priorityClass">@Model.UrgencyLevel</span>
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">
+                        <span class="glyphicon glyphicon-user-md"></span>
+                        Spécialité souhaitée
+                    </div>
+                    <div class="info-value">@Model.PreferredSpecialty</div>
+                </div>
+
+                @if (Model.PreferredDate.HasValue)
+                {
+                    <div class="info-row">
+                        <div class="info-label">
+                            <span class="glyphicon glyphicon-calendar"></span>
+                            Date souhaitée
+                        </div>
+                        <div class="info-value">@Model.PreferredDate.Value.ToString("dd/MM/yyyy")</div>
+                    </div>
+                }
+
+                @if (Model.PreferredTime.HasValue)
+                {
+                    <div class="info-row">
+                        <div class="info-label">
+                            <span class="glyphicon glyphicon-time"></span>
+                            Heure souhaitée
+                        </div>
+                        <div class="info-value">@Model.PreferredTime.Value.ToString(@"hh\:mm")</div>
+                    </div>
+                }
+
+                <div class="symptoms-box">
+                    <h4><span class="glyphicon glyphicon-list-alt"></span> Symptômes décrits</h4>
+                    <p>@Model.SymptomsDescription</p>
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(Model.AdditionalComments))
+                {
+                    <div class="symptoms-box" style="border-left-color: var(--info);">
+                        <h4><span class="glyphicon glyphicon-comment"></span> Commentaires additionnels</h4>
+                        <p>@Model.AdditionalComments</p>
+                    </div>
+                }
+            </div>
+
+            <!-- Appointment Details (if approved) -->
+            @if (ViewBag.AppointmentDate != null)
+            {
+                <div class="detail-card">
+                    <div class="card-header-custom">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                        <h3>Détails du rendez-vous</h3>
+                    </div>
+
+                    <div class="info-row">
+                        <div class="info-label">
+                            <span class="glyphicon glyphicon-calendar"></span>
+                            Date et heure
+                        </div>
+                        <div class="info-value">
+                            <strong>@(((DateTime)ViewBag.AppointmentDate).ToString("dd/MM/yyyy à HH:mm"))</strong>
+                        </div>
+                    </div>
+
+                    @if (ViewBag.AppointmentEndDate != null)
+                    {
+                        <div class="info-row">
+                            <div class="info-label">
+                                <span class="glyphicon glyphicon-time"></span>
+                                Durée
+                            </div>
+                            <div class="info-value">
+                                @{
+                                    var duration = ((DateTime)ViewBag.AppointmentEndDate - (DateTime)ViewBag.AppointmentDate).TotalMinutes;
+                                }
+                                @duration minutes
+                            </div>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(ViewBag.DoctorFullName))
+                    {
+                        <div class="info-row">
+                            <div class="info-label">
+                                <span class="glyphicon glyphicon-user-md"></span>
+                                Médecin assigné
+                            </div>
+                            <div class="info-value">
+                                <strong>@ViewBag.DoctorFullName</strong>
+                                @if (!string.IsNullOrWhiteSpace(ViewBag.DoctorSpecialite))
+                                {
+                                    <span> - @ViewBag.DoctorSpecialite</span>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(ViewBag.AppointmentStatus))
+                    {
+                        <div class="info-row">
+                            <div class="info-label">
+                                <span class="glyphicon glyphicon-info-sign"></span>
+                                Statut
+                            </div>
+                            <div class="info-value">
+                                @{
+                                    var appointmentStatusClass = ViewBag.AppointmentStatus == "Confirme" || ViewBag.AppointmentStatus == "Confirmé" ? "status-approved" :
+                                                                 ViewBag.AppointmentStatus == "Refuse" || ViewBag.AppointmentStatus == "Refusé" ? "status-declined" : "status-pending";
+                                }
+                                <span class="status-badge @appointmentStatusClass">@ViewBag.AppointmentStatus</span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <div class="col-md-4">
+            <!-- Status Card -->
+            <div class="detail-card">
+                <div class="card-header-custom">
+                    <span class="glyphicon glyphicon-info-sign"></span>
+                    <h3>Statut</h3>
+                </div>
+
+                @{
+                    var statusLabel = string.IsNullOrWhiteSpace(Model.Status) ? "En attente" : Model.Status;
+                    var statusClass = statusLabel.Equals("Approuvé", StringComparison.InvariantCultureIgnoreCase) ? "status-approved" :
+                                     statusLabel.Equals("Refusé", StringComparison.InvariantCultureIgnoreCase) ? "status-declined" : "status-pending";
+                }
+                
+                <div style="text-align: center; padding: 20px 0;">
+                    <span class="status-badge @statusClass" style="font-size: 14px; padding: 12px 28px;">@statusLabel</span>
+                </div>
+
+                @if (Model.ProcessedDate.HasValue)
+                {
+                    <div class="info-row">
+                        <div class="info-label">
+                            <span class="glyphicon glyphicon-calendar"></span>
+                            Traitée le
+                        </div>
+                        <div class="info-value">@Model.ProcessedDate.Value.ToString("dd/MM/yyyy à HH:mm")</div>
+                    </div>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(Model.ProcessedBy))
+                {
+                    <div class="info-row">
+                        <div class="info-label">
+                            <span class="glyphicon glyphicon-user"></span>
+                            Traitée par
+                        </div>
+                        <div class="info-value">@Model.ProcessedBy</div>
+                    </div>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(Model.AssignedDoctor))
+                {
+                    <div class="info-row">
+                        <div class="info-label">
+                            <span class="glyphicon glyphicon-user-md"></span>
+                            Médecin
+                        </div>
+                        <div class="info-value">@Model.AssignedDoctor</div>
+                    </div>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(Model.SecretaryComments))
+                {
+                    <div style="margin-top: 20px;">
+                        <strong style="color: var(--dark-text); display: block; margin-bottom: 8px;">
+                            <span class="glyphicon glyphicon-comment"></span> Commentaires
+                        </strong>
+                        <div style="background: var(--light-bg); padding: 12px; border-radius: 8px; color: var(--light-text); font-size: 14px;">
+                            @Model.SecretaryComments
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="detail-card">
+                <div class="card-header-custom">
+                    <span class="glyphicon glyphicon-cog"></span>
+                    <h3>Actions</h3>
+                </div>
+
+                <div class="action-buttons" style="flex-direction: column;">
+                    <a href="@Url.Action("AppointmentRequests", "Secretary")" class="btn-custom btn-primary-custom" style="text-align: center;">
+                        <span class="glyphicon glyphicon-list"></span>
+                        Toutes les demandes
+                    </a>
+                    <a href="@Url.Action("Index", "Secretary")" class="btn-custom btn-secondary-custom" style="text-align: center;">
+                        <span class="glyphicon glyphicon-home"></span>
+                        Tableau de bord
+                    </a>
+                </div>
+            </div>
+
+            <!-- Timeline -->
+            @if (Model.ProcessedDate.HasValue || Model.DateDemande != null)
+            {
+                <div class="detail-card">
+                    <div class="card-header-custom">
+                        <span class="glyphicon glyphicon-time"></span>
+                        <h3>Historique</h3>
+                    </div>
+
+                    <div style="padding: 10px 0;">
+                        <div class="timeline-item">
+                            <div class="timeline-date">@Model.DateDemande.ToString("dd/MM/yyyy à HH:mm")</div>
+                            <div class="timeline-title">Demande créée</div>
+                            <div class="timeline-content">Demande de rendez-vous soumise par le patient</div>
+                        </div>
+
+                        @if (Model.ProcessedDate.HasValue)
+                        {
+                            <div class="timeline-item">
+                                <div class="timeline-date">@Model.ProcessedDate.Value.ToString("dd/MM/yyyy à HH:mm")</div>
+                                <div class="timeline-title">Demande traitée</div>
+                                <div class="timeline-content">
+                                    @if (statusLabel.Equals("Approuvé", StringComparison.InvariantCultureIgnoreCase))
+                                    {
+                                        <text>Demande approuvée par @(Model.ProcessedBy ?? "le secrétaire")</text>
+                                    }
+                                    else if (statusLabel.Equals("Refusé", StringComparison.InvariantCultureIgnoreCase))
+                                    {
+                                        <text>Demande refusée par @(Model.ProcessedBy ?? "le secrétaire")</text>
+                                    }
+                                    else
+                                    {
+                                        <text>Demande mise à jour</text>
+                                    }
+                                </div>
+                            </div>
+                        }
+
+                        @if (ViewBag.AppointmentDate != null)
+                        {
+                            <div class="timeline-item">
+                                <div class="timeline-date">@(((DateTime)ViewBag.AppointmentDate).ToString("dd/MM/yyyy à HH:mm"))</div>
+                                <div class="timeline-title">Rendez-vous planifié</div>
+                                <div class="timeline-content">Rendez-vous avec @(ViewBag.DoctorFullName ?? "le médecin")</div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
