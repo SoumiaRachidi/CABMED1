@@ -5,152 +5,532 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container" style="margin-top: 30px;">
-    <div class="row">
-        <div class="col-md-12">
-            <h2>
-                <span class="glyphicon glyphicon-briefcase"></span> Gestion du Personnel
-            </h2>
-            <hr />
+<style>
+ /* Unified Professional Admin Theme */
+    :root {
+        --admin-primary: #1e40af;
+        --admin-primary-dark: #1e3a8a;
+        --admin-primary-light: #3b82f6;
+  --admin-accent: #60a5fa;
+        --admin-success: #10b981;
+        --admin-warning: #f59e0b;
+        --admin-danger: #ef4444;
+        --white: #ffffff;
+        --gray-50: #f8fafc;
+        --gray-100: #f1f5f9;
+        --gray-200: #e2e8f0;
+        --gray-300: #cbd5e1;
+        --gray-600: #475569;
+     --gray-700: #334155;
+        --gray-900: #0f172a;
+        --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+    }
 
-            @if (TempData["SuccessMessage"] != null)
-            {
-                <div class="alert alert-success alert-dismissible">
-                    <button type="button" class="close" data-dismiss="alert">&times;</button>
-                    <strong>Succès!</strong> @TempData["SuccessMessage"]
-                </div>
-            }
+    body {
+        background: var(--gray-50);
+    }
 
-            @if (TempData["ErrorMessage"] != null)
-            {
-                <div class="alert alert-danger alert-dismissible">
-                    <button type="button" class="close" data-dismiss="alert">&times;</button>
-                    <strong>Erreur!</strong> @TempData["ErrorMessage"]
-                </div>
-            }
+    .staff-container {
+      max-width: 1400px;
+        margin: 30px auto;
+        padding: 0 20px;
+    }
 
-            <!-- Add New Staff Button -->
-            <div class="text-right" style="margin-bottom: 20px;">
-                <a href="@Url.Action("CreateStaff", "Admin")" class="btn btn-success btn-lg">
-                    <span class="glyphicon glyphicon-plus"></span> Ajouter un nouvel employé
-                </a>
+    /* Page Header */
+    .page-header-staff {
+        background: linear-gradient(135deg, var(--admin-primary) 0%, var(--admin-primary-dark) 100%);
+    color: white;
+      padding: 45px 40px;
+        border-radius: 16px;
+   margin-bottom: 30px;
+        box-shadow: var(--shadow-xl);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .page-header-staff::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+      right: -10%;
+      width: 350px;
+        height: 350px;
+  background: rgba(255, 255, 255, 0.08);
+    border-radius: 50%;
+    }
+
+    .page-header-staff .content {
+        position: relative;
+      z-index: 1;
+display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .page-header-staff h2 {
+        margin: 0;
+        font-size: 30px;
+        font-weight: 700;
+    }
+
+.page-header-staff .btn-add {
+      background: white;
+   color: var(--admin-primary);
+        border: none;
+        padding: 14px 24px;
+ border-radius: 12px;
+font-weight: 600;
+     font-size: 15px;
+      display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        box-shadow: var(--shadow-lg);
+        text-decoration: none;
+ }
+
+    .page-header-staff .btn-add:hover {
+ transform: translateY(-2px);
+    box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.2);
+        color: var(--admin-primary-dark);
+    }
+
+    /* Alerts */
+    .alert-modern {
+        border-radius: 12px;
+     border: none;
+        padding: 16px 20px;
+        margin-bottom: 24px;
+    box-shadow: var(--shadow);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .alert-modern.success {
+        background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+        color: #065f46;
+    }
+
+    .alert-modern.error {
+        background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+        color: #991b1b;
+    }
+
+    /* Staff Table */
+    .staff-table-container {
+        background: white;
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-200);
+        overflow: hidden;
+    }
+
+    .staff-table-header {
+        padding: 24px;
+        background: var(--gray-50);
+  border-bottom: 2px solid var(--gray-200);
+    }
+
+    .staff-table-header h3 {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--gray-900);
+        display: flex;
+      align-items: center;
+    gap: 10px;
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+    }
+
+    .staff-table {
+        width: 100%;
+        margin: 0;
+    }
+
+    .staff-table thead {
+     background: linear-gradient(135deg, var(--admin-primary) 0%, var(--admin-primary-dark) 100%);
+        color: white;
+    }
+
+    .staff-table thead th {
+        padding: 18px 16px;
+        font-weight: 600;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+  border: none;
+    }
+
+    .staff-table tbody tr {
+        border-bottom: 1px solid var(--gray-200);
+    transition: all 0.3s ease;
+    }
+
+    .staff-table tbody tr:hover {
+     background: rgba(30, 64, 175, 0.02);
+        transform: translateX(2px);
+    }
+
+    .staff-table tbody td {
+        padding: 20px 16px;
+        vertical-align: middle;
+        color: var(--gray-700);
+        font-size: 14px;
+    }
+
+  /* Staff Avatar */
+    .staff-avatar {
+   width: 42px;
+        height: 42px;
+   border-radius: 12px;
+      background: linear-gradient(135deg, var(--admin-primary), var(--admin-primary-light));
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    color: white;
+        font-weight: 700;
+        font-size: 15px;
+        margin-right: 12px;
+    }
+
+    /* Role Badges */
+    .role-badge {
+ display: inline-block;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 12px;
+     font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .role-badge.medecin {
+        background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  color: var(--admin-primary-dark);
+    }
+
+    .role-badge.secretaire {
+     background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+        color: #065f46;
+    }
+
+    /* Action Buttons */
+    .btn-action {
+        padding: 8px 16px;
+        border-radius: 8px;
+  font-size: 13px;
+        font-weight: 600;
+        border: none;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+      gap: 6px;
+    }
+
+    .btn-action.edit {
+        background: linear-gradient(135deg, var(--admin-primary), var(--admin-primary-light));
+        color: white;
+ }
+
+    .btn-action.edit:hover {
+        background: linear-gradient(135deg, var(--admin-primary-dark), var(--admin-primary));
+        transform: translateY(-1px);
+    }
+
+    .btn-action.delete {
+        background: linear-gradient(135deg, var(--admin-danger), #f87171);
+    color: white;
+    }
+
+  .btn-action.delete:hover {
+        background: linear-gradient(135deg, #dc2626, var(--admin-danger));
+        transform: translateY(-1px);
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+    }
+
+    .empty-state-icon {
+  font-size: 80px;
+        color: var(--gray-300);
+        margin-bottom: 24px;
+    }
+
+    .empty-state h3 {
+      color: var(--gray-700);
+        font-size: 22px;
+        margin-bottom: 12px;
+    }
+
+    .empty-state p {
+     color: var(--gray-600);
+   font-size: 15px;
+}
+
+    /* Modal */
+    .modal-content {
+border-radius: 16px;
+        border: none;
+        box-shadow: var(--shadow-xl);
+    }
+
+    .modal-header {
+ background: linear-gradient(135deg, var(--admin-danger) 0%, #dc2626 100%);
+        color: white;
+      border-radius: 16px 16px 0 0;
+        padding: 20px 24px;
+   border: none;
+    }
+
+    .modal-header .close {
+        color: white;
+        opacity: 0.9;
+    }
+
+    .modal-body {
+        padding: 24px;
+    }
+
+  .modal-footer {
+        padding: 16px 24px;
+        border-top: 1px solid var(--gray-200);
+    }
+
+    /* Back Button */
+    .btn-back {
+      background: white;
+        color: var(--admin-primary);
+        border: 2px solid var(--gray-200);
+        padding: 12px 24px;
+  border-radius: 12px;
+   font-weight: 600;
+    display: inline-flex;
+      align-items: center;
+        gap: 8px;
+    transition: all 0.3s ease;
+     text-decoration: none;
+    }
+
+    .btn-back:hover {
+        border-color: var(--admin-primary);
+        color: var(--admin-primary-dark);
+      transform: translateY(-2px);
+        box-shadow: var(--shadow);
+    }
+
+    /* Info Alert */
+    .info-tip {
+        background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+        color: var(--admin-primary-dark);
+        padding: 14px 18px;
+   border-radius: 12px;
+        font-size: 13px;
+        margin-top: 20px;
+    display: flex;
+        align-items: center;
+        gap: 10px;
+  }
+
+    @@media (max-width: 768px) {
+ .page-header-staff .content {
+flex-direction: column;
+ gap: 16px;
+     text-align: center;
+        }
+
+    .page-header-staff h2 {
+       font-size: 24px;
+        }
+
+  .btn-group {
+   flex-direction: column;
+          width: 100%;
+        }
+
+        .btn-action {
+         width: 100%;
+     justify-content: center;
+    }
+    }
+</style>
+
+<div class="staff-container">
+    <!-- Page Header -->
+    <div class="page-header-staff">
+        <div class="content">
+  <div>
+  <h2><span class="glyphicon glyphicon-briefcase"></span> Gestion du Personnel</h2>
+             <p style="margin: 8px 0 0 0; opacity: 0.9;">Gérez les employés du cabinet médical</p>
             </div>
-
-            <!-- Staff Table -->
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">
-                        <span class="glyphicon glyphicon-list"></span> Liste complète du personnel
-                    </h3>
-                </div>
-                <div class="panel-body">
-                    @if (Model != null && Model.Any())
-                    {
-                        <div class="table-responsive">
-                            <table class="table table-striped table-hover table-bordered">
-                                <thead style="background-color: #f5f5f5;">
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Nom</th>
-                                        <th>Prénom</th>
-                                        <th>Email</th>
-                                        <th>Téléphone</th>
-                                        <th>Rôle</th>
-                                        <th>Spécialité</th>
-                                        <th style="width:220px;">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var staff in Model)
-                                    {
-                                        <tr>
-                                            <td>@staff.UserId</td>
-                                            <td>@staff.Nom</td>
-                                            <td>@staff.Prenom</td>
-                                            <td>
-                                                <a href="mailto:@staff.Email">
-                                                    <span class="glyphicon glyphicon-envelope"></span> @staff.Email
-                                                </a>
-                                            </td>
-                                            <td>@(staff.Telephone ?? "N/A")</td>
-                                            <td>
-                                                @if (staff.Role.ToLower() == "medecin")
-                                                {
-                                                    <span class="label label-primary">Médecin</span>
-                                                }
-                                                else if (staff.Role.ToLower() == "secretaire")
-                                                {
-                                                    <span class="label label-success">Secrétaire</span>
-                                                }
-                                                else
-                                                {
-                                                    <span class="label label-default">@staff.Role</span>
-                                                }
-                                            </td>
-                                            <td>@(staff.Specialite ?? "N/A")</td>
-                                            <td>
-                                                <div class="btn-group" role="group">
-                                                    <a class="btn btn-info btn-sm" href="@Url.Action("CreateStaff","Admin")?id=@staff.UserId" title="Modifier le profil">
-                                                        <span class="glyphicon glyphicon-pencil"></span> Modifier
-                                                    </a>
-                                                    <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteModal-@staff.UserId">
-                                                        <span class="glyphicon glyphicon-trash"></span> Supprimer
-                                                    </button>
-                                                </div>
-
-                                                <!-- Delete Confirmation Modal -->
-                                                <div class="modal fade" id="deleteModal-@staff.UserId" tabindex="-1" role="dialog">
-                                                    <div class="modal-dialog" role="document">
-                                                        <div class="modal-content">
-                                                            <div class="modal-header">
-                                                                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                                                <h4 class="modal-title">Confirmer la suppression</h4>
-                                                            </div>
-                                                            <div class="modal-body">
-                                                                <p>Êtes-vous sûr de vouloir supprimer <strong>@staff.Prenom @staff.Nom</strong> ?</p>
-                                                                <p class="text-danger">Cette action désactivera le compte de cet employé.</p>
-                                                            </div>
-                                                            <div class="modal-footer">
-                                                                <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
-                                                                @using (Html.BeginForm("DeleteStaff", "Admin", FormMethod.Post, new { style = "display:inline;" }))
-                                                                {
-                                                                    @Html.AntiForgeryToken()
-                                                                    <input type="hidden" name="id" value="@staff.UserId" />
-                                                                    <button type="submit" class="btn btn-danger">
-                                                                        <span class="glyphicon glyphicon-trash"></span> Confirmer la suppression
-                                                                    </button>
-                                                                }
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="alert alert-info">
-                            <span class="glyphicon glyphicon-info-sign"></span>
-                            Astuce: Le bouton "Modifier" ouvre le formulaire d'ajout avec l'identifiant dans l'URL (pour futur support d'édition). Aucun changement serveur requis.
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="alert alert-info">
-                            <span class="glyphicon glyphicon-info-sign"></span>
-                            Aucun membre du personnel trouvé. Cliquez sur "Ajouter un nouvel employé" pour commencer.
-                        </div>
-                    }
-                </div>
-            </div>
-
-            <!-- Back to Dashboard -->
-            <div class="text-center" style="margin-top: 20px;">
-                <a href="@Url.Action("Index", "Admin")" class="btn btn-default">
-                    <span class="glyphicon glyphicon-arrow-left"></span> Retour au tableau de bord
-                </a>
-            </div>
+            <a href="@Url.Action("CreateStaff", "Admin")" class="btn-add">
+       <span class="glyphicon glyphicon-plus"></span> Ajouter un nouvel employé
+            </a>
         </div>
+    </div>
+
+    <!-- Alerts -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+      <div class="alert-modern success">
+      <span class="glyphicon glyphicon-ok-circle" style="font-size: 20px;"></span>
+            <div>
+    <strong>Succès!</strong> @TempData["SuccessMessage"]
+  </div>
+    <button type="button" class="close" data-dismiss="alert" style="margin-left: auto;">&times;</button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert-modern error">
+            <span class="glyphicon glyphicon-exclamation-sign" style="font-size: 20px;"></span>
+        <div>
+     <strong>Erreur!</strong> @TempData["ErrorMessage"]
+   </div>
+            <button type="button" class="close" data-dismiss="alert" style="margin-left: auto;">&times;</button>
+        </div>
+    }
+
+    <!-- Staff Table -->
+    <div class="staff-table-container">
+        <div class="staff-table-header">
+         <h3>
+                <span class="glyphicon glyphicon-list"></span>
+         Liste complète du personnel
+     </h3>
+        </div>
+
+ @if (Model != null && Model.Any())
+        {
+    <div class="table-wrapper">
+         <table class="staff-table table">
+     <thead>
+   <tr>
+     <th>ID</th>
+       <th>Employé</th>
+     <th>Email</th>
+  <th>Téléphone</th>
+    <th>Rôle</th>
+      <th>Spécialité</th>
+                 <th style="width: 220px;">Actions</th>
+        </tr>
+       </thead>
+           <tbody>
+   @foreach (var staff in Model)
+    {
+            var initials = "";
+     if (!string.IsNullOrEmpty(staff.Prenom) && !string.IsNullOrEmpty(staff.Nom))
+   {
+     initials = staff.Prenom[0].ToString().ToUpper() + staff.Nom[0].ToString().ToUpper();
+         }
+
+                <tr>
+      <td><strong>#@staff.UserId</strong></td>
+     <td>
+     <div style="display: flex; align-items: center;">
+<div class="staff-avatar">@initials</div>
+        <div>
+   <strong style="color: var(--gray-900);">@staff.Prenom @staff.Nom</strong>
+    </div>
+               </div>
+        </td>
+     <td>
+   <a href="mailto:@staff.Email" style="color: var(--admin-primary); text-decoration: none;">
+     <span class="glyphicon glyphicon-envelope"></span> @staff.Email
+      </a>
+   </td>
+      <td>@(staff.Telephone ?? "N/A")</td>
+       <td>
+ @if (staff.Role.ToLower() == "medecin")
+        {
+  <span class="role-badge medecin">Médecin</span>
+   }
+           else if (staff.Role.ToLower() == "secretaire")
+             {
+        <span class="role-badge secretaire">Secrétaire</span>
+      }
+         else
+          {
+ <span class="role-badge">@staff.Role</span>
+    }
+      </td>
+      <td>@(staff.Specialite ?? "N/A")</td>
+  <td>
+         <div class="btn-group" style="display: flex; gap: 8px;">
+            <a class="btn-action edit" href="@Url.Action("EditStaff","Admin", new { id = staff.UserId })">
+              <span class="glyphicon glyphicon-pencil"></span> Modifier
+  </a>
+            <button type="button" class="btn-action delete" data-toggle="modal" data-target="#deleteModal-@staff.UserId">
+   <span class="glyphicon glyphicon-trash"></span> Supprimer
+</button>
+  </div>
+
+      <!-- Delete Confirmation Modal -->
+   <div class="modal fade" id="deleteModal-@staff.UserId" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+            <div class="modal-content">
+ <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal">&times;</button>
+           <h4 class="modal-title" style="margin: 0;">Confirmer la suppression</h4>
+    </div>
+         <div class="modal-body">
+         <p style="font-size: 15px; margin-bottom: 12px;">Êtes-vous sûr de vouloir supprimer <strong>@staff.Prenom @staff.Nom</strong> ?</p>
+       <div style="background: #fee2e2; color: #991b1b; padding: 12px; border-radius: 8px; font-size: 14px;">
+         <span class="glyphicon glyphicon-warning-sign"></span>
+             Cette action désactivera le compte de cet employé.
+      </div>
+    </div>
+       <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal" style="border-radius: 8px;">Annuler</button>
+        @using (Html.BeginForm("DeleteStaff", "Admin", FormMethod.Post, new { style = "display:inline;" }))
+    {
+         @Html.AntiForgeryToken()
+             <input type="hidden" name="id" value="@staff.UserId" />
+          <button type="submit" class="btn-action delete">
+            <span class="glyphicon glyphicon-trash"></span> Confirmer la suppression
+                  </button>
+               }
+       </div>
+            </div>
+                 </div>
+      </div>
+       </td>
+  </tr>
+     }
+       </tbody>
+   </table>
+            </div>
+
+            <div class="info-tip">
+          <span class="glyphicon glyphicon-info-sign"></span>
+        <span>Cliquez sur "Modifier" pour éditer les informations d'un employé.</span>
+       </div>
+        }
+        else
+     {
+            <div class="empty-state">
+    <div class="empty-state-icon">
+     <span class="glyphicon glyphicon-inbox"></span>
+        </div>
+                <h3>Aucun membre du personnel trouvé</h3>
+                <p>Cliquez sur "Ajouter un nouvel employé" pour commencer.</p>
+      </div>
+        }
+    </div>
+
+    <!-- Back Button -->
+    <div class="text-center" style="margin-top: 30px;">
+        <a href="@Url.Action("Index", "Admin")" class="btn-back">
+            <span class="glyphicon glyphicon-arrow-left"></span> Retour au tableau de bord
+   </a>
     </div>
 </div>

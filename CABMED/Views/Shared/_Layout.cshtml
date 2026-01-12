@@ -6,29 +6,269 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewBag.Title - MEDX</title>
     @Styles.Render("~/Content/css")
-    @Scripts.Render("~/bundles/modernizr")
+ @Scripts.Render("~/bundles/modernizr")
     <style>
-        /* Reset some default Bootstrap margins */
+  /* Reset some default Bootstrap margins */
         body {
-  margin: 0;
-         padding: 0;
+    margin: 0;
+       padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         }
         
-        /* Navbar styling */
-    .navbar {
-   margin-bottom: 0;
+/* Modern Navbar */
+ .modern-navbar {
+background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+         box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+     padding: 0;
+      margin-bottom: 0;
+  border: none;
+            border-radius: 0;
+ }
+
+      .navbar-container {
+            display: flex;
+            align-items: center;
+        justify-content: space-between;
+            padding: 0 30px;
+   max-width: 1400px;
+            margin: 0 auto;
+   }
+
+  /* Brand */
+ .navbar-brand-modern {
+      color: white !important;
+            font-size: 24px;
+       font-weight: 700;
+      text-decoration: none;
+         padding: 20px 0;
+            display: flex;
+            align-items: center;
+     gap: 10px;
+        }
+
+ .navbar-brand-modern:hover {
+            color: #93c5fd !important;
+      }
+
+        .brand-icon {
+            width: 32px;
+            height: 32px;
+        background: white;
+       border-radius: 8px;
+            display: flex;
+       align-items: center;
+     justify-content: center;
+            color: #2563eb;
+            font-weight: bold;
+        }
+
+   /* Navigation Links */
+        .navbar-nav-modern {
+            display: flex;
+    list-style: none;
+   margin: 0;
+            padding: 0;
+            gap: 8px;
+ }
+
+     .nav-item-modern {
+    position: relative;
+        }
+
+        .nav-link-modern {
+    color: rgba(255, 255, 255, 0.9) !important;
+        text-decoration: none;
+     padding: 20px 16px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+ font-size: 14px;
+   font-weight: 500;
+            transition: all 0.3s ease;
+     border-bottom: 3px solid transparent;
+  }
+
+        .nav-link-modern:hover {
+            color: white !important;
+  background: rgba(255, 255, 255, 0.1);
+            border-bottom-color: white;
+        }
+
+        /* User Menu */
+        .user-menu {
+     position: relative;
+        }
+
+    .user-menu-toggle {
+background: rgba(255, 255, 255, 0.1);
+border: 2px solid rgba(255, 255, 255, 0.2);
+            color: white;
+   padding: 8px 16px;
+  border-radius: 10px;
+    display: flex;
+    align-items: center;
+        gap: 10px;
+ cursor: pointer;
+            font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s ease;
+        }
+
+        .user-menu-toggle:hover {
+ background: rgba(255, 255, 255, 0.2);
+       border-color: rgba(255, 255, 255, 0.4);
+        }
+
+    .user-avatar {
+   width: 32px;
+   height: 32px;
+ border-radius: 8px;
+            background: white;
+  color: #2563eb;
+   display: flex;
+ align-items: center;
+     justify-content: center;
+       font-weight: 700;
+          font-size: 14px;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+  right: 0;
+    margin-top: 8px;
+       background: white;
+            border-radius: 12px;
+   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            min-width: 220px;
+ display: none;
+   z-index: 1000;
+        overflow: hidden;
+        }
+
+        .user-dropdown.show {
+        display: block;
+animation: dropdownSlide 0.3s ease;
+        }
+
+      @@keyframes dropdownSlide {
+            from {
+      opacity: 0;
+   transform: translateY(-10px);
+            }
+   to {
+      opacity: 1;
+   transform: translateY(0);
+            }
+   }
+
+        .user-dropdown-header {
+padding: 16px;
+ background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+     color: white;
+        }
+
+        .user-dropdown-header .user-name {
+            font-weight: 700;
+  font-size: 15px;
+      margin-bottom: 4px;
+        }
+
+     .user-dropdown-header .user-role {
+            font-size: 12px;
+            opacity: 0.9;
+    text-transform: uppercase;
+  letter-spacing: 0.5px;
+        }
+
+ .user-dropdown-menu {
+       padding: 8px;
+ }
+
+        .dropdown-item-modern {
+    display: flex;
+      align-items: center;
+            gap: 10px;
+  padding: 12px 14px;
+      color: #374151;
+      text-decoration: none;
+      border-radius: 8px;
+        font-size: 14px;
+   font-weight: 500;
+   transition: all 0.2s ease;
+        }
+
+        .dropdown-item-modern:hover {
+            background: #f3f4f6;
+     color: #2563eb;
+            text-decoration: none;
+   }
+
+        .dropdown-divider {
+   height: 1px;
+    background: #e5e7eb;
+          margin: 8px 0;
+        }
+
+        /* Mobile Toggle */
+     .mobile-toggle {
+     display: none;
+      background: none;
+          border: 2px solid rgba(255, 255, 255, 0.3);
+       color: white;
+   padding: 8px 12px;
+         border-radius: 8px;
+     cursor: pointer;
+            font-size: 20px;
+     }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .navbar-container {
+         flex-wrap: wrap;
+padding: 0 20px;
+       }
+
+            .mobile-toggle {
+        display: block;
+            }
+
+    .navbar-nav-modern {
+     display: none;
+     width: 100%;
+                flex-direction: column;
+                padding: 10px 0;
+  }
+
+      .navbar-nav-modern.show {
+     display: flex;
+            }
+
+            .nav-link-modern {
+         padding: 12px 16px;
+         }
+
+     .user-menu {
+            width: 100%;
+     margin-top: 10px;
+  }
+
+     .user-menu-toggle {
+      width: 100%;
+          justify-content: center;
+            }
         }
         
-  /* Full width layout for auth pages */
+      /* Full width layout for auth pages */
         .full-width-content {
       width: 100%;
-            padding: 0;
-      margin: 0;
-        }
+     padding: 0;
+            margin: 0;
+  }
         
-        /* Standard container for regular pages */
- .standard-content {
-            padding-top: 20px;
+/* Standard container for regular pages */
+     .standard-content {
+          padding-top: 20px;
         }
     </style>
 </head>
@@ -36,44 +276,232 @@
     @* Only show navbar if not on auth page *@
     @if (ViewBag.HideNavbar != true)
     {
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark">
-            <div class="container">
-       @Html.ActionLink("MEDX", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
-                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" title="Activer/désactiver la navigation" aria-controls="navbarSupportedContent"
-    aria-expanded="false" aria-label="Toggle navigation">
-         <span class="navbar-toggler-icon"></span>
-      </button>
-   <div class="collapse navbar-collapse d-sm-inline-flex justify-content-between">
-            <ul class="navbar-nav flex-grow-1">
-     <li>@Html.ActionLink("Accueil", "Index", "Home", new { area = "" }, new { @class = "nav-link" })</li>
-  <li>@Html.ActionLink("À propos de", "About", "Home", new { area = "" }, new { @class = "nav-link" })</li>
-<li>@Html.ActionLink("Contact", "Contact", "Home", new { area = "" }, new { @class = "nav-link" })</li>
-           </ul>
-        </div>
+        <nav class="modern-navbar">
+            <div class="navbar-container">
+      <!-- Brand -->
+             <a href="@Url.Action("Index", "Home")" class="navbar-brand-modern">
+      <div class="brand-icon">
+         <span class="glyphicon glyphicon-plus"></span>
+   </div>
+  <span>MEDX</span>
+             </a>
+
+           <!-- Mobile Toggle -->
+        <button class="mobile-toggle" onclick="toggleMobileMenu()">
+        <span class="glyphicon glyphicon-menu-hamburger"></span>
+         </button>
+
+    <!-- Navigation Links -->
+     <ul class="navbar-nav-modern" id="navbarNav">
+        <li class="nav-item-modern">
+ <a href="@Url.Action("Index", "Home")" class="nav-link-modern">
+  <span class="glyphicon glyphicon-home"></span>
+      Accueil
+    </a>
+ </li>
+          
+           @if (Session["Role"] != null)
+   {
+ var role = Session["Role"].ToString().ToLower();
+     
+               if (role == "admin")
+  {
+     <li class="nav-item-modern">
+    <a href="@Url.Action("Index", "Admin")" class="nav-link-modern">
+       <span class="glyphicon glyphicon-dashboard"></span>
+     Dashboard
+    </a>
+  </li>
+    <li class="nav-item-modern">
+      <a href="@Url.Action("StaffList", "Admin")" class="nav-link-modern">
+  <span class="glyphicon glyphicon-user"></span>
+  Personnel
+      </a>
+    </li>
+       <li class="nav-item-modern">
+     <a href="@Url.Action("PatientsList", "Admin")" class="nav-link-modern">
+  <span class="glyphicon glyphicon-heart"></span>
+      Patients
+          </a>
+           </li>
+         }
+    else if (role == "medecin")
+        {
+     <li class="nav-item-modern">
+     <a href="@Url.Action("Index", "Doctor")" class="nav-link-modern">
+     <span class="glyphicon glyphicon-dashboard"></span>
+ Dashboard
+  </a>
+  </li>
+        <li class="nav-item-modern">
+ <a href="@Url.Action("Appointments", "Doctor")" class="nav-link-modern">
+     <span class="glyphicon glyphicon-calendar"></span>
+      Rendez-vous
+       </a>
+</li>
+       }
+          else if (role == "secretaire")
+   {
+             <li class="nav-item-modern">
+    <a href="@Url.Action("Index", "Secretary")" class="nav-link-modern">
+        <span class="glyphicon glyphicon-dashboard"></span>
+             Dashboard
+     </a>
+        </li>
+ <li class="nav-item-modern">
+  <a href="@Url.Action("AppointmentRequests", "Secretary")" class="nav-link-modern">
+         <span class="glyphicon glyphicon-list-alt"></span>
+        Demandes
+    </a>
+       </li>
+           }
+  else if (role == "patient")
+           {
+         <li class="nav-item-modern">
+<a href="@Url.Action("Index", "Patient")" class="nav-link-modern">
+    <span class="glyphicon glyphicon-dashboard"></span>
+        Mon espace
+   </a>
+            </li>
+    <li class="nav-item-modern">
+     <a href="@Url.Action("BookAppointment", "Patient")" class="nav-link-modern">
+       <span class="glyphicon glyphicon-calendar"></span>
+       Prendre RDV
+  </a>
+     </li>
+  }
+    }
+     else
+      {
+<li class="nav-item-modern">
+     <a href="@Url.Action("About", "Home")" class="nav-link-modern">
+  <span class="glyphicon glyphicon-info-sign"></span>
+ À propos
+        </a>
+ </li>
+   <li class="nav-item-modern">
+ <a href="@Url.Action("Contact", "Home")" class="nav-link-modern">
+             <span class="glyphicon glyphicon-envelope"></span>
+    Contact
+         </a>
+ </li>
+       }
+</ul>
+
+  <!-- User Menu -->
+     @if (Session["Role"] != null)
+    {
+           var userName = Session["UserName"]?.ToString() ?? "Utilisateur";
+    var userRole = Session["Role"]?.ToString() ?? "User";
+   var initials = "";
+      if (!string.IsNullOrEmpty(userName))
+  {
+   var parts = userName.Split(' ');
+       if (parts.Length > 1)
+        {
+initials = parts[0][0].ToString().ToUpper() + parts[1][0].ToString().ToUpper();
+         }
+       else
+          {
+       initials = userName.Substring(0, Math.Min(2, userName.Length)).ToUpper();
+        }
+            }
+
+         <div class="user-menu">
+        <div class="user-menu-toggle" onclick="toggleUserMenu()">
+   <div class="user-avatar">@initials</div>
+           <span>@userName</span>
+      <span class="glyphicon glyphicon-chevron-down" style="font-size: 10px;"></span>
     </div>
-        </nav>
+
+                 <div class="user-dropdown" id="userDropdown">
+     <div class="user-dropdown-header">
+          <div class="user-name">@userName</div>
+    <div class="user-role">@userRole</div>
+   </div>
+    <div class="user-dropdown-menu">
+  @{
+            var role = Session["Role"].ToString().ToLower();
+           var dashboardAction = "Index";
+            var dashboardController = "Home";
+            
+              if (role == "admin") { dashboardController = "Admin"; }
+            else if (role == "medecin") { dashboardController = "Doctor"; }
+  else if (role == "secretaire") { dashboardController = "Secretary"; }
+              else if (role == "patient") { dashboardController = "Patient"; }
+}
+       
+                 <a href="@Url.Action(dashboardAction, dashboardController)" class="dropdown-item-modern">
+       <span class="glyphicon glyphicon-dashboard"></span>
+          Mon tableau de bord
+         </a>
+       
+  <div class="dropdown-divider"></div>
+    
+         <a href="@Url.Action("Logout", "Auth")" class="dropdown-item-modern" style="color: #ef4444;">
+           <span class="glyphicon glyphicon-log-out"></span>
+     Déconnexion
+              </a>
+      </div>
+        </div>
+          </div>
+         }
+     else
+         {
+      <div class="user-menu">
+    <a href="@Url.Action("Login", "Auth")" class="user-menu-toggle" style="text-decoration: none; border: none;">
+      <span class="glyphicon glyphicon-log-in"></span>
+               Se connecter
+ </a>
+         </div>
+         }
+     </div>
+  </nav>
     }
 
     @* Conditional wrapper based on page type *@
     @if (ViewBag.FullWidth == true)
     {
         <div class="full-width-content">
-          @RenderBody()
-        </div>
+            @RenderBody()
+</div>
     }
     else
     {
-  <div class="container body-content standard-content">
+        <div class="container body-content standard-content">
        @RenderBody()
      <hr />
-        <footer>
-       <p>© @DateTime.Now.Year MEDX</p>
-  </footer>
-        </div>
+            <footer>
+          <p>© @DateTime.Now.Year MEDX</p>
+            </footer>
+     </div>
     }
 
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
+    
+    <script>
+        function toggleUserMenu() {
+    var dropdown = document.getElementById('userDropdown');
+            dropdown.classList.toggle('show');
+    }
+
+   function toggleMobileMenu() {
+    var nav = document.getElementById('navbarNav');
+nav.classList.toggle('show');
+        }
+
+      // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            var userMenu = document.querySelector('.user-menu');
+   var dropdown = document.getElementById('userDropdown');
+   
+            if (dropdown && !userMenu.contains(event.target)) {
+         dropdown.classList.remove('show');
+        }
+  });
+    </script>
+ 
     @RenderSection("scripts", required: false)
 </body>
 </html>

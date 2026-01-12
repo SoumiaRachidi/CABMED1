@@ -5,382 +5,494 @@
 }
 
 <style>
-    /* Professional Purple Medical Theme */
+    /* Unified Professional Admin Theme */
     :root {
-        --primary-purple: #7132CA;
-        --light-purple: #C47BE4;
-        --dark-purple: #301CA0;
-        --pink-accent: #F29AAE;
-        --white: #FFFFFF;
-        --light-bg: #F7F8FC;
-        --dark-text: #2C2C54;
-        --light-text: #8B8BA7;
-        --card-shadow: 0 4px 20px rgba(113, 50, 202, 0.12);
-        --hover-shadow: 0 8px 35px rgba(113, 50, 202, 0.2);
-        --gradient-primary: linear-gradient(135deg, #7132CA 0%, #C47BE4 100%);
+        --admin-primary: #1e40af;
+     --admin-primary-dark: #1e3a8a;
+ --admin-primary-light: #3b82f6;
+        --admin-accent: #60a5fa;
+        --admin-success: #10b981;
+        --admin-warning: #f59e0b;
+   --admin-danger: #ef4444;
+        --white: #ffffff;
+        --gray-50: #f8fafc;
+     --gray-100: #f1f5f9;
+    --gray-200: #e2e8f0;
+        --gray-300: #cbd5e1;
+   --gray-600: #475569;
+ --gray-700: #334155;
+--gray-900: #0f172a;
+--shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+    }
+
+  body {
+        background: var(--gray-50);
     }
 
     .patients-container {
-        max-width: 1400px;
-        margin: 30px auto;
-        padding: 0 20px;
-    }
+      max-width: 1400px;
+   margin: 30px auto;
+      padding: 0 20px;
+}
 
-    /* Header */
-    .page-header-custom {
-        background: var(--gradient-primary);
+    /* Page Header */
+    .page-header-patients {
+ background: linear-gradient(135deg, var(--admin-primary) 0%, var(--admin-primary-dark) 100%);
         color: white;
-        padding: 40px;
-        border-radius: 20px;
-        margin-bottom: 35px;
-        box-shadow: var(--card-shadow);
+        padding: 45px 40px;
+border-radius: 16px;
+        margin-bottom: 30px;
+ box-shadow: var(--shadow-xl);
         position: relative;
         overflow: hidden;
     }
 
-    .page-header-custom::before {
+    .page-header-patients::before {
         content: '';
         position: absolute;
-        top: -50%;
+    top: -50%;
         right: -10%;
-        width: 300px;
-        height: 300px;
+        width: 350px;
+        height: 350px;
         background: rgba(255, 255, 255, 0.08);
-        border-radius: 50%;
+     border-radius: 50%;
+  }
+
+    .page-header-patients .content {
+   position: relative;
+  z-index: 1;
     }
 
-    .page-header-custom h2 {
-        margin: 0;
-        font-size: 30px;
+    .page-header-patients h2 {
+        margin: 0 0 10px 0;
+        font-size: 32px;
         font-weight: 700;
-        position: relative;
-        z-index: 1;
-    }
+    display: flex;
+  align-items: center;
+        gap: 12px;
+  }
 
-    .page-header-custom p {
-        margin: 8px 0 0 0;
-        opacity: 0.95;
-        font-size: 15px;
-        position: relative;
-        z-index: 1;
+    .page-header-patients p {
+    margin: 0;
+      opacity: 0.95;
+        font-size: 16px;
     }
 
     /* Stats Bar */
     .stats-bar {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 20px;
-        margin-bottom: 35px;
+ grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 24px;
+        margin-bottom: 30px;
     }
 
     .stat-card {
-        background: white;
-        border-radius: 16px;
-        padding: 20px;
-        box-shadow: var(--card-shadow);
-        border: 1px solid rgba(113, 50, 202, 0.08);
+ background: white;
+   border-radius: 16px;
+        padding: 28px;
+        box-shadow: var(--shadow);
+   border: 1px solid var(--gray-200);
         text-align: center;
+    position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
     }
 
     .stat-card::before {
         content: '';
-        position: absolute;
-        top: 0;
+ position: absolute;
+    top: 0;
         left: 0;
         right: 0;
         height: 4px;
-        background: var(--gradient-primary);
-        border-radius: 16px 16px 0 0;
+   background: linear-gradient(90deg, var(--admin-primary), var(--admin-primary-light));
+    }
+
+    .stat-card:hover {
+   transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
     }
 
     .stat-value {
-        font-size: 32px;
+        font-size: 40px;
         font-weight: 700;
-        color: var(--primary-purple);
-        margin-bottom: 5px;
-    }
+        color: var(--admin-primary);
+        margin-bottom: 8px;
+        display: block;
+  }
 
     .stat-label {
-        font-size: 13px;
-        color: var(--light-text);
+        font-size: 14px;
+        color: var(--gray-600);
         font-weight: 600;
     }
 
     /* Search Bar */
-    .search-bar {
+    .search-section {
         background: white;
-        border: 1px solid rgba(113, 50, 202, 0.08);
-        border-radius: 16px;
-        padding: 25px;
-        margin-bottom: 28px;
-        box-shadow: var(--card-shadow);
-    }
+  border: 1px solid var(--gray-200);
+  border-radius: 16px;
+  padding: 28px;
+        margin-bottom: 30px;
+        box-shadow: var(--shadow);
+}
 
-    .search-input {
-        border-radius: 10px;
-        border: 2px solid rgba(113, 50, 202, 0.15);
-        padding: 12px 16px;
-        font-size: 14px;
-        transition: all 0.3s ease;
+    .search-box {
+        position: relative;
+ }
+
+.search-input {
+      border-radius: 12px;
+        border: 2px solid var(--gray-200);
+     padding: 14px 20px 14px 50px;
+        font-size: 15px;
+    transition: all 0.3s ease;
+        width: 100%;
     }
 
     .search-input:focus {
-        border-color: var(--primary-purple);
-        box-shadow: 0 0 0 4px rgba(113, 50, 202, 0.1);
-        outline: none;
+        border-color: var(--admin-primary);
+    box-shadow: 0 0 0 4px rgba(30, 64, 175, 0.1);
+  outline: none;
     }
+
+    .search-icon {
+      position: absolute;
+ left: 18px;
+top: 50%;
+        transform: translateY(-50%);
+        color: var(--gray-600);
+        font-size: 18px;
+    }
+
+    .btn-reset {
+        background: white;
+        border: 2px solid var(--gray-200);
+    color: var(--gray-700);
+    padding: 14px 24px;
+     border-radius: 12px;
+        font-weight: 600;
+        font-size: 14px;
+   transition: all 0.3s ease;
+     width: 100%;
+    }
+
+    .btn-reset:hover {
+        border-color: var(--admin-primary);
+   color: var(--admin-primary);
+background: rgba(30, 64, 175, 0.02);
+  }
 
     /* Patients Table */
-    .patients-table {
-        background: white;
+    .patients-table-container {
+     background: white;
         border-radius: 16px;
-        overflow: hidden;
-        box-shadow: var(--card-shadow);
-        border: 1px solid rgba(113, 50, 202, 0.08);
+    overflow: hidden;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-200);
     }
 
-    .patients-table table {
-        margin-bottom: 0;
+    .patients-table {
+        width: 100%;
+        margin: 0;
     }
 
-    .patients-table thead {
-        background: var(--gradient-primary);
+.patients-table thead {
+ background: linear-gradient(135deg, var(--admin-primary) 0%, var(--admin-primary-dark) 100%);
         color: white;
     }
 
     .patients-table thead th {
-        border: none;
-        padding: 18px 16px;
-        font-weight: 600;
-        text-transform: uppercase;
-        font-size: 12px;
-        letter-spacing: 0.8px;
+   border: none;
+     padding: 20px 18px;
+   font-weight: 600;
+      text-transform: uppercase;
+      font-size: 13px;
+     letter-spacing: 0.8px;
     }
 
     .patients-table tbody tr {
-        border-bottom: 1px solid rgba(113, 50, 202, 0.08);
+        border-bottom: 1px solid var(--gray-200);
         transition: all 0.3s ease;
     }
 
     .patients-table tbody tr:hover {
-        background-color: rgba(113, 50, 202, 0.03);
+  background-color: rgba(30, 64, 175, 0.02);
         transform: translateX(3px);
     }
 
     .patients-table tbody td {
-        padding: 20px 16px;
-        vertical-align: middle;
+padding: 22px 18px;
+   vertical-align: middle;
+    color: var(--gray-700);
+        font-size: 14px;
     }
 
-    .btn-details {
-        background: var(--gradient-primary);
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 10px;
-        font-weight: 600;
-        font-size: 13px;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 12px rgba(113, 50, 202, 0.25);
-        text-decoration: none;
-        display: inline-block;
-    }
-
-    .btn-details:hover {
-        background: linear-gradient(135deg, #301CA0 0%, #7132CA 100%);
-        color: white;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(113, 50, 202, 0.35);
-        text-decoration: none;
-    }
-
+    /* Patient Avatar */
     .patient-avatar {
-        width: 44px;
-        height: 44px;
-        border-radius: 12px;
-        background: var(--gradient-primary);
-        display: inline-flex;
-        align-items: center;
+  width: 48px;
+        height: 48px;
+  border-radius: 12px;
+        background: linear-gradient(135deg, var(--admin-primary), var(--admin-primary-light));
+    display: inline-flex;
+   align-items: center;
         justify-content: center;
         color: white;
         font-weight: 700;
         font-size: 16px;
-        box-shadow: 0 2px 10px rgba(113, 50, 202, 0.2);
-        margin-right: 12px;
+      box-shadow: 0 2px 10px rgba(30, 64, 175, 0.25);
+        margin-right: 14px;
     }
 
+    /* Details Button */
+    .btn-details {
+        background: linear-gradient(135deg, var(--admin-primary), var(--admin-primary-light));
+        color: white;
+        border: none;
+        padding: 11px 22px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 13px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(30, 64, 175, 0.25);
+      text-decoration: none;
+  display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .btn-details:hover {
+        background: linear-gradient(135deg, var(--admin-primary-dark), var(--admin-primary));
+     color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(30, 64, 175, 0.35);
+        text-decoration: none;
+    }
+
+    /* Empty State */
     .empty-state {
         text-align: center;
-        padding: 80px 20px;
-        background: white;
-        border-radius: 16px;
-        box-shadow: var(--card-shadow);
+   padding: 80px 20px;
     }
 
-    .empty-state-icon {
-        font-size: 80px;
-        color: rgba(113, 50, 202, 0.12);
-        margin-bottom: 24px;
+ .empty-state-icon {
+font-size: 80px;
+  color: var(--gray-300);
+     margin-bottom: 24px;
+    }
+
+    .empty-state h3 {
+        color: var(--gray-900);
+     font-size: 24px;
+        margin-bottom: 12px;
+        font-weight: 700;
+    }
+
+    .empty-state p {
+        color: var(--gray-600);
+        font-size: 15px;
+    }
+
+    /* Back Button */
+    .btn-back {
+        background: white;
+    color: var(--admin-primary);
+        border: 2px solid var(--gray-200);
+        padding: 14px 32px;
+   border-radius: 12px;
+        font-weight: 600;
+        font-size: 15px;
+        display: inline-flex;
+        align-items: center;
+ gap: 10px;
+  transition: all 0.3s ease;
+        text-decoration: none;
+    }
+
+    .btn-back:hover {
+        border-color: var(--admin-primary);
+   background: rgba(30, 64, 175, 0.02);
+   color: var(--admin-primary-dark);
+        transform: translateY(-2px);
+ box-shadow: var(--shadow);
+        text-decoration: none;
+    }
+
+    @@media (max-width: 768px) {
+     .page-header-patients {
+            padding: 30px 24px;
+   }
+
+    .page-header-patients h2 {
+       font-size: 24px;
+        }
+
+ .search-section {
+   padding: 20px;
+     }
+
+        .btn-reset {
+   margin-top: 12px;
+        }
     }
 </style>
 
 <div class="patients-container">
-    
-    <!-- Header -->
-    <div class="page-header-custom">
-        <h2>
-            <span class="glyphicon glyphicon-user"></span>
-            Liste des Patients
-        </h2>
-        <p>Consultez et gérez tous les patients du cabinet</p>
+    <!-- Page Header -->
+    <div class="page-header-patients">
+     <div class="content">
+          <h2>
+     <span class="glyphicon glyphicon-user"></span>
+ Liste des Patients
+            </h2>
+            <p>Consultez et gérez tous les patients du cabinet médical</p>
+        </div>
     </div>
 
     <!-- Stats Bar -->
     <div class="stats-bar">
-        <div class="stat-card" style="position: relative;">
-            <div class="stat-value">@(Model?.Count ?? 0)</div>
-            <div class="stat-label">Total Patients</div>
+        <div class="stat-card">
+            <span class="stat-value">@(Model?.Count ?? 0)</span>
+            <span class="stat-label">Total des patients enregistrés</span>
         </div>
     </div>
 
-    <!-- Search Bar -->
-    <div class="search-bar">
-        <div class="row">
-            <div class="col-md-10">
-                <div class="input-group">
-                    <span class="input-group-addon" style="background: var(--gradient-primary); color: white; border: none; border-radius: 10px 0 0 10px;">
-                        <span class="glyphicon glyphicon-search"></span>
-                    </span>
-                    <input type="text" 
-                           id="searchInput" 
-                           class="form-control search-input" 
-                           placeholder="Rechercher par nom, prénom, email ou téléphone..."
-                           style="border-left: none; border-radius: 0 10px 10px 0;">
-                </div>
-            </div>
-            <div class="col-md-2">
-                <button type="button" 
-                        class="btn btn-default btn-block" 
-                        onclick="clearSearch()"
-                        style="border-radius: 10px; border: 2px solid rgba(113, 50, 202, 0.15); font-weight: 600;">
-                    <span class="glyphicon glyphicon-refresh"></span>
-                    Réinitialiser
-                </button>
-            </div>
+    <!-- Search Section -->
+    <div class="search-section">
+      <div class="row">
+            <div class="col-md-9">
+    <div class="search-box">
+          <span class="search-icon glyphicon glyphicon-search"></span>
+ <input type="text" 
+   id="searchInput" 
+        class="search-input" 
+      placeholder="Rechercher par nom, prénom, email ou téléphone...">
+         </div>
+      </div>
+     <div class="col-md-3">
+ <button type="button" 
+           class="btn-reset" 
+            onclick="clearSearch()">
+       <span class="glyphicon glyphicon-refresh"></span>
+    Réinitialiser
+      </button>
+          </div>
         </div>
-    </div>
+ </div>
 
     <!-- Patients Table -->
     @if (Model != null && Model.Any())
     {
-        <div class="patients-table">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Patient</th>
-                        <th>Email</th>
-                        <th>Téléphone</th>
-                        <th>Date de naissance</th>
-                        <th style="text-align: center;">Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="patientsTableBody">
-                    @foreach (var patient in Model)
-                    {
-                        var initials = "";
-                        if (!string.IsNullOrEmpty(patient.Prenom) && !string.IsNullOrEmpty(patient.Nom))
-                        {
-                            initials = patient.Prenom[0].ToString().ToUpper() + patient.Nom[0].ToString().ToUpper();
-                        }
-                        
-                        <tr class="patient-row"
-                            data-search="@((patient.Prenom + " " + patient.Nom + " " + patient.Email + " " + patient.Telephone).ToLower())">
-                            
-                            <td>
-                                <div style="display: flex; align-items: center;">
-                                    <div class="patient-avatar">@initials</div>
-                                    <div>
-                                        <strong style="color: var(--dark-text);">@patient.Prenom @patient.Nom</strong><br>
-                                        <small class="text-muted">ID: @patient.UserId</small>
-                                    </div>
-                                </div>
-                            </td>
-                            
-                            <td>
-                                @if (!string.IsNullOrEmpty(patient.Email))
-                                {
-                                    <a href="mailto:@patient.Email" style="color: var(--primary-purple); text-decoration: none;">
-                                        @patient.Email
-                                    </a>
-                                }
-                                else
-                                {
-                                    <span class="text-muted">Non renseigné</span>
-                                }
-                            </td>
-                            
-                            <td>
-                                @if (!string.IsNullOrEmpty(patient.Telephone))
-                                {
-                                    <a href="tel:@patient.Telephone" style="color: var(--primary-purple); text-decoration: none;">
-                                        @patient.Telephone
-                                    </a>
-                                }
-                                else
-                                {
-                                    <span class="text-muted">Non renseigné</span>
-                                }
-                            </td>
-                            
-                            <td>
-                                @if (patient.DateNaissance.HasValue)
-                                {
-                                    <span>@patient.DateNaissance.Value.ToString("dd/MM/yyyy")</span>
-                                }
-                                else
-                                {
-                                    <span class="text-muted">Non renseigné</span>
-                                }
-                            </td>
-                            
-                            <td style="text-align: center;">
-                                <a href="@Url.Action("PatientDetails", "Admin", new { id = patient.UserId })" 
-                                   class="btn-details">
-                                    <span class="glyphicon glyphicon-eye-open"></span>
-                                    Voir détails
-                                </a>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+        <div class="patients-table-container">
+       <table class="patients-table table">
+            <thead>
+       <tr>
+          <th>Patient</th>
+         <th>Email</th>
+          <th>Téléphone</th>
+      <th>Date de naissance</th>
+             <th style="text-align: center;">Actions</th>
+    </tr>
+</thead>
+   <tbody id="patientsTableBody">
+@foreach (var patient in Model)
+     {
+   var initials = "";
+         if (!string.IsNullOrEmpty(patient.Prenom) && !string.IsNullOrEmpty(patient.Nom))
+          {
+  initials = patient.Prenom[0].ToString().ToUpper() + patient.Nom[0].ToString().ToUpper();
+         }
+        
+           <tr class="patient-row"
+         data-search="@((patient.Prenom + " " + patient.Nom + " " + patient.Email + " " + patient.Telephone).ToLower())">
+    
+       <td>
+          <div style="display: flex; align-items: center;">
+        <div class="patient-avatar">@initials</div>
+   <div>
+      <strong style="color: var(--gray-900); font-size: 15px;">@patient.Prenom @patient.Nom</strong><br>
+                  <small style="color: var(--gray-600);">ID: @patient.UserId</small>
+               </div>
+        </div>
+        </td>
+   
+    <td>
+             @if (!string.IsNullOrEmpty(patient.Email))
+              {
+       <a href="mailto:@patient.Email" style="color: var(--admin-primary); text-decoration: none; font-weight: 500;">
+        @patient.Email
+           </a>
+   }
+     else
+ {
+         <span style="color: var(--gray-600);">Non renseigné</span>
+   }
+             </td>
+        
+         <td>
+         @if (!string.IsNullOrEmpty(patient.Telephone))
+             {
+    <a href="tel:@patient.Telephone" style="color: var(--admin-primary); text-decoration: none; font-weight: 500;">
+         @patient.Telephone
+        </a>
+              }
+  else
+  {
+          <span style="color: var(--gray-600);">Non renseigné</span>
+         }
+    </td>
+     
+        <td>
+ @if (patient.DateNaissance.HasValue)
+     {
+            <span style="font-weight: 500;">@patient.DateNaissance.Value.ToString("dd/MM/yyyy")</span>
+          }
+  else
+         {
+    <span style="color: var(--gray-600);">Non renseigné</span>
+  }
+     </td>
+ 
+    <td style="text-align: center;">
+     <a href="@Url.Action("PatientDetails", "Admin", new { id = patient.UserId })" 
+   class="btn-details">
+   <span class="glyphicon glyphicon-eye-open"></span>
+   Voir détails
+  </a>
+         </td>
+                </tr>
+    }
+         </tbody>
+        </table>
         </div>
 
-        <!-- No Results Message -->
-        <div id="noResultsMessage" class="empty-state" style="display: none; margin-top: 20px;">
+<!-- No Results Message -->
+        <div id="noResultsMessage" class="empty-state" style="display: none; margin-top: 30px; background: white; border-radius: 16px; box-shadow: var(--shadow);">
             <div class="empty-state-icon">
-                <span class="glyphicon glyphicon-search"></span>
+       <span class="glyphicon glyphicon-search"></span>
             </div>
-            <h3>Aucun résultat trouvé</h3>
-            <p>Essayez de modifier vos critères de recherche</p>
+      <h3>Aucun résultat trouvé</h3>
+ <p>Essayez de modifier vos critères de recherche</p>
         </div>
     }
     else
     {
-        <div class="empty-state">
+    <div class="empty-state" style="background: white; border-radius: 16px; box-shadow: var(--shadow);">
             <div class="empty-state-icon">
-                <span class="glyphicon glyphicon-inbox"></span>
-            </div>
+    <span class="glyphicon glyphicon-inbox"></span>
+          </div>
             <h3>Aucun patient</h3>
-            <p>Il n'y a pas encore de patients enregistrés dans le système.</p>
-        </div>
+       <p>Il n'y a pas encore de patients enregistrés dans le système.</p>
+   </div>
     }
 
     <!-- Back Button -->
-    <div class="text-center" style="margin-top: 35px;">
-        <a href="@Url.Action("Index", "Secretary")" class="btn btn-default btn-lg" style="border-radius: 12px; padding: 13px 32px; border: 2px solid rgba(113, 50, 202, 0.15); background: white; color: #7132CA; font-weight: 600;">
-            <span class="glyphicon glyphicon-arrow-left"></span>
-            Retour au tableau de bord
+    <div class="text-center" style="margin-top: 40px;">
+        <a href="@Url.Action("Index", "Admin")" class="btn-back">
+     <span class="glyphicon glyphicon-arrow-left"></span>
+          Retour au tableau de bord
         </a>
     </div>
 
@@ -388,42 +500,42 @@
 
 @section Scripts {
 <script>
-    $(document).ready(function() {
-        $('#searchInput').on('keyup', function() {
+  $(document).ready(function() {
+ $('#searchInput').on('keyup', function() {
             filterPatients();
-        });
+     });
     });
 
-    function filterPatients() {
+ function filterPatients() {
         var searchText = $('#searchInput').val().toLowerCase();
         var visibleCount = 0;
 
         $('.patient-row').each(function() {
-            var row = $(this);
-            var searchData = row.data('search');
-            
-            if (searchText === '' || searchData.indexOf(searchText) > -1) {
-                row.show();
-                visibleCount++;
-            } else {
-                row.hide();
-            }
+  var row = $(this);
+ var searchData = row.data('search');
+    
+if (searchText === '' || searchData.indexOf(searchText) > -1) {
+           row.show();
+             visibleCount++;
+     } else {
+         row.hide();
+}
         });
 
         if (visibleCount === 0) {
-            $('#noResultsMessage').show();
-            $('.patients-table').hide();
-        } else {
-            $('#noResultsMessage').hide();
-            $('.patients-table').show();
-        }
+   $('#noResultsMessage').show();
+ $('.patients-table-container').hide();
+      } else {
+         $('#noResultsMessage').hide();
+ $('.patients-table-container').show();
+  }
     }
 
     function clearSearch() {
-        $('#searchInput').val('');
-        $('.patient-row').show();
+     $('#searchInput').val('');
+    $('.patient-row').show();
         $('#noResultsMessage').hide();
-        $('.patients-table').show();
+        $('.patients-table-container').show();
     }
 </script>
 }

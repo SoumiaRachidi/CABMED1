@@ -5,6 +5,7 @@ using System.Web.Mvc;
 using System.Web.Security;
 using CABMED.Models;
 using CABMED.ViewModels;
+using CABMED.Services;
 
 namespace CABMED.Controllers
 {
@@ -317,8 +318,8 @@ namespace CABMED.Controllers
                     db.SaveChanges();
                     tx.Commit();
 
-                    TempData["SuccessMessage"] = "Profil mis à jour avec succès.";
-                    return RedirectToAction("EditStaff", new { id = model.UserId });
+                    TempData["SuccessMessage"] = $"Le profil de {staff.Prenom} {staff.Nom} a été mis à jour avec succès.";
+                    return RedirectToAction("StaffList");
                 }
                 catch
                 {
@@ -327,6 +328,27 @@ namespace CABMED.Controllers
                     ModelState.AddModelError("", "Erreur lors de la mise à jour du profil.");
                     return View(model);
                 }
+            }
+        }
+
+        // POST: Admin/ClearTestData
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult ClearTestData()
+        {
+            if (!CheckAdminAccess())
+            {
+                return Json(new { success = false, message = "Accès non autorisé" });
+            }
+
+            try
+            {
+                AppointmentRequestRepository.Reset();
+                return Json(new { success = true, message = "Toutes les demandes de rendez-vous ont été supprimées avec succès." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Erreur: " + ex.Message });
             }
         }
 
