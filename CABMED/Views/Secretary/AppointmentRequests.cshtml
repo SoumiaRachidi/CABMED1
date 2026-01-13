@@ -214,7 +214,7 @@
         border-radius: 8px;
     }
     
-    .assigned-doctor .glyphicon {
+    .assigned-doctor . glyphicon {
         color: var(--primary-orange);
     }
     
@@ -554,13 +554,13 @@ border-color: var(--primary-orange);
                              !statusLabel.Equals("Refusé", StringComparison.InvariantCultureIgnoreCase))
                         {
                             <button class="btn btn-approve" onclick="approveRequest(@request.RequestId, '@encodedName')">
-                                <span class=" glyphicon glyphicon-ok"></span>
-                                Approuver
-                            </button>
-                            <button class="btn btn-decline" onclick="declineRequest(@request.RequestId, '@encodedName')">
-                                <span class="glyphicon glyphicon-remove"></span>
-                                Refuser
-                            </button>
+     <span class="glyphicon glyphicon-ok"></span>
+     Approuver
+       </button>
+      <button class="btn btn-decline" onclick="declineRequest(@request.RequestId, '@encodedName')">
+    <span class="glyphicon glyphicon-remove"></span>
+          Refuser
+              </button>
                         }
                     </div>
                 </div>
@@ -727,19 +727,19 @@ border-color: var(--primary-orange);
                 case 'medium':
                     show = priority === 'moyen';
                     break;
-                case 'low',
-                    show = priority === 'faible';
-                    break;
-                case 'today':
-                    show = true;
-                    break;
-            }
+                 case 'low':
+    show = priority === 'faible';
+        break;
+             case 'today':
+            show = true;
+      break;
+   }
             
-            if (show) {
-                $(this).show();
-            } else {
-                $(this).hide();
-            }
+          if (show) {
+  $(this).show();
+    } else {
+  $(this).hide();
+      }
         });
     }
     
