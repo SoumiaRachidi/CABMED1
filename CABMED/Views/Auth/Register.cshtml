@@ -377,8 +377,8 @@ color: var(--accent-orange);
 
 <div class="auth-page">
     <div class="auth-container">
-        <div class="auth-card">
-            <div class="auth-header">
+      <div class="auth-card">
+     <div class="auth-header">
     <div class="auth-header-icon">
    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
          <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
@@ -388,14 +388,14 @@ color: var(--accent-orange);
        <p>Rejoignez MEDX et gérez vos rendez-vous en ligne</p>
        </div>
 
- <div class="auth-body">
-   @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+<div class="auth-body">
+    @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
 
-         @using (Html.BeginForm("Register", "Auth", FormMethod.Post))
-            {
-            @Html.AntiForgeryToken()
+      @using (Html.BeginForm("Register", "Auth", FormMethod.Post))
+     {
+   @Html.AntiForgeryToken()
 
-    <div class="form-section">
+            <div class="form-section">
     <div class="form-section-title">
          Informations personnelles
        </div>
@@ -493,37 +493,31 @@ color: var(--accent-orange);
       @Html.ValidationMessageFor(m => m.AntecedentsMedicaux, "", new { @class = "text-danger" })
           </div>
 
-         <div class="form-group">
-   <label for="Role">Type de compte *</label>
-                <select id="Role" name="Role" class="form-control">
-            <option value="patient" @(Model?.Role == "patient" ? "selected" : "")>Patient</option>
-     <option value="admin" @(Model?.Role == "admin" ? "selected" : "")>Administrateur</option>
- </select>
-           </div>
-         </div>
-
-       <button type="submit" class="btn-auth">
-    Créer mon compte →
-        </button>
-             }
-
-    <div class="divider">
-   <span>OU</span>
+           @Html.Hidden("Role", "patient")
     </div>
 
-    <div class="auth-footer">
-     <p>Vous avez déjà un compte ?</p>
-<a href="@Url.Action("Login", "Auth")" class="btn-secondary-auth">
-      Se connecter
-        </a>
-          </div>
-   </div>
-        </div>
+       <button type="submit" class="btn-auth">
+ Créer mon compte →
+     </button>
+  }
 
-      <div class="brand-link">
-     <a href="@Url.Action("Index", "Home")">← Retour à l'accueil</a>
+         <div class="divider">
+         <span>OU</span>
+          </div>
+
+          <div class="auth-footer">
+         <p>Vous avez déjà un compte ?</p>
+       <a href="@Url.Action("Login", "Auth")" class="btn-secondary-auth">
+         Se connecter
+            </a>
+   </div>
+   </div>
+    </div>
+
+        <div class="brand-link">
+ <a href="@Url.Action("Index", "Home")">← Retour à l'accueil</a>
         </div>
- </div>
+    </div>
 </div>
 
 @section Scripts {
